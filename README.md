@@ -1,3 +1,5 @@
+> Equipo: consultar [reparto vigente y cuatro prompts](docs/equipo/00-coordinacion.md). El integrante 1 es Laureano.
+
 > Actualización multirrefugio: consultar [implementación, roles y actualización](docs/10-multirrefugio.md). Las referencias a un refugio único y al estado previo de los PR pertenecen a la etapa inicial.
 
 ﻿# Huella · Proyecto Final UTN
