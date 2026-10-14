@@ -44,8 +44,9 @@ return new class extends Migration
         // El rollback elimina la separación; nunca se ejecuta como actualización normal.
         DB::table('users')->where('role', 'superadmin')->update(['role' => 'adoptante']);
         Schema::table('animals', function (Blueprint $t) {
+            $t->dropForeign(['shelter_id']);
             $t->dropIndex(['shelter_id', 'availability_status']);
-            $t->dropConstrainedForeignId('shelter_id');
+            $t->dropColumn('shelter_id');
         });
         Schema::table('users', fn (Blueprint $t) => $t->dropConstrainedForeignId('shelter_id'));
         Schema::dropIfExists('shelters');
