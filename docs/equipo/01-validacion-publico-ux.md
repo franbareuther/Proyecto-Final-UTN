@@ -2,6 +2,7 @@
 
 Fecha: 14 de octubre de 2026. Rama: `feature/equipo-1-publico-ux`.
 Base publicada: `origin/feature/huella-multirrefugio`, commit `3c3e0fc`.
+Entrega publicada: [PR #9 en borrador](https://github.com/franbareuther/Proyecto-Final-UTN/pull/9), con `Refs #2` y revisión solicitada por responsabilidad en la descripción. El conector devolvió 403 al crearlo; se publicó mediante la autenticación Git existente, sin mostrar credenciales.
 Los PR #7 y #8 continúan abiertos y sin integrar; esta entrega depende de ellos y propone su diff contra la base multirrefugio.
 
 ## Diagnóstico y alcance
