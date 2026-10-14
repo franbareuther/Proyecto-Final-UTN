@@ -16,7 +16,9 @@ class AdoptionRequestController extends Controller
 {
     public function create(Animal $animal)
     {
-        abort_unless($animal->availability_status === 'Disponible', 409, 'Animal no disponible.');
+        if ($animal->availability_status !== 'Disponible') {
+            return to_route('animals.show', $animal)->with('error', 'Este animal ya no recibe nuevas solicitudes. Podés consultar su estado en el perfil.');
+        }
 
         return Inertia::render('Adoptante/Apply', ['animal' => $animal->load('photos')]);
     }

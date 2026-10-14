@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, useState } from 'react';
 import { Animal, Application, Page, Shared } from '@/types/shelter';
 import Modal from '@/Components/Modal';
+import { DialogTitle } from '@headlessui/react';
 
 export const date = (value: string) =>
     new Date(value.slice(0, 10) + 'T12:00:00').toLocaleDateString('es-AR');
@@ -100,12 +101,19 @@ export function Confirm({
     const [open, setOpen] = useState(false);
     return (
         <>
-            <button type="button" className="btn-secondary" onClick={() => setOpen(true)}>
+            <button
+                type="button"
+                className="btn-secondary"
+                disabled={busy}
+                onClick={() => setOpen(true)}
+            >
                 {label}
             </button>
-            <Modal show={open} onClose={() => setOpen(false)}>
+            <Modal show={open} closeable={!busy} onClose={() => setOpen(false)}>
                 <div className="p-7">
-                    <h2 className="text-xl font-semibold">{title}</h2>
+                    <DialogTitle as="h2" className="text-xl font-semibold">
+                        {title}
+                    </DialogTitle>
                     <div className="my-5 text-stone-600">{children}</div>
                     <div className="flex gap-3">
                         <button
@@ -161,10 +169,10 @@ export function AnimalCard({ animal }: { animal: Animal }) {
                 </p>
                 <p className="mt-4 text-sm">
                     {animal.sex} · {animal.size} ·{' '}
-                    {animal.estimated_age !== null
-                        ? `${animal.estimated_age} meses aprox.`
-                        : animal.birth_date
-                          ? `Nació el ${date(animal.birth_date)}`
+                    {animal.birth_date
+                        ? `Nació el ${date(animal.birth_date)}`
+                        : animal.estimated_age !== null
+                          ? `${animal.estimated_age} meses aprox.`
                           : 'Edad a confirmar'}
                 </p>
             </div>
@@ -299,6 +307,14 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                         (internal ? 'min-w-0 lg:p-10' : '')
                     }
                 >
+                    {flash.error && (
+                        <div
+                            role="alert"
+                            className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-950"
+                        >
+                            {flash.error}
+                        </div>
+                    )}
                     {flash.success && (
                         <div
                             role="status"

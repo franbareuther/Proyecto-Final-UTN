@@ -1,6 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import { Application, Page } from '@/types/shelter';
-import { Field, Pagination, RequestList, Shell, Title } from '@/Components/Shelter';
+import { Errors, Field, Pagination, RequestList, Shell, Title } from '@/Components/Shelter';
 export default function Requests({
     requests,
     filters,
@@ -41,6 +41,7 @@ export default function Requests({
                     Buscar
                 </button>
             </form>
+            <Errors errors={f.errors} />
             <RequestList requests={requests.data} admin />
             <Pagination page={requests} />
         </Shell>

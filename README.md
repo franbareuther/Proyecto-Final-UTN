@@ -44,6 +44,8 @@ Por defecto los tests usan SQLite en memoria **solo para testing**. La aplicaci�
 - [Arquitectura y seguridad](docs/05-arquitectura.md)
 - [Instalación XAMPP, Apache opcional y testing](docs/06-instalacion.md)
 - [Estado de implementación y pendientes](docs/07-plan-de-desarrollo.md)
+- [Distribución de cuatro integrantes y secuencia de integración](docs/08-distribucion-equipo.md)
+- [Revisión funcional y matriz visual manual](docs/09-revision-plataforma.md)
 - [Informe de ejecución](docs/informe-ejecucion.md)
 - [Contribuir mediante ramas y PRs](CONTRIBUTING.md)
 - [Créditos de fotografías demo](docs/creditos-imagenes.md)

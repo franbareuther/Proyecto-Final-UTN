@@ -70,7 +70,7 @@ export interface MedicalRecord {
 }
 export type Shared = {
     auth: { user: Person | null };
-    flash: { success?: string };
+    flash: { success?: string; error?: string };
     shelterName: string;
     [key: string]: unknown;
 };
