@@ -42,8 +42,16 @@ function domainSnapshot(): array
 
 function checkPage(Client $client, string $path, string $component): array
 {
-    $version = app(HandleInertiaRequests::class)->version(Request::create('/'));
-    $response = $client->get($path, ['headers' => ['X-Inertia' => 'true', 'X-Inertia-Version' => $version ?? '', 'Accept' => 'text/html']]);
+    // Un build concurrente puede cambiar la versión entre el cálculo y la petición.
+    // Repetir una vez el GET de lectura, como actualización de assets de Inertia.
+    for ($attempt = 0; $attempt < 2; $attempt++) {
+        clearstatcache();
+        $version = app(HandleInertiaRequests::class)->version(Request::create('/'));
+        $response = $client->get($path, ['headers' => ['X-Inertia' => 'true', 'X-Inertia-Version' => $version ?? '', 'Accept' => 'text/html']]);
+        if ($response->getStatusCode() !== 409 || ! $response->hasHeader('X-Inertia-Location')) {
+            break;
+        }
+    }
     $page = json_decode((string) $response->getBody(), true);
     if ($response->getStatusCode() !== 200 || ($page['component'] ?? null) !== $component) {
         throw new RuntimeException('Respuesta inesperada: '.$path.' (HTTP '.$response->getStatusCode().').');
