@@ -1,0 +1,76 @@
+export interface Person {
+    id: number;
+    name: string;
+    last_name: string;
+    email: string;
+    email_verified_at?: string;
+    role: 'admin' | 'adoptante' | 'veterinario';
+}
+export interface Photo {
+    id: number;
+    file_path: string;
+    is_primary: boolean;
+}
+export interface Animal {
+    id: number;
+    name: string;
+    species: string;
+    breed: string;
+    sex: string;
+    birth_date: string | null;
+    estimated_age: number | null;
+    size: string;
+    color: string;
+    description: string;
+    personality: string;
+    entry_date: string;
+    availability_status: string;
+    public_health_info: string;
+    photo_url: string;
+    photos: Photo[];
+}
+export interface Page<T> {
+    data: T[];
+    total: number;
+    links: { url: string | null; label: string; active: boolean }[];
+}
+export interface Application {
+    id: number;
+    animal: Animal;
+    user: Person;
+    status: string;
+    created_at: string;
+    phone: string;
+    address: string;
+    housing_type: string;
+    has_other_pets: boolean;
+    previous_experience: string;
+    motivation: string;
+    additional_information: string;
+    history: {
+        id: number;
+        new_status: string;
+        observations: string;
+        created_at: string;
+        actor: Person;
+    }[];
+}
+export interface Adoption {
+    id: number;
+    animal: Animal;
+    user: Person;
+    adoption_date: string;
+}
+export interface MedicalRecord {
+    id: number;
+    veterinarian_id: number;
+    veterinarian?: Person;
+    animal?: Animal;
+    [key: string]: unknown;
+}
+export type Shared = {
+    auth: { user: Person | null };
+    flash: { success?: string };
+    shelterName: string;
+    [key: string]: unknown;
+};
