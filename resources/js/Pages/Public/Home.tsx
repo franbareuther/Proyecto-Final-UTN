@@ -3,6 +3,7 @@ import { Animal, Refuge } from '@/types/shelter';
 import { AnimalCard, Badge, Empty, Shell } from '@/Components/Shelter';
 import AnimalImage from '@/Components/AnimalImage';
 import Icon from '@/Components/Icon';
+import ShelterImage from '@/Components/ShelterImage';
 
 export default function Home({ animals, refuges = [] }: { animals: Animal[]; refuges?: Refuge[] }) {
     const featured = animals[0];
@@ -107,8 +108,8 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
                     </div>
                 ) : (
                     <Empty>
-                        Pronto vas a conocer a los animales del refugio. Mientras tanto, descubrí
-                        cómo funciona la adopción.
+                        Pronto vas a conocer a los animales de la red. Mientras tanto, descubrí cómo
+                        funciona la adopción.
                     </Empty>
                 )}
             </section>
@@ -128,6 +129,12 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
                             className="card hover:border-emerald-800"
                             href={`/refugios/${s.slug}`}
                         >
+                            <ShelterImage
+                                src={s.image_url}
+                                name={s.name}
+                                kind={s.image_type}
+                                className="mb-4"
+                            />
                             <p className="eyebrow">{s.city || 'Red Huella'}</p>
                             <h3 className="mt-3 text-xl font-semibold">{s.name}</h3>
                             <p className="mt-4 text-sm text-emerald-800">
@@ -168,7 +175,7 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
                         {
                             number: '02',
                             title: 'Contanos sobre vos',
-                            text: 'Creá tu cuenta y completá la solicitud. Conocer tu hogar nos ayuda a acompañar una adopción responsable.',
+                            text: 'Creá tu cuenta y completá la solicitud. El refugio responsable del animal la recibe y evalúa para acompañar una adopción responsable.',
                         },
                         {
                             number: '03',
@@ -206,9 +213,9 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
                 </div>
                 <div className="min-w-0">
                     <p className="reading-copy text-lg leading-relaxed text-stone-700">
-                        En la red Huella creemos en las segundas oportunidades. Cuidamos y
-                        acompañamos a cada animal mientras encuentra una familia que respete sus
-                        tiempos y lo quiera durante toda su vida.
+                        Huella conecta a familias con refugios de la red. Cada institución cuida a
+                        sus animales, informa sobre sus necesidades y evalúa las solicitudes de
+                        adopción. La plataforma permite conocerlos y seguir ese recorrido.
                     </p>
                     <div className="mt-7 grid gap-4 sm:grid-cols-2">
                         <div className="rounded-2xl border border-stone-200 bg-white p-5">

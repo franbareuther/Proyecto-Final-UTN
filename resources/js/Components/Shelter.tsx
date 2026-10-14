@@ -332,7 +332,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
     const admin = auth.user?.role === 'admin';
     const superadmin = auth.user?.role === 'superadmin';
     const staff = admin;
-    const catalogUrl = currentShelter ? `/refugios/${currentShelter.slug}/animales` : '/refugios';
+    const catalogUrl = currentShelter ? `/refugios/${currentShelter.slug}/animales` : '/animales';
     useEffect(() => router.on('navigate', () => setOpen(false)), []);
     useEffect(() => {
         if (!open) return;
@@ -436,7 +436,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                                 huella<span className="text-huella-clay">.</span>
                             </span>
                             <span className="mt-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em]">
-                                Refugio y adopciones
+                                Red de refugios
                             </span>
                         </span>
                     </Link>
@@ -538,7 +538,13 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                                 href={catalogUrl}
                                 className="block py-2 text-sm underline-offset-4 hover:underline"
                             >
-                                {currentShelter ? 'Animales del refugio' : 'Conocer los refugios'}
+                                {currentShelter ? 'Animales del refugio' : 'Animales en adopción'}
+                            </Link>
+                            <Link
+                                href="/refugios"
+                                className="block py-2 text-sm underline-offset-4 hover:underline"
+                            >
+                                Refugios
                             </Link>
                             <Link
                                 href="/#como-funciona"

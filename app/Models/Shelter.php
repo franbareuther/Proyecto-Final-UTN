@@ -3,10 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Shelter extends Model
 {
-    protected $fillable = ['name', 'slug', 'description', 'city', 'address', 'email', 'phone', 'active'];
+    protected $fillable = ['name', 'slug', 'description', 'city', 'address', 'email', 'phone', 'active', 'image_type'];
+
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image_path ? Storage::disk('public')->url($this->image_path) : null;
+    }
 
     protected function casts(): array
     {
