@@ -1,6 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Animal, Page } from '@/types/shelter';
-import { Badge, Empty, Field, Pagination, Shell, Title } from '@/Components/Shelter';
+import { Badge, Empty, Errors, Field, Pagination, Shell, Title } from '@/Components/Shelter';
 export default function Index({
     animals,
     filters,
@@ -34,6 +34,7 @@ export default function Index({
                     Buscar
                 </button>
             </form>
+            <Errors errors={f.errors} />
             {animals.data.length ? (
                 <div className="grid gap-4 md:grid-cols-2">
                     {animals.data.map((a) => (
