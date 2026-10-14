@@ -2,6 +2,8 @@
 
 `main` es la rama estable. No hacer commits de funcionalidad ni merges automáticos sobre ella. Toda implementación se propone mediante Pull Request y se revisa por otro integrante.
 
+**Antes de la integración inicial:** main todavía no contiene la aplicación. Revisar PR #1 y su PR dependiente de `review/revision-equipo`, siguiendo la [secuencia de integración y reparto de archivos](docs/08-distribucion-equipo.md). Crear las ramas de funcionalidad desde main solamente después de que el equipo autorice e integre esa base. Las [Issues #2–#5](https://github.com/franbareuther/Proyecto-Final-UTN/issues) ya distribuyen las cuatro responsabilidades; reutilizarlas para no duplicar trabajo.
+
 ## Preparar el entorno
 
 ```powershell
@@ -13,6 +15,8 @@ Copy-Item .env.example .env
 ```
 
 Configurar MySQL de XAMPP y seguir [instalación](docs/06-instalacion.md). Luego ejecutar key:generate, migrate, storage:link y, si corresponde, DemoSeeder. Nunca usar datos demo en producción ni compartir .env. Consultar [arquitectura](docs/05-arquitectura.md) y [modelo de datos](docs/04-base-de-datos.md).
+
+Durante la revisión de la instalación existente no repetir esos pasos de inicialización: conservar .env, APP_KEY y MariaDB en 3307. Ver [matriz de revisión manual](docs/09-revision-plataforma.md). Los comandos de inicialización se aplican a una instalación personal nueva.
 
 ## Ramas y commits
 
