@@ -4,6 +4,8 @@ Plan basado en el código de `feature/plataforma-refugio` (`de50fcd`) y las corr
 
 La revisión real, las limitaciones y la matriz manual están en [09-revision-plataforma.md](09-revision-plataforma.md). Las responsabilidades siguientes son lógicas; el equipo debe asociarlas con sus nombres y usuarios GitHub. No se inventaron asignaciones nominales.
 
+Entrega de esta etapa: [PR #6](https://github.com/franbareuther/Proyecto-Final-UTN/pull/6), en borrador, con base `feature/plataforma-refugio`. No contiene un merge a main ni modifica el estado del PR #1.
+
 ## Propiedad de archivos y coordinación
 
 Cada fila tiene un solo responsable principal. Otros integrantes pueden proponer cambios mediante PR, con revisión del propietario. La carpeta `Admin` no define por sí sola la responsabilidad de negocio.

@@ -4,6 +4,8 @@
 
 Se inspeccionó la implementación existente y se trabajó sobre `review/revision-equipo`, derivada de `feature/plataforma-refugio` en `de50fcd`. No se reconstruyó el sistema ni se modificaron reglas de AdoptionService. PR #1 permanece abierto en borrador; main no fue modificado en esta etapa.
 
+Cambios publicados en [PR #6](https://github.com/franbareuther/Proyecto-Final-UTN/pull/6), con base `feature/plataforma-refugio`: `1889f62` corrige navegación y mensajes; `c0b7865` incorpora distribución, matriz y recorrido HTTP; `1e4695c` permite repetir una consulta de lectura si un build concurrente cambia la versión de assets de Inertia. GitHub Actions se consulta en ese PR; sus resultados se distinguen de los checks locales de este documento.
+
 **No había navegador disponible:** computer-use devolvió `apps: []` y `browsers: []`. No se ejecutó React en un navegador ni se capturaron pantallas. No se comprobaron visualmente escritorio, tablet, celular, teclado, contraste ni lector de pantalla. El análisis de JSX/CSS, el build y las respuestas HTTP no reemplazan esas pruebas. Toda celda visual de la matriz inferior está pendiente.
 
 Servicios existentes comprobados:
