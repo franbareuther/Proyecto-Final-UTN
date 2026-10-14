@@ -16,11 +16,12 @@ class AdoptionRequestController extends Controller
 {
     public function create(Animal $animal)
     {
+        abort_unless($animal->shelter?->active, 404);
         if ($animal->availability_status !== 'Disponible') {
             return to_route('animals.show', $animal)->with('error', 'Este animal ya no recibe nuevas solicitudes. Podés consultar su estado en el perfil.');
         }
 
-        return Inertia::render('Adoptante/Apply', ['animal' => $animal->load('photos')]);
+        return Inertia::render('Adoptante/Apply', ['animal' => $animal->load(['photos', 'shelter'])]);
     }
 
     public function store(StoreAdoptionRequest $r, Animal $animal, AdoptionService $service)
@@ -32,20 +33,20 @@ class AdoptionRequestController extends Controller
 
     public function mine(Request $r)
     {
-        return Inertia::render('Adoptante/Requests', ['requests' => $r->user()->adoptionRequests()->with('animal.photos')->latest()->paginate(10)]);
+        return Inertia::render('Adoptante/Requests', ['requests' => $r->user()->adoptionRequests()->with('animal.photos', 'animal.shelter')->latest()->paginate(10)]);
     }
 
     public function show(AdoptionRequest $adoptionRequest)
     {
         Gate::authorize('view', $adoptionRequest);
 
-        return Inertia::render('Adoptante/RequestDetail', ['application' => $adoptionRequest->load(['animal.photos', 'user:id,name,last_name,email', 'history'])]);
+        return Inertia::render('Adoptante/RequestDetail', ['application' => $adoptionRequest->load(['animal.photos', 'animal.shelter', 'user:id,name,last_name,email', 'history'])]);
     }
 
     public function index(Request $r)
     {
         $f = $r->validate(['q' => 'nullable|string|max:100', 'status' => ['nullable', Rule::in(['Nueva', 'En revisión', 'Aprobada', 'Rechazada', 'Adoptado'])]]);
-        $q = AdoptionRequest::with(['animal.photos', 'user:id,name,last_name,email']);
+        $q = AdoptionRequest::with(['animal.photos', 'animal.shelter', 'user:id,name,last_name,email']);
         if ($r->filled('status')) {
             $q->where('status', $f['status']);
         }
@@ -67,6 +68,6 @@ class AdoptionRequestController extends Controller
 
     public function adoptions()
     {
-        return Inertia::render('Admin/Adoptions', ['adoptions' => Adoption::with(['animal.photos', 'user:id,name,last_name'])->latest()->paginate(15)]);
+        return Inertia::render('Admin/Adoptions', ['adoptions' => Adoption::with(['animal.photos', 'animal.shelter', 'user:id,name,last_name'])->latest()->paginate(15)]);
     }
 }

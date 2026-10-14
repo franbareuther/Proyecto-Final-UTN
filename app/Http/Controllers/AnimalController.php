@@ -71,7 +71,7 @@ class AnimalController extends Controller
                     }
                     $animal->update($data);
                 } else {
-                    $animal = Animal::create($data);
+                    $animal = Animal::create($data + ['shelter_id' => $r->user()->shelter_id]);
                 }
                 foreach ($paths as $path) {
                     $animal->photos()->create(['file_path' => $path, 'is_primary' => ! $animal->photos()->exists()]);

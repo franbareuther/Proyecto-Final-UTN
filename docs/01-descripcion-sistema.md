@@ -1,9 +1,9 @@
 # Descripción del sistema
 
-Los refugios necesitan vincular datos de animales, personas interesadas y atención veterinaria. Los registros dispersos dificultan conocer disponibilidad, evaluar solicitudes y reconstruir decisiones.
+Huella reúne refugios y familias interesadas en adoptar. Cada refugio administra su catálogo y procesos de adopción, con historias clínicas e indicadores propios. La plataforma permite elegir refugio antes de explorar su catálogo, o explorar primero los animales de toda la red.
 
-Huella es una identidad provisional para una aplicación web que centraliza esa información. Su objetivo general es gestionar adopciones responsables con trazabilidad, permisos y persistencia relacional. El nombre visible del refugio se configura mediante `APP_NAME`; la marca gráfica provisional se encuentra en `Components/Shelter.tsx`.
+El alta de refugios es manual, por un superadministrador, después de conversar con la institución. El superadministrador crea sus cuentas de personal. Los administradores pertenecen a un refugio y registran también la información de salud; adoptantes tienen una cuenta global y consultan solo sus solicitudes.
 
-La función principal es **gestionar la adopción de animales de un refugio**. Comienza con el registro del interesado y termina con el registro definitivo de una adopción; un rechazo finaliza el recorrido sin adopción. Incluye catálogo, filtros, perfiles, solicitud, seguimiento y evaluación. Veterinaria y estadísticas son funciones complementarias.
+Huella es la marca de la plataforma (APP_NAME); el nombre de cada refugio se guarda en shelters. Los registros anteriores se conservan bajo un refugio inicial configurable. Los permisos se validan en el servidor y las decisiones de adopción conservan historial y transacciones.
 
-Quedan fuera del alcance pagos, donaciones, reservas comerciales, diagnósticos automáticos, múltiples refugios y despliegue automático. Esta entrega implementa una base funcional que necesita revisión visual y validación de usuarios antes de producción.
+Quedan fuera pagos, donaciones, chat, autorregistro de refugios, traslados de animales, diagnósticos automáticos y despliegue automático. Ver [diseño y actualización](10-multirrefugio.md).

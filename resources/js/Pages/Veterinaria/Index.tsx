@@ -11,7 +11,7 @@ export default function Index({
     const f = useForm({ q: filters.q || '' });
     return (
         <Shell internal>
-            <Head title="Veterinaria" />
+            <Head title="Salud y cuidados" />
             <Title
                 title="Cuidar también es acompañar."
                 text="Historias clínicas internas, tratamientos y seguimiento sanitario."

@@ -1,3 +1,5 @@
+> Actualización multirrefugio: consultar [diseño y actualización vigentes](10-multirrefugio.md). Las referencias a un refugio único y al estado previo de los PR pertenecen a la etapa inicial.
+
 # Arquitectura
 
 Monolito Laravel con páginas React TypeScript servidas por Inertia. No hay API REST separada. Vite compila los recursos; Tailwind 4 usa PostCSS y la configuración compartida de estilos. Breeze suministra autenticación nativa de sesión y limitación de intentos de login.

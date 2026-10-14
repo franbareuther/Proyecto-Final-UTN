@@ -1,10 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
-import { Animal } from '@/types/shelter';
+import { Animal, Refuge } from '@/types/shelter';
 import { AnimalCard, Badge, Empty, Shell } from '@/Components/Shelter';
 import AnimalImage from '@/Components/AnimalImage';
 import Icon from '@/Components/Icon';
 
-export default function Home({ animals }: { animals: Animal[] }) {
+export default function Home({ animals, refuges = [] }: { animals: Animal[]; refuges?: Refuge[] }) {
     const featured = animals[0];
     return (
         <Shell>
@@ -28,8 +28,8 @@ export default function Home({ animals }: { animals: Animal[] }) {
                         </span>
                     </h1>
                     <p className="reading-copy mt-6 text-base leading-relaxed text-stone-700 sm:text-lg">
-                        Hay una historia esperando cruzarse con la tuya. Conocé a los animales del
-                        refugio y encontrá a tu próximo compañero.
+                        Hay una historia esperando cruzarse con la tuya. Conocé a los animales de
+                        nuestra red y encontrá a tu próximo compañero.
                     </p>
                     <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
                         <Link href="/animales" className="btn">
@@ -112,6 +112,32 @@ export default function Home({ animals }: { animals: Animal[] }) {
                     </Empty>
                 )}
             </section>
+            <section aria-labelledby="refuges-title" className="pb-14 sm:pb-20">
+                <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+                    <h2 id="refuges-title" className="section-heading">
+                        Conocé los refugios
+                    </h2>
+                    <Link className="text-link" href="/refugios">
+                        Ver todos los refugios →
+                    </Link>
+                </div>
+                <div className="grid gap-5 md:grid-cols-3">
+                    {refuges.map((s) => (
+                        <Link
+                            key={s.id}
+                            className="card hover:border-emerald-800"
+                            href={`/refugios/${s.slug}`}
+                        >
+                            <p className="eyebrow">{s.city || 'Red Huella'}</p>
+                            <h3 className="mt-3 text-xl font-semibold">{s.name}</h3>
+                            <p className="mt-4 text-sm text-emerald-800">
+                                Conocer su historia y sus animales →
+                            </p>
+                        </Link>
+                    ))}
+                </div>
+                {!refuges.length && <Empty>Pronto conocerás los refugios de nuestra red.</Empty>}
+            </section>
             <section
                 id="como-funciona"
                 aria-labelledby="process-title"
@@ -137,7 +163,7 @@ export default function Home({ animals }: { animals: Animal[] }) {
                         {
                             number: '01',
                             title: 'Encontrá esa conexión',
-                            text: 'Explorá el catálogo y conocé la historia, personalidad y cuidados de cada animal.',
+                            text: 'Explorá los animales de la red o elegí un refugio y conocé la historia, personalidad y cuidados de cada animal.',
                         },
                         {
                             number: '02',
@@ -180,9 +206,9 @@ export default function Home({ animals }: { animals: Animal[] }) {
                 </div>
                 <div className="min-w-0">
                     <p className="reading-copy text-lg leading-relaxed text-stone-700">
-                        En Huella creemos en las segundas oportunidades. Cuidamos y acompañamos a
-                        cada animal mientras encuentra una familia que respete sus tiempos y lo
-                        quiera durante toda su vida.
+                        En la red Huella creemos en las segundas oportunidades. Cuidamos y
+                        acompañamos a cada animal mientras encuentra una familia que respete sus
+                        tiempos y lo quiera durante toda su vida.
                     </p>
                     <div className="mt-7 grid gap-4 sm:grid-cols-2">
                         <div className="rounded-2xl border border-stone-200 bg-white p-5">

@@ -35,6 +35,16 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function shelter()
+    {
+        return $this->belongsTo(Shelter::class);
+    }
+
+    public function belongsToShelter(int $id): bool
+    {
+        return (int) $this->shelter_id === $id && $this->shelter?->active === true;
+    }
+
     public function adoptionRequests()
     {
         return $this->hasMany(AdoptionRequest::class);

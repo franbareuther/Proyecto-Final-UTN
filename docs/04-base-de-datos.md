@@ -1,3 +1,5 @@
+> Actualización multirrefugio: consultar [diseño y actualización vigentes](10-multirrefugio.md). Las referencias a un refugio único y al estado previo de los PR pertenecen a la etapa inicial.
+
 # Base de datos
 
 Conexión real `mysql`, base `refugio_animales`, codificación utf8mb4. XAMPP puede incluir MariaDB; se verificó el esquema en MariaDB 10.4.32. CI configura MySQL 8.4. Testing usa una base separada o SQLite en memoria por defecto; SQLite nunca reemplaza la base de la aplicación.

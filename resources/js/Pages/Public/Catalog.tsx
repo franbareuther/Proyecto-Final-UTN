@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Animal, Page } from '@/types/shelter';
+import { Animal, Page, Refuge } from '@/types/shelter';
 import { AnimalCard, Empty, Errors, Field, Pagination, Shell } from '@/Components/Shelter';
 import Icon from '@/Components/Icon';
 
@@ -10,12 +10,22 @@ type Filters = {
     size: string;
     age: string;
     status: string;
+    shelter: string;
+    city: string;
 };
 export default function Catalog({
+    catalogUrl = '/animales',
+    shelter,
+    refuges = [],
+    cities = [],
     animals,
     filters,
     breeds,
 }: {
+    catalogUrl?: string;
+    shelter?: Refuge | null;
+    refuges?: Refuge[];
+    cities?: string[];
     animals: Page<Animal>;
     filters: Record<string, string>;
     breeds: string[];
@@ -27,6 +37,8 @@ export default function Catalog({
         size: filters.size || '',
         age: filters.age || '',
         status: filters.status || '',
+        shelter: filters.shelter || '',
+        city: filters.city || '',
     });
     const options: [keyof Filters, string, (string | [string, string])[]][] = [
         ['species', 'Especie', ['Perro', 'Gato', 'Otro']],
@@ -47,7 +59,15 @@ export default function Catalog({
             ['Disponible', 'En proceso de adopción', 'Adoptado', 'No disponible temporalmente'],
         ],
     ];
+    if (!shelter) {
+        options.push(
+            ['shelter', 'Refugio', refuges.map((s) => [s.slug, s.name])],
+            ['city', 'Ciudad', cities],
+        );
+    }
     const labels: Record<string, string> = {
+        shelter: 'Refugio',
+        city: 'Ciudad',
         q: 'Nombre',
         species: 'Especie',
         breed: 'Raza',
@@ -65,12 +85,17 @@ export default function Catalog({
         const query = new URLSearchParams(
             Object.entries(filters).filter(([k, v]) => k !== key && k in f.data && v),
         );
-        return '/animales' + (query.size ? '?' + query.toString() : '');
+        return catalogUrl + (query.size ? '?' + query.toString() : '');
     };
     return (
         <Shell>
             <Head title="Encontrá tu compañero" />
             <header className="mb-8 max-w-3xl sm:mb-10">
+                {shelter && (
+                    <Link className="text-link mb-4 inline-flex" href={`/refugios/${shelter.slug}`}>
+                        {shelter.name} · Ver refugio
+                    </Link>
+                )}
                 <p className="eyebrow">Cada historia merece una oportunidad</p>
                 <h1 className="public-heading mt-4">
                     Tu próximo compañero
@@ -80,8 +105,10 @@ export default function Catalog({
                     </span>
                 </h1>
                 <p className="mt-5 max-w-xl text-base leading-relaxed text-stone-600 sm:text-lg">
-                    Conocé a los animales del refugio. Más allá de su tamaño o edad, cada uno tiene
-                    algo único para compartir.
+                    {shelter
+                        ? 'Conocé a los animales de este refugio.'
+                        : 'Conocé a los animales de toda la red Huella.'}{' '}
+                    Más allá de su tamaño o edad, cada uno tiene algo único para compartir.
                 </p>
             </header>
             <section aria-labelledby="filters-title" className="card mb-8">
@@ -98,7 +125,7 @@ export default function Catalog({
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
-                        f.get('/animales', { preserveState: true, preserveScroll: true });
+                        f.get(catalogUrl, { preserveState: true, preserveScroll: true });
                     }}
                     aria-label="Buscar y filtrar animales"
                 >
@@ -142,7 +169,7 @@ export default function Catalog({
                             <Icon name="search" className="h-4 w-4" />
                             {f.processing ? 'Buscando…' : 'Buscar compañeros'}
                         </button>
-                        <Link href="/animales" className="btn-secondary w-full sm:w-auto">
+                        <Link href={catalogUrl} className="btn-secondary w-full sm:w-auto">
                             Limpiar filtros
                         </Link>
                     </div>
@@ -174,7 +201,7 @@ export default function Catalog({
                                 href={withoutFilter(key)}
                                 preserveScroll
                                 className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-950 hover:border-emerald-800"
-                                aria-label={`Quitar filtro ${labels[key]}: ${key === 'age' ? ageLabels[value] || value : value}`}
+                                aria-label={`Quitar filtro ${labels[key]}: ${key === 'age' ? ageLabels[value] || value : key === 'shelter' ? refuges.find((s) => s.slug === value)?.name || value : value}`}
                             >
                                 <span className="min-w-0 break-words">
                                     {labels[key]}:{' '}
@@ -200,7 +227,7 @@ export default function Catalog({
                             Probá con menos filtros o buscá por otro nombre. Hay muchas historias
                             por conocer.
                         </p>
-                        <Link href="/animales" className="btn-secondary mt-5">
+                        <Link href={catalogUrl} className="btn-secondary mt-5">
                             Ver todos los animales
                         </Link>
                     </Empty>

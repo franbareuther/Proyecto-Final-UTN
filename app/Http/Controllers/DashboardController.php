@@ -29,9 +29,9 @@ class DashboardController extends Controller
             'species' => Animal::selectRaw('species as label, COUNT(*) as total')->groupBy('species')->get(),
             'statuses' => AdoptionRequest::selectRaw('status as label, COUNT(*) as total')->groupBy('status')->get(),
             'months' => $months,
-            'recentRequests' => AdoptionRequest::with(['animal.photos', 'user:id,name,last_name'])->latest()->take(5)->get(),
-            'recentAdoptions' => Adoption::with(['animal.photos', 'user:id,name,last_name'])->latest()->take(5)->get(),
-            'controls' => VeterinaryControl::with('animal.photos')->where('status', 'Pendiente')->orderBy('scheduled_date')->take(5)->get(),
+            'recentRequests' => AdoptionRequest::with(['animal.photos', 'animal.shelter', 'user:id,name,last_name'])->latest()->take(5)->get(),
+            'recentAdoptions' => Adoption::with(['animal.photos', 'animal.shelter', 'user:id,name,last_name'])->latest()->take(5)->get(),
+            'controls' => VeterinaryControl::with('animal.photos', 'animal.shelter')->where('status', 'Pendiente')->orderBy('scheduled_date')->take(5)->get(),
         ]);
     }
 }

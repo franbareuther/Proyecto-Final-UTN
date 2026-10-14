@@ -36,6 +36,7 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
             'shelterName' => config('app.name'),
+            'currentShelter' => fn () => $request->route('shelter') ?? $request->route('animal')?->shelter ?? $request->user()?->shelter,
             'auth' => [
                 'user' => $request->user(),
             ],

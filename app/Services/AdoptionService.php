@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Adoption;
 use App\Models\AdoptionRequest;
 use App\Models\Animal;
+use App\Models\Shelter;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -24,6 +25,8 @@ class AdoptionService
 
         return DB::transaction(function () use ($animal, $user, $data) {
             $locked = Animal::lockForUpdate()->findOrFail($animal->id);
+            $shelter = Shelter::whereKey($locked->shelter_id)->lockForUpdate()->firstOrFail();
+            $this->ensure($shelter->active, 'El refugio no recibe nuevas solicitudes.');
             $this->ensure($locked->availability_status === 'Disponible', 'Este animal ya no está disponible para solicitudes.');
             $this->ensure(! AdoptionRequest::where('animal_id', $locked->id)->where('user_id', $user->id)->whereIn('status', AdoptionRequest::ACTIVE)->exists(), 'Ya tenés una solicitud activa para este animal.');
             $request = new AdoptionRequest($data);
@@ -44,6 +47,8 @@ class AdoptionService
             // Siempre bloquear primero el animal: serializa solicitudes y decisiones concurrentes.
             $animal = Animal::withTrashed()->lockForUpdate()->findOrFail($request->animal_id);
             $r = AdoptionRequest::lockForUpdate()->findOrFail($request->id);
+            $shelter = Shelter::whereKey($animal->shelter_id)->lockForUpdate()->firstOrFail();
+            abort_unless($shelter->active && (int) $actor->shelter_id === (int) $animal->shelter_id, 403);
             $allowed = ['Nueva' => ['En revisión', 'Aprobada', 'Rechazada'], 'En revisión' => ['Aprobada', 'Rechazada'], 'Aprobada' => ['Rechazada', 'Adoptado']];
             $this->ensure(in_array($next, $allowed[$r->status] ?? [], true), 'El cambio de estado solicitado no está permitido.');
             if ($next === 'Aprobada') {

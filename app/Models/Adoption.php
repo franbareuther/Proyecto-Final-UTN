@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopedToStaffShelter;
 use Illuminate\Database\Eloquent\Model;
 
 class Adoption extends Model
 {
+    use ScopedToStaffShelter;
+
     protected $guarded = ['id'];
 
     public function animal()

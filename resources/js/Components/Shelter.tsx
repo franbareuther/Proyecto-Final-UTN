@@ -52,7 +52,7 @@ export function Title({
     return (
         <div className="mb-8 flex min-w-0 flex-wrap items-end justify-between gap-5 sm:mb-10">
             <div className="min-w-0 max-w-3xl">
-                <p className="eyebrow">HUELLA / REFUGIO Y ADOPCIONES</p>
+                <p className="eyebrow">HUELLA / RED DE REFUGIOS</p>
                 <h1 className="mt-3 break-words text-3xl font-semibold tracking-tight text-emerald-950 sm:text-4xl">
                     {title}
                 </h1>
@@ -234,7 +234,11 @@ export function Confirm({
 export function AnimalCard({ animal }: { animal: Animal }) {
     return (
         <Link
-            href={'/animales/' + animal.id}
+            href={
+                animal.shelter
+                    ? `/refugios/${animal.shelter.slug}/animales/${animal.id}`
+                    : '/animales/' + animal.id
+            }
             className="animal-card group"
             aria-label={`Conocer a ${animal.name}, ${animal.availability_status.toLowerCase()}`}
         >
@@ -249,6 +253,11 @@ export function AnimalCard({ animal }: { animal: Animal }) {
                 </div>
             </div>
             <div className="flex flex-1 flex-col p-5 sm:p-6">
+                {animal.shelter && (
+                    <p className="mb-3 text-xs font-semibold text-emerald-800">
+                        {animal.shelter.name}
+                    </p>
+                )}
                 <div className="flex min-w-0 items-start justify-between gap-3">
                     <h3 className="min-w-0 break-words text-2xl font-semibold tracking-tight text-emerald-950">
                         {animal.name}
@@ -297,6 +306,9 @@ export function RequestList({
                     />
                     <div className="min-w-0 flex-1 basis-40">
                         <p className="break-words font-semibold">{r.animal.name}</p>
+                        {r.animal.shelter && (
+                            <p className="text-sm text-emerald-800">{r.animal.shelter.name}</p>
+                        )}
                         <p className="break-words text-sm text-stone-600">
                             {admin ? `${r.user.name} ${r.user.last_name} · ` : ''}
                             {date(r.created_at)}
@@ -312,13 +324,15 @@ export function RequestList({
     );
 }
 export function Shell({ children, internal = false }: PropsWithChildren<{ internal?: boolean }>) {
-    const { auth, flash, shelterName } = usePage<Shared>().props;
+    const { auth, flash, shelterName, currentShelter } = usePage<Shared>().props;
     const currentPath = usePage().url.split(/[?#]/)[0];
     const [open, setOpen] = useState(false);
     const menuButton = useRef<HTMLButtonElement>(null);
     const menuId = useId();
     const admin = auth.user?.role === 'admin';
-    const staff = admin || auth.user?.role === 'veterinario';
+    const superadmin = auth.user?.role === 'superadmin';
+    const staff = admin;
+    const catalogUrl = currentShelter ? `/refugios/${currentShelter.slug}/animales` : '/refugios';
     useEffect(() => router.on('navigate', () => setOpen(false)), []);
     useEffect(() => {
         if (!open) return;
@@ -344,9 +358,11 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
     );
     const navigation = (
         <>
+            {internal && superadmin && navLink('/superadmin/refugios', 'Gestionar refugios')}
             {internal && admin && (
                 <>
                     {navLink('/admin', 'Resumen')}
+                    {navLink('/admin/refugio', 'Mi refugio')}
                     {navLink(
                         '/admin/animales',
                         'Animales',
@@ -360,7 +376,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                 <>
                     {navLink(
                         '/veterinaria',
-                        'Veterinaria',
+                        'Salud y cuidados',
                         currentPath.startsWith('/veterinaria') &&
                             currentPath !== '/veterinaria/controles',
                     )}
@@ -369,9 +385,12 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
             )}
             {!internal && (
                 <>
-                    {navLink('/animales', 'Adoptar', currentPath.startsWith('/animales'))}
+                    {navLink('/animales', 'Animales en adopción', currentPath === '/animales')}
+                    {navLink('/refugios', 'Refugios', currentPath === '/refugios')}
+                    {currentShelter &&
+                        navLink(catalogUrl, 'Adoptar', currentPath.startsWith(catalogUrl))}
                     {navLink('/#como-funciona', 'Cómo funciona', false)}
-                    {navLink('/#nosotros', 'El refugio', false)}
+                    {navLink('/#nosotros', 'Huella', false)}
                 </>
             )}
             {auth.user ? (
@@ -379,7 +398,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                     {!internal &&
                         navLink(
                             '/dashboard',
-                            staff ? 'Mi panel' : 'Mis solicitudes',
+                            staff || superadmin ? 'Mi panel' : 'Mis solicitudes',
                             currentPath === '/mis-solicitudes',
                         )}
                     {navLink('/profile', 'Mi perfil')}
@@ -426,7 +445,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                         className="hidden items-center gap-1 lg:flex"
                     >
                         {internal ? (
-                            <Link href="/animales" className="text-link">
+                            <Link href={catalogUrl} className="text-link">
                                 Ver sitio público <Icon name="arrow" className="h-4 w-4" />
                             </Link>
                         ) : (
@@ -455,19 +474,26 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                     }
                 >
                     {navigation}
-                    {internal && navLink('/animales', 'Ver sitio público')}
+                    {internal && navLink(catalogUrl, 'Ver sitio público')}
                 </nav>
             </header>
             <div className={'app-frame ' + (internal ? 'flex' : '')}>
                 {internal && (
                     <aside className="hidden min-h-[85vh] w-60 shrink-0 border-r border-stone-200 bg-white p-5 lg:block">
-                        <p className="eyebrow mb-6 px-3">Espacio del refugio</p>
+                        <p className="eyebrow mb-6 px-3">
+                            {superadmin ? 'Administración de Huella' : 'Espacio del refugio'}
+                        </p>
                         <nav aria-label="Panel del refugio" className="flex flex-col gap-1">
                             {navigation}
                         </nav>
                     </aside>
                 )}
                 <main id="main" tabIndex={-1} className="app-main site-gutter py-10">
+                    {internal && currentShelter && (
+                        <p className="mb-6 rounded-xl bg-emerald-50 p-4 font-semibold text-emerald-950">
+                            {currentShelter.name}
+                        </p>
+                    )}
                     {flash.error && (
                         <div
                             role="alert"
@@ -509,10 +535,10 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                                 Encontrá tu compañero
                             </p>
                             <Link
-                                href="/animales"
+                                href={catalogUrl}
                                 className="block py-2 text-sm underline-offset-4 hover:underline"
                             >
-                                Animales del refugio
+                                {currentShelter ? 'Animales del refugio' : 'Conocer los refugios'}
                             </Link>
                             <Link
                                 href="/#como-funciona"
@@ -529,7 +555,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                                 href="/#nosotros"
                                 className="block py-2 text-sm underline-offset-4 hover:underline"
                             >
-                                Sobre el refugio
+                                Sobre Huella
                             </Link>
                             <Link
                                 href={auth.user ? '/dashboard' : '/login'}

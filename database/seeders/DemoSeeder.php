@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Animal;
+use App\Models\Shelter;
 use App\Models\User;
 use App\Services\AdoptionService;
 use Illuminate\Database\Seeder;
@@ -28,15 +29,17 @@ class DemoSeeder extends Seeder
         }
         DB::transaction(function () use ($password) {
             $users = [];
-            foreach (['admin', 'veterinario', 'adoptante'] as $role) {
+            foreach (['admin', 'adoptante'] as $role) {
                 $u = new User(['name' => ucfirst($role), 'last_name' => 'Demostración', 'email' => $role.'@huella.test', 'password' => Hash::make($password)]);
                 $u->role = $role;
+                $u->shelter_id = $role === 'adoptante' ? null : Shelter::where('slug', 'huella-inicial')->value('id');
                 $u->save();
                 $users[$role] = $u;
             }
             $animals = [];
             foreach (['Mora', 'Simón', 'Luna', 'Coco', 'Nina', 'Toto', 'Oliva', 'Félix', 'Alma', 'Rocco', 'Milo', 'Frida', 'Pipa', 'Bruno'] as $i => $name) {
                 $animals[] = Animal::create([
+                    'shelter_id' => Shelter::where('slug', 'huella-inicial')->value('id'),
                     'name' => $name, 'species' => $i % 3 === 0 ? 'Gato' : 'Perro', 'breed' => 'Mestizo', 'sex' => $i % 2 ? 'Macho' : 'Hembra',
                     'estimated_age' => [8, 24, 48, 100][$i % 4], 'size' => ['Pequeño', 'Mediano', 'Grande'][$i % 3],
                     'color' => ['Marrón', 'Negro y blanco', 'Dorado'][$i % 3],
@@ -64,7 +67,7 @@ class DemoSeeder extends Seeder
             }
             $animals[5]->update(['availability_status' => 'No disponible temporalmente']);
             foreach (array_slice($animals, 0, 5) as $i => $animal) {
-                $vet = ['veterinarian_id' => $users['veterinario']->id, 'observations' => '[DEMOSTRACIÓN] Registro académico.'];
+                $vet = ['recorded_by' => $users['admin']->id, 'observations' => '[DEMOSTRACIÓN] Registro académico.'];
                 $animal->consultations()->create($vet + ['consultation_date' => today()->subDays(10), 'reason' => 'Control de ingreso', 'symptoms' => 'Sin síntomas referidos', 'diagnosis' => 'Evaluación clínica de demostración', 'instructions' => 'Seguimiento por profesional.']);
                 $animal->vaccinations()->create($vet + ['vaccine_name' => 'Vacuna de demostración', 'application_date' => today()->subMonths(11), 'dose' => 'Primera', 'next_dose_date' => today()->addDays(10 + $i)]);
                 $animal->treatments()->create($vet + ['description' => 'Tratamiento de demostración indicado por profesional', 'start_date' => today()->subDays(3), 'estimated_end_date' => today()->addDays(10), 'status' => $i % 2 ? 'Finalizado' : 'Activo']);

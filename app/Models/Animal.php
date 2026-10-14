@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopedToStaffShelter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,14 +11,20 @@ use Illuminate\Support\Facades\Storage;
 class Animal extends Model
 {
     use HasFactory, SoftDeletes;
+    use ScopedToStaffShelter;
 
-    protected $fillable = ['name', 'species', 'breed', 'sex', 'birth_date', 'estimated_age', 'size', 'color', 'description', 'personality', 'entry_date', 'availability_status', 'public_health_info'];
+    protected $fillable = ['shelter_id', 'name', 'species', 'breed', 'sex', 'birth_date', 'estimated_age', 'size', 'color', 'description', 'personality', 'entry_date', 'availability_status', 'public_health_info'];
 
     protected $appends = ['photo_url'];
 
     protected function casts(): array
     {
         return ['birth_date' => 'date:Y-m-d', 'entry_date' => 'date:Y-m-d'];
+    }
+
+    public function shelter()
+    {
+        return $this->belongsTo(Shelter::class);
     }
 
     public function photos()
