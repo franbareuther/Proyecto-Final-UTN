@@ -4,7 +4,7 @@ export interface Person {
     last_name: string;
     email: string;
     email_verified_at?: string;
-    role: 'superadmin' | 'admin' | 'adoptante' | 'veterinario';
+    role: 'superadmin' | 'admin' | 'adoptante';
 }
 export interface Photo {
     id: number;
@@ -78,8 +78,10 @@ export interface Adoption {
 }
 export interface MedicalRecord {
     id: number;
-    veterinarian_id: number;
-    veterinarian?: Person;
+    recorded_by: number;
+    practitioner_name?: string | null;
+    updated_by?: number | null;
+    recorder?: Person;
     animal?: Animal;
     [key: string]: unknown;
 }

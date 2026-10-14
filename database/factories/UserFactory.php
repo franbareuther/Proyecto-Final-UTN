@@ -41,7 +41,7 @@ class UserFactory extends Factory
     public function configure(): static
     {
         return $this->afterMaking(function (User $user) {
-            if (in_array($user->role, ['admin', 'veterinario'], true) && ! $user->shelter_id) {
+            if ($user->role === 'admin' && ! $user->shelter_id) {
                 $user->shelter_id = Shelter::where('slug', 'huella-inicial')->value('id');
             }
         });

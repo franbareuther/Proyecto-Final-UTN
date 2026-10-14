@@ -313,3 +313,62 @@ test('superadministrador tiene navegación y alta manual sin acciones clínicas'
     assert.doesNotMatch(html, /href="\/admin\/adopciones"/);
     assert.doesNotMatch(html, /href="\/veterinaria"/);
 });
+
+test('catálogo general muestra ambas entradas y mantiene ciudad y refugio al quitar especie', async () => {
+    const html = await renderPage(
+        'Public/Catalog',
+        {
+            animals: page([]),
+            filters: { shelter: 'sur', city: 'Rosario', species: 'Gato' },
+            breeds: [],
+            refuges: [{ id: 1, name: 'Sur', slug: 'sur', active: true }],
+            cities: ['Rosario'],
+            catalogUrl: '/animales',
+        },
+        null,
+        '/animales?shelter=sur&city=Rosario&species=Gato',
+    );
+    assert.match(html, /Animales en adopción/);
+    assert.match(html, /href="\/refugios"/);
+    assert.match(html, /href="\/animales\?shelter=sur&amp;city=Rosario"/);
+    assert.match(html, /name="shelter"/);
+    assert.match(html, /name="city"/);
+});
+
+test('salud identifica profesional y persona que registra sin requerir perfil veterinario', async () => {
+    const html = await renderPage(
+        'Veterinaria/History',
+        {
+            animal: {
+                ...animal,
+                consultations: [
+                    {
+                        id: 1,
+                        recorded_by: 1,
+                        practitioner_name: 'Dra. Ana',
+                        recorder: { name: 'Equipo', last_name: 'Sur' },
+                        consultation_date: '2026-10-14',
+                        reason: 'Consulta',
+                        diagnosis: 'Informe',
+                    },
+                ],
+                vaccinations: [],
+                treatments: [],
+                controls: [],
+            },
+        },
+        { id: 1, name: 'Equipo', role: 'admin' },
+        '/veterinaria/7',
+    );
+    const visible = html.replace(/<!--.*?-->/g, '');
+    assert.match(visible, /Profesional que atendió: Dra. Ana/);
+    assert.match(visible, /Registrado por: Equipo Sur/);
+    assert.match(visible, /Agregar consultas/);
+    assert.match(html, /Editar \/ actualizar estado/);
+    const panel = await renderPage(
+        'Superadmin/Shelters',
+        { shelters: [] },
+        { id: 2, name: 'Global', role: 'superadmin' },
+    );
+    assert.doesNotMatch(panel, /option value="veterinario"/);
+});

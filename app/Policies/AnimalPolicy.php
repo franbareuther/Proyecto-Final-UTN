@@ -24,6 +24,6 @@ class AnimalPolicy
 
     public function medical(User $u, Animal $a): bool
     {
-        return in_array($u->role, ['admin', 'veterinario'], true) && $u->belongsToShelter($a->shelter_id);
+        return $u->role === 'admin' && $u->belongsToShelter($a->shelter_id);
     }
 }

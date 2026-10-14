@@ -10,7 +10,7 @@ use App\Http\Controllers\ShelterController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [CatalogController::class, 'home'])->name('home');
-Route::redirect('/animales', '/refugios')->name('catalog');
+Route::get('/animales', [CatalogController::class, 'all'])->name('catalog');
 Route::get('/refugios', [ShelterController::class, 'index'])->name('shelters.index');
 Route::get('/refugios/{shelter}', [ShelterController::class, 'show'])->name('shelters.show');
 Route::get('/refugios/{shelter}/animales', [CatalogController::class, 'index'])->name('shelters.catalog');
@@ -18,7 +18,7 @@ Route::get('/refugios/{shelter}/animales/{animal}', [CatalogController::class, '
 Route::get('/animales/{animal}', [CatalogController::class, 'show'])->name('animals.show');
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', fn () => redirect(match (auth()->user()->role) {
-        'superadmin' => '/superadmin/refugios', 'admin' => '/admin','veterinario' => '/veterinaria',default => '/mis-solicitudes'
+        'superadmin' => '/superadmin/refugios', 'admin' => '/admin',default => '/mis-solicitudes'
     }))->name('dashboard');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -44,12 +44,12 @@ Route::middleware('auth')->group(function () {
         Route::patch('/solicitudes/{adoptionRequest}', [AdoptionRequestController::class, 'update'])->name('admin.requests.update');
         Route::get('/adopciones', [AdoptionRequestController::class, 'adoptions'])->name('admin.adoptions');
     });
-    Route::middleware('role:admin,veterinario')->group(function () {
+    Route::middleware('role:admin')->group(function () {
         Route::get('/veterinaria', [MedicalController::class, 'index'])->name('medical.index');
         Route::get('/veterinaria/controles', [MedicalController::class, 'controls'])->name('medical.controls');
         Route::get('/veterinaria/{animal}', [MedicalController::class, 'show'])->name('medical.show');
-        Route::post('/veterinaria/{animal}/{type}', [MedicalController::class, 'store'])->middleware('role:veterinario')->name('medical.store');
-        Route::patch('/veterinaria/{animal}/{type}/{record}', [MedicalController::class, 'update'])->middleware('role:veterinario')->name('medical.update');
+        Route::post('/veterinaria/{animal}/{type}', [MedicalController::class, 'store'])->middleware('role:admin')->name('medical.store');
+        Route::patch('/veterinaria/{animal}/{type}/{record}', [MedicalController::class, 'update'])->middleware('role:admin')->name('medical.update');
     });
 });
 require __DIR__.'/auth.php';

@@ -1,3 +1,5 @@
+> Informe de la primera entrega multirrefugio. La actualización a catálogo general y tres roles está documentada en [12-catalogo-y-tres-roles.md](12-catalogo-y-tres-roles.md).
+
 # Validación de la entrega multirrefugio
 
 Fecha: 14 de octubre de 2026. Base visual: rama del PR #7 en `34d9a12`. Implementación en `feature/huella-multirrefugio`, con revisión e integración pendientes. No se modificaron main, PR #7 ni las asignaciones de los issues #2–#5.

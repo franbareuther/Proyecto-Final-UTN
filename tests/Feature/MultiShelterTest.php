@@ -40,7 +40,7 @@ class MultiShelterTest extends TestCase
         Animal::factory()->create(['shelter_id' => $b->id, 'breed' => 'Raza del norte']);
         Animal::factory()->create(['shelter_id' => $hidden->id]);
         $this->get('/refugios')->assertInertia(fn (Assert $p) => $p->has('shelters.data', 3));
-        $this->get('/animales')->assertRedirect('/refugios');
+        $this->get('/animales')->assertInertia(fn (Assert $p) => $p->has('animals.data', 2));
         $this->get('/refugios/sur/animales')->assertInertia(fn (Assert $p) => $p->has('animals.data', 1)->where('animals.data.0.id', $animal->id)->where('breeds', ['Raza del sur']));
         $this->get('/refugios/norte/animales/'.$animal->id)->assertNotFound();
         $this->get('/refugios/inactivo')->assertNotFound();
@@ -115,10 +115,10 @@ class MultiShelterTest extends TestCase
         $b = $this->refuge('norte');
         $own = Animal::factory()->create(['shelter_id' => $a->id]);
         $foreign = Animal::factory()->create(['shelter_id' => $b->id]);
-        $vet = $this->staff($a, 'veterinario');
+        $vet = $this->staff($a);
         foreach ([$own, $foreign] as $animal) {
-            $animal->controls()->create(['control_type' => 'Revisión', 'scheduled_date' => today(), 'status' => 'Pendiente', 'veterinarian_id' => $vet->id]);
-            $animal->vaccinations()->create(['vaccine_name' => 'Prueba', 'application_date' => today(), 'next_dose_date' => today(), 'veterinarian_id' => $vet->id]);
+            $animal->controls()->create(['control_type' => 'Revisión', 'scheduled_date' => today(), 'status' => 'Pendiente', 'recorded_by' => $vet->id]);
+            $animal->vaccinations()->create(['vaccine_name' => 'Prueba', 'application_date' => today(), 'next_dose_date' => today(), 'recorded_by' => $vet->id]);
         }
         $this->actingAs($vet);
         $this->get('/veterinaria')->assertInertia(fn (Assert $p) => $p->has('animals.data', 1));

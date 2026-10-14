@@ -9,15 +9,15 @@ class Vaccination extends Model
 {
     use ScopedToStaffShelter;
 
-    protected $fillable = ['vaccine_name', 'application_date', 'dose', 'next_dose_date', 'observations', 'veterinarian_id'];
+    protected $fillable = ['vaccine_name', 'application_date', 'dose', 'next_dose_date', 'observations', 'recorded_by', 'updated_by', 'practitioner_name'];
 
     public function animal()
     {
         return $this->belongsTo(Animal::class)->withTrashed();
     }
 
-    public function veterinarian()
+    public function recorder()
     {
-        return $this->belongsTo(User::class, 'veterinarian_id');
+        return $this->belongsTo(User::class, 'recorded_by');
     }
 }

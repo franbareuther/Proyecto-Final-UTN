@@ -1,7 +1,7 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { Animal, MedicalRecord, Shared } from '@/types/shelter';
-import { Badge, Errors, Field, Shell, Title } from '@/Components/Shelter';
+import { Badge, Errors, Field, Shell, Title, date } from '@/Components/Shelter';
 type Kind = 'consultations' | 'vaccinations' | 'treatments' | 'controls';
 type SchemaField = [string, string, string, string[]?];
 const schemas: Record<Kind, SchemaField[]> = {
@@ -47,11 +47,14 @@ function MedicalForm({
     record?: MedicalRecord;
     onDone: () => void;
 }) {
-    const initial: Record<string, string> = { observations: String(record?.observations || '') };
-    schemas[type].forEach(
-        ([key, , t, options]) =>
-            (initial[key] = String(record?.[key] || (t === 'select' ? options?.[0] : '') || '')),
-    );
+    const initial: Record<string, string> = {
+        practitioner_name: String(record?.practitioner_name || ''),
+        observations: String(record?.observations || ''),
+    };
+    schemas[type].forEach(([key, , t, options]) => {
+        const value = String(record?.[key] || (t === 'select' ? options?.[0] : '') || '');
+        initial[key] = t === 'date' ? value.slice(0, 10) : value;
+    });
     const f = useForm(initial);
     return (
         <form
@@ -67,34 +70,40 @@ function MedicalForm({
                 {record ? 'Editar registro' : 'Agregar registro'} · {labels[type]}
             </h2>
             <Errors errors={f.errors} />
-            {[...schemas[type], ['observations', 'Observaciones', 'textarea'] as SchemaField].map(
-                ([key, label, t, options]) => (
-                    <Field key={key} label={label} error={f.errors[key]}>
-                        {t === 'select' ? (
-                            <select
-                                value={f.data[key]}
-                                onChange={(e) => f.setData(key, e.target.value)}
-                            >
-                                {options?.map((x) => (
-                                    <option key={x}>{x}</option>
-                                ))}
-                            </select>
-                        ) : t === 'textarea' ? (
-                            <textarea
-                                rows={3}
-                                value={f.data[key]}
-                                onChange={(e) => f.setData(key, e.target.value)}
-                            />
-                        ) : (
-                            <input
-                                type={t}
-                                value={f.data[key]}
-                                onChange={(e) => f.setData(key, e.target.value)}
-                            />
-                        )}
-                    </Field>
-                ),
-            )}
+            {[
+                ...schemas[type],
+                [
+                    'practitioner_name',
+                    'Profesional que atendió (si se conoce)',
+                    'text',
+                ] as SchemaField,
+                ['observations', 'Observaciones', 'textarea'] as SchemaField,
+            ].map(([key, label, t, options]) => (
+                <Field key={key} label={label} error={f.errors[key]}>
+                    {t === 'select' ? (
+                        <select
+                            value={f.data[key]}
+                            onChange={(e) => f.setData(key, e.target.value)}
+                        >
+                            {options?.map((x) => (
+                                <option key={x}>{x}</option>
+                            ))}
+                        </select>
+                    ) : t === 'textarea' ? (
+                        <textarea
+                            rows={3}
+                            value={f.data[key]}
+                            onChange={(e) => f.setData(key, e.target.value)}
+                        />
+                    ) : (
+                        <input
+                            type={t}
+                            value={f.data[key]}
+                            onChange={(e) => f.setData(key, e.target.value)}
+                        />
+                    )}
+                </Field>
+            ))}
             <div className="flex gap-3">
                 <button className="btn" disabled={f.processing}>
                     {f.processing ? 'Guardando…' : 'Guardar registro'}
@@ -137,7 +146,7 @@ export default function History({ animal }: { animal: Animal & Record<Kind, Medi
             </div>
             <div className="grid items-start gap-6 xl:grid-cols-2">
                 <section className="space-y-4">
-                    {user?.role === 'veterinario' && (
+                    {user?.role === 'admin' && (
                         <button
                             className="btn"
                             onClick={() => {
@@ -159,23 +168,27 @@ export default function History({ animal }: { animal: Animal & Record<Kind, Medi
                                             'Observaciones',
                                             'textarea',
                                         ] as SchemaField,
-                                    ].map(([key, label]) =>
+                                    ].map(([key, label, kind]) =>
                                         r[key] ? (
                                             <div key={key}>
                                                 <dt className="text-xs font-medium text-stone-500">
                                                     {label}
                                                 </dt>
                                                 <dd className="mt-1 whitespace-pre-wrap break-words text-sm">
-                                                    {String(r[key])}
+                                                    {kind === 'date'
+                                                        ? date(String(r[key]))
+                                                        : String(r[key])}
                                                 </dd>
                                             </div>
                                         ) : null,
                                     )}
                                 </dl>
                                 <p className="mt-5 text-xs text-stone-500">
-                                    Profesional: {r.veterinarian?.name} {r.veterinarian?.last_name}
+                                    Profesional que atendió: {r.practitioner_name || 'Sin informar'}
+                                    <br />
+                                    Registrado por: {r.recorder?.name} {r.recorder?.last_name}
                                 </p>
-                                {user?.role === 'veterinario' && r.veterinarian_id === user.id && (
+                                {user?.role === 'admin' && (
                                     <button
                                         className="btn-secondary mt-4"
                                         onClick={() => {

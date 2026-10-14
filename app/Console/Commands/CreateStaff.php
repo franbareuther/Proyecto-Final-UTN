@@ -13,12 +13,12 @@ class CreateStaff extends Command
 {
     protected $signature = 'shelter:create-staff';
 
-    protected $description = 'Crear una cuenta administrativa o veterinaria de forma interactiva';
+    protected $description = 'Crear una cuenta de superadministrador o administrador de refugio';
 
     public function handle(): int
     {
-        $data = ['name' => $this->ask('Nombre'), 'last_name' => $this->ask('Apellido'), 'email' => strtolower($this->ask('Correo electrónico')), 'role' => $this->choice('Rol', ['superadmin', 'admin', 'veterinario']), 'password' => $this->secret('Contraseña (mínimo 12 caracteres)')];
-        $v = Validator::make($data, ['name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'email' => 'required|email|max:255|unique:users', 'role' => ['required', Rule::in(['superadmin', 'admin', 'veterinario'])], 'password' => 'required|string|min:12']);
+        $data = ['name' => $this->ask('Nombre'), 'last_name' => $this->ask('Apellido'), 'email' => strtolower($this->ask('Correo electrónico')), 'role' => $this->choice('Rol', ['superadmin', 'admin']), 'password' => $this->secret('Contraseña (mínimo 12 caracteres)')];
+        $v = Validator::make($data, ['name' => 'required|string|max:255', 'last_name' => 'required|string|max:255', 'email' => 'required|email|max:255|unique:users', 'role' => ['required', Rule::in(['superadmin', 'admin'])], 'password' => 'required|string|min:12']);
         if ($v->fails()) {
             foreach ($v->errors()->all() as $error) {
                 $this->error($error);

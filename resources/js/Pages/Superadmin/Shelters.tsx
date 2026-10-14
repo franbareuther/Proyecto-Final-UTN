@@ -48,16 +48,9 @@ function StaffForm({ shelter }: { shelter: Refuge }) {
                     </Field>
                 ))}
             </div>
-            <Field label="Rol">
-                <select
-                    className="input"
-                    value={f.data.role}
-                    onChange={(e) => f.setData('role', e.target.value)}
-                >
-                    <option value="admin">Administrador del refugio</option>
-                    <option value="veterinario">Veterinario del refugio</option>
-                </select>
-            </Field>
+            <p className="text-sm text-emerald-800">
+                Esta cuenta administrará los animales, adopciones y salud de este refugio.
+            </p>
             <p className="text-sm text-stone-600">
                 Coordiná la entrega de acceso con la persona responsable. Podrá cambiar la
                 contraseña desde su perfil.
@@ -115,10 +108,7 @@ export default function Shelters({ shelters }: { shelters: Refuge[] }) {
                                     <ul className="divide-y">
                                         {shelter.staff.map((u) => (
                                             <li className="break-words py-3" key={u.id}>
-                                                {u.name} {u.last_name} ·{' '}
-                                                {u.role === 'admin'
-                                                    ? 'Administrador'
-                                                    : 'Veterinario'}
+                                                {u.name} {u.last_name} · Administrador del refugio
                                                 <br />
                                                 <span className="text-sm text-stone-600">
                                                     {u.email}

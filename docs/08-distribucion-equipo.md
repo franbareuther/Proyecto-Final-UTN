@@ -9,7 +9,7 @@ Los issues #2–#5 identifican las cuatro áreas. Sus textos originales describe
 | 1 / #2 | Páginas públicas, CatalogController, componentes, layouts, estilos y tipos compartidos | Recorrido Huella → refugio → catálogo → animal; filtros, vacíos, fotos, teclado y responsive. Revisar PR #7 y componentes con los otros módulos. |
 | 2 / #3 | User, autenticación, RequireRole, policies de solicitudes, AdoptionService, páginas del adoptante y Admin/Requests/Adoptions; integración de rutas | Aislamiento por refugio, adoptante global, solicitudes históricas, permisos y concurrencia con conexiones independientes. Revisar ampliaciones de roles. |
 | 3 / #4 | Shelter, ShelterController, superadmin, perfil del refugio, CRUD/fotos/AnimalPolicy, Animal, dashboard e integridad del esquema | Alta manual real, cuentas del refugio, actualización del refugio inicial, fotos e indicadores separados. Revisar permisos con 2. |
-| 4 / #5 | Veterinaria, modelos clínicos, agenda, tests/CI y documentación de instalación | Privacidad entre refugios, autoría, fechas y agenda; actualización MySQL, migraciones, historial y recorrido completo. |
+| 4 / #5 | Salud, modelos clínicos, agenda, tests/CI y documentación de instalación | Privacidad entre refugios, autoría, fechas y agenda; actualización MySQL, migraciones, historial y recorrido completo. |
 
 Cada autor escribe las pruebas de su módulo. ScopedToStaffShelter es compartido: 2 revisa permisos, 3 relaciones y 4 casos transversales. No desactivar el scope para resolver un problema visual; cualquier excepción requiere autorización y tests.
 
@@ -21,6 +21,6 @@ Cada autor escribe las pruebas de su módulo. ScopedToStaffShelter es compartido
 4. Mantener issues abiertos hasta cumplir criterios actualizados con evidencia. Implementación no equivale a validación de usuarios.
 5. Revisiones cruzadas: 3 revisa 1, 4 revisa 2, 2 revisa 3 y 1 revisa 4. Permisos también 2; esquema también 3.
 
-Una cuenta de personal pertenece a un refugio; adoptantes pueden usar varios. El superadministrador gestiona altas y habilitación, sin decidir adopciones o modificar clínica. La conversación previa ocurre fuera del sistema. Quedan fuera pagos, donaciones, chat, autorregistro, traslados y diagnósticos automáticos.
+Una cuenta de personal pertenece a un refugio; adoptantes pueden usar varios. Solo hay tres roles: superadministrador, administrador del refugio y adoptante. El administrador carga la salud; el superadministrador gestiona altas y habilitación, sin decidir adopciones o modificar clínica. La conversación previa ocurre fuera del sistema. Quedan fuera pagos, donaciones, chat, autorregistro, traslados y diagnósticos automáticos.
 
-Los prompts individuales se preparan posteriormente sobre esta base y con responsables confirmados. Ver [implementación y actualización](10-multirrefugio.md).
+Los prompts individuales se preparan posteriormente sobre esta base y con responsables confirmados. La navegación general y la migración de roles se detallan en [la nueva etapa](12-catalogo-y-tres-roles.md). Ver [implementación y actualización](10-multirrefugio.md).

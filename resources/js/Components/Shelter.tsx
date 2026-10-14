@@ -331,7 +331,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
     const menuId = useId();
     const admin = auth.user?.role === 'admin';
     const superadmin = auth.user?.role === 'superadmin';
-    const staff = admin || auth.user?.role === 'veterinario';
+    const staff = admin;
     const catalogUrl = currentShelter ? `/refugios/${currentShelter.slug}/animales` : '/refugios';
     useEffect(() => router.on('navigate', () => setOpen(false)), []);
     useEffect(() => {
@@ -376,7 +376,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                 <>
                     {navLink(
                         '/veterinaria',
-                        'Veterinaria',
+                        'Salud y cuidados',
                         currentPath.startsWith('/veterinaria') &&
                             currentPath !== '/veterinaria/controles',
                     )}
@@ -385,6 +385,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
             )}
             {!internal && (
                 <>
+                    {navLink('/animales', 'Animales en adopción', currentPath === '/animales')}
                     {navLink('/refugios', 'Refugios', currentPath === '/refugios')}
                     {currentShelter &&
                         navLink(catalogUrl, 'Adoptar', currentPath.startsWith(catalogUrl))}

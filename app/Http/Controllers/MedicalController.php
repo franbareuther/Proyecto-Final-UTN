@@ -23,13 +23,13 @@ class MedicalController extends Controller
     {
         Gate::authorize('medical', $animal);
 
-        return Inertia::render('Veterinaria/History', ['animal' => $animal->load(['photos', 'consultations.veterinarian:id,name,last_name', 'vaccinations.veterinarian:id,name,last_name', 'treatments.veterinarian:id,name,last_name', 'controls.veterinarian:id,name,last_name'])]);
+        return Inertia::render('Veterinaria/History', ['animal' => $animal->load(['photos', 'consultations.recorder:id,name,last_name', 'vaccinations.recorder:id,name,last_name', 'treatments.recorder:id,name,last_name', 'controls.recorder:id,name,last_name'])]);
     }
 
     public function store(MedicalRequest $r, Animal $animal, string $type)
     {
         Gate::authorize('medical', $animal);
-        $animal->{$type}()->create($r->validated() + ['veterinarian_id' => $r->user()->id]);
+        $animal->{$type}()->create($r->validated() + ['recorded_by' => $r->user()->id]);
 
         return back()->with('success', 'Registro sanitario guardado.');
     }
@@ -38,8 +38,7 @@ class MedicalController extends Controller
     {
         Gate::authorize('medical', $animal);
         $entry = $animal->{$type}()->findOrFail($record);
-        abort_unless($entry->veterinarian_id === $r->user()->id, 403);
-        $entry->update($r->validated());
+        $entry->update($r->validated() + ['updated_by' => $r->user()->id]);
 
         return back()->with('success', 'Registro sanitario actualizado.');
     }

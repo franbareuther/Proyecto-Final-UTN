@@ -66,7 +66,7 @@ class ShelterController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255', 'last_name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users', 'password' => 'required|string|min:12|confirmed',
-            'role' => ['required', Rule::in(['admin', 'veterinario'])],
+            'role' => ['required', Rule::in(['admin'])],
         ]);
         $user = new User(collect($data)->except('role')->all());
         $user->role = $data['role'];

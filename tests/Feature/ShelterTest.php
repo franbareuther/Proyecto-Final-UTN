@@ -52,7 +52,7 @@ class ShelterTest extends TestCase
         $this->get('/admin/animales')->assertForbidden();
         $this->get('/veterinaria')->assertForbidden();
         $this->actingAs($this->user('veterinario'))->get('/admin/solicitudes')->assertForbidden();
-        $this->get('/dashboard')->assertRedirect('/veterinaria');
+        $this->get('/dashboard')->assertRedirect('/mis-solicitudes');
     }
 
     public function test_admin_can_create_update_and_archive_an_animal(): void
@@ -71,7 +71,7 @@ class ShelterTest extends TestCase
     {
         $a = Animal::factory()->create(['name' => 'Mora', 'species' => 'Gato', 'breed' => 'Mestizo', 'estimated_age' => 8, 'size' => 'Pequeño']);
         Animal::factory()->create(['name' => 'Bruno', 'estimated_age' => 50]);
-        $a->consultations()->create(['veterinarian_id' => $this->user('veterinario')->id, 'consultation_date' => today(), 'reason' => 'Interno', 'diagnosis' => 'DATO CLINICO PRIVADO']);
+        $a->consultations()->create(['recorded_by' => $this->user('admin')->id, 'consultation_date' => today(), 'reason' => 'Interno', 'diagnosis' => 'DATO CLINICO PRIVADO']);
         $this->get('/refugios/huella-inicial/animales?q=Mora&species=Gato&breed=Mestizo&age=young&size=Pequeño')->assertInertia(fn (Assert $p) => $p->component('Public/Catalog')->has('animals.data', 1)->where('animals.data.0.id', $a->id));
         $this->get('/animales/'.$a->id)->assertInertia(fn (Assert $p) => $p->missing('animal.consultations')->missing('animal.requests'))->assertDontSee('DATO CLINICO PRIVADO');
     }
@@ -180,24 +180,24 @@ class ShelterTest extends TestCase
         $this->put('/admin/animales/'.$r->animal_id, $data)->assertSessionHasErrors('availability_status');
     }
 
-    public function test_medical_records_require_authorized_veterinarian_and_ignore_spoofed_author(): void
+    public function test_medical_records_require_shelter_admin_and_ignore_spoofed_author(): void
     {
         $a = Animal::factory()->create();
-        $v = $this->user('veterinario');
-        $payload = ['consultation_date' => today()->toDateString(), 'reason' => 'Ingreso', 'diagnosis' => 'Evaluación del profesional', 'veterinarian_id' => $this->user()->id];
+        $v = $this->user('admin');
+        $payload = ['consultation_date' => today()->toDateString(), 'reason' => 'Ingreso', 'diagnosis' => 'Evaluación del profesional', 'recorded_by' => $this->user()->id];
         $this->actingAs($this->user())->get('/veterinaria/'.$a->id)->assertForbidden();
         $this->post('/veterinaria/'.$a->id.'/consultations', $payload)->assertForbidden();
         $this->actingAs($this->user('admin'))->get('/veterinaria/'.$a->id)->assertOk();
-        $this->post('/veterinaria/'.$a->id.'/consultations', $payload)->assertForbidden();
+        $this->actingAs($this->user('superadmin'))->post('/veterinaria/'.$a->id.'/consultations', $payload)->assertForbidden();
         $this->actingAs($v)->post('/veterinaria/'.$a->id.'/consultations', $payload)->assertSessionHasNoErrors();
-        $this->assertDatabaseHas('medical_consultations', ['animal_id' => $a->id, 'veterinarian_id' => $v->id]);
+        $this->assertDatabaseHas('medical_consultations', ['animal_id' => $a->id, 'recorded_by' => $v->id]);
         $this->get('/veterinaria/'.$a->id)->assertOk();
     }
 
     public function test_vaccinations_treatments_and_controls_can_be_recorded_and_completed(): void
     {
         $a = Animal::factory()->create();
-        $v = $this->user('veterinario');
+        $v = $this->user('admin');
         $this->actingAs($v);
         $this->post('/veterinaria/'.$a->id.'/vaccinations', ['vaccine_name' => 'Antirrábica', 'application_date' => today()->toDateString(), 'next_dose_date' => today()->addYear()->toDateString()])->assertSessionHasNoErrors();
         $this->post('/veterinaria/'.$a->id.'/treatments', ['description' => 'Tratamiento indicado', 'start_date' => today()->toDateString(), 'status' => 'Activo'])->assertSessionHasNoErrors();
@@ -207,22 +207,23 @@ class ShelterTest extends TestCase
         $this->assertDatabaseHas('veterinary_controls', ['id' => $c->id, 'status' => 'Realizado']);
         $this->assertDatabaseCount('vaccinations', 1);
         $this->assertDatabaseCount('treatments', 1);
-        $this->actingAs($this->user('veterinario'))->patch('/veterinaria/'.$a->id.'/controls/'.$c->id, ['control_type' => 'General', 'scheduled_date' => today()->toDateString(), 'status' => 'Cancelado'])->assertForbidden();
+        $this->actingAs($this->user('admin'))->patch('/veterinaria/'.$a->id.'/controls/'.$c->id, ['control_type' => 'General', 'scheduled_date' => today()->toDateString(), 'status' => 'Cancelado'])->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('veterinary_controls', ['id' => $c->id, 'recorded_by' => $v->id, 'status' => 'Cancelado']);
     }
 
     public function test_medical_dates_are_validated(): void
     {
         $a = Animal::factory()->create();
-        $this->actingAs($this->user('veterinario'));
+        $this->actingAs($this->user('admin'));
         $this->post('/veterinaria/'.$a->id.'/vaccinations', ['vaccine_name' => 'Prueba', 'application_date' => today()->toDateString(), 'next_dose_date' => today()->subDay()->toDateString()])->assertSessionHasErrors('next_dose_date');
     }
 
     public function test_dashboard_calculates_statistics_from_database(): void
     {
         $r = $this->submit();
-        $v = $this->user('veterinario');
-        $r->animal->treatments()->create(['veterinarian_id' => $v->id, 'description' => 'Tratamiento', 'start_date' => today(), 'status' => 'Activo']);
-        $r->animal->controls()->create(['veterinarian_id' => $v->id, 'control_type' => 'General', 'scheduled_date' => today()->addDay(), 'status' => 'Pendiente']);
+        $v = $this->user('admin');
+        $r->animal->treatments()->create(['recorded_by' => $v->id, 'description' => 'Tratamiento', 'start_date' => today(), 'status' => 'Activo']);
+        $r->animal->controls()->create(['recorded_by' => $v->id, 'control_type' => 'General', 'scheduled_date' => today()->addDay(), 'status' => 'Pendiente']);
         $this->actingAs($this->user('admin'))->get('/admin')->assertInertia(fn (Assert $p) => $p->where('stats.Animales registrados', 1)->where('stats.Disponibles', 1)->where('stats.Solicitudes pendientes', 1)->where('stats.Adopciones realizadas', 0)->where('stats.Animales en tratamiento', 1)->where('stats.Controles en 30 días', 1)->has('months', 6));
     }
 

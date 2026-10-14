@@ -10,16 +10,22 @@ type Filters = {
     size: string;
     age: string;
     status: string;
+    shelter: string;
+    city: string;
 };
 export default function Catalog({
     catalogUrl = '/animales',
     shelter,
+    refuges = [],
+    cities = [],
     animals,
     filters,
     breeds,
 }: {
     catalogUrl?: string;
-    shelter?: Refuge;
+    shelter?: Refuge | null;
+    refuges?: Refuge[];
+    cities?: string[];
     animals: Page<Animal>;
     filters: Record<string, string>;
     breeds: string[];
@@ -31,6 +37,8 @@ export default function Catalog({
         size: filters.size || '',
         age: filters.age || '',
         status: filters.status || '',
+        shelter: filters.shelter || '',
+        city: filters.city || '',
     });
     const options: [keyof Filters, string, (string | [string, string])[]][] = [
         ['species', 'Especie', ['Perro', 'Gato', 'Otro']],
@@ -51,7 +59,15 @@ export default function Catalog({
             ['Disponible', 'En proceso de adopción', 'Adoptado', 'No disponible temporalmente'],
         ],
     ];
+    if (!shelter) {
+        options.push(
+            ['shelter', 'Refugio', refuges.map((s) => [s.slug, s.name])],
+            ['city', 'Ciudad', cities],
+        );
+    }
     const labels: Record<string, string> = {
+        shelter: 'Refugio',
+        city: 'Ciudad',
         q: 'Nombre',
         species: 'Especie',
         breed: 'Raza',
@@ -89,8 +105,10 @@ export default function Catalog({
                     </span>
                 </h1>
                 <p className="mt-5 max-w-xl text-base leading-relaxed text-stone-600 sm:text-lg">
-                    Conocé a los animales del refugio. Más allá de su tamaño o edad, cada uno tiene
-                    algo único para compartir.
+                    {shelter
+                        ? 'Conocé a los animales de este refugio.'
+                        : 'Conocé a los animales de toda la red Huella.'}{' '}
+                    Más allá de su tamaño o edad, cada uno tiene algo único para compartir.
                 </p>
             </header>
             <section aria-labelledby="filters-title" className="card mb-8">
@@ -183,7 +201,7 @@ export default function Catalog({
                                 href={withoutFilter(key)}
                                 preserveScroll
                                 className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-950 hover:border-emerald-800"
-                                aria-label={`Quitar filtro ${labels[key]}: ${key === 'age' ? ageLabels[value] || value : value}`}
+                                aria-label={`Quitar filtro ${labels[key]}: ${key === 'age' ? ageLabels[value] || value : key === 'shelter' ? refuges.find((s) => s.slug === value)?.name || value : value}`}
                             >
                                 <span className="min-w-0 break-words">
                                     {labels[key]}:{' '}

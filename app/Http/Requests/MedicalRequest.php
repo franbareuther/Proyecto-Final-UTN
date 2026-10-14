@@ -9,7 +9,7 @@ class MedicalRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->role === 'veterinario';
+        return $this->user()?->role === 'admin';
     }
 
     public function rules(): array
@@ -22,6 +22,6 @@ class MedicalRequest extends FormRequest
             default => abort(404),
         };
 
-        return $rules + ['observations' => ['nullable', 'string', 'max:5000']];
+        return $rules + ['practitioner_name' => ['nullable', 'string', 'max:255'], 'observations' => ['nullable', 'string', 'max:5000']];
     }
 }
