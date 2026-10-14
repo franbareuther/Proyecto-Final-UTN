@@ -66,9 +66,9 @@ Rama: `feature/plataforma-refugio`.
 - `ee44df7`: dominio Laravel y flujo transaccional de adopciones.
 - `2262ad1`: interfaz React/Inertia pública e interna.
 - `fa8a4e8`: tests de autenticación, adopciones, veterinaria y CI MySQL.
-- La documentación se entrega en un commit posterior. Consultar `git log --oneline` para el hash exacto.
+- `8940c44`: documentación de arquitectura, instalación XAMPP, colaboración y validación.
 
-No se integra automáticamente la aplicación en main. El enlace y estado del Pull Request se añaden después de publicar la rama.
+Pull Request en borrador: https://github.com/franbareuther/Proyecto-Final-UTN/pull/1. No se integra automáticamente la aplicación en main. La integración GitHub no tenía permiso para crear el PR (403); se creó con la autenticación Git ya disponible para este mismo repositorio. GitHub Actions se verifica por separado; no confundir resultados locales con CI remoto.
 
 ## Pendientes recomendados
 
