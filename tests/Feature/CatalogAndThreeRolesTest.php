@@ -24,7 +24,7 @@ class CatalogAndThreeRolesTest extends TestCase
         $this->get('/animales')->assertInertia(fn (Assert $p) => $p->where('animals.total', 15)->where('shelter', null)->has('refuges', 3));
         $this->get('/animales?city=Rosario&species=Gato')->assertInertia(fn (Assert $p) => $p->where('animals.total', 14)->where('animals.next_page_url', url('/animales?city=Rosario&species=Gato&page=2')));
         $this->get('/animales?shelter=norte')->assertInertia(fn (Assert $p) => $p->has('animals.data', 1)->where('animals.data.0.id', $other->id)->where('animals.data.0.shelter.name', 'Norte'));
-        $this->get('/refugios/sur/animales?shelter=norte&city=Córdoba')->assertInertia(fn (Assert $p) => $p->where('animals.total', 14));
+        $this->followingRedirects()->get('/refugios/sur/animales?shelter=norte&city=Córdoba')->assertInertia(fn (Assert $p) => $p->where('animals.total', 14));
         $this->actingAs(User::factory()->create(['role' => 'admin', 'shelter_id' => $sur->id]));
         $this->get('/animales')->assertInertia(fn (Assert $p) => $p->where('animals.total', 15));
         $this->get('/refugios/norte/animales/'.$other->id)->assertOk();

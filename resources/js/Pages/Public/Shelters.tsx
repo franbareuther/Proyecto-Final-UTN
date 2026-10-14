@@ -1,6 +1,7 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Empty, Errors, Field, Pagination, Shell, Title } from '@/Components/Shelter';
 import { Page, Refuge } from '@/types/shelter';
+import { useEffect } from 'react';
 
 export default function Shelters({
     shelters,
@@ -10,6 +11,7 @@ export default function Shelters({
     filters: { q?: string };
 }) {
     const form = useForm({ q: filters.q || '' });
+    useEffect(() => form.setData('q', filters.q || ''), [filters.q]);
     return (
         <Shell>
             <Head title="Refugios de Huella" />
@@ -24,10 +26,13 @@ export default function Shelters({
                     form.get('/refugios');
                 }}
             >
-                <div className="flex-1">
-                    <Field label="Nombre o ciudad">
+                <div className="min-w-0 flex-1 basis-48">
+                    <Field label="Nombre o ciudad" error={form.errors.q}>
                         <input
                             className="input"
+                            type="search"
+                            name="q"
+                            maxLength={100}
                             value={form.data.q}
                             onChange={(e) => form.setData('q', e.target.value)}
                         />

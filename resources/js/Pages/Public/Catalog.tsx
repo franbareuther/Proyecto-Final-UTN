@@ -2,6 +2,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { Animal, Page, Refuge } from '@/types/shelter';
 import { AnimalCard, Empty, Errors, Field, Pagination, Shell } from '@/Components/Shelter';
 import Icon from '@/Components/Icon';
+import { useEffect } from 'react';
 
 type Filters = {
     q: string;
@@ -37,9 +38,21 @@ export default function Catalog({
         size: filters.size || '',
         age: filters.age || '',
         status: filters.status || '',
-        shelter: filters.shelter || '',
-        city: filters.city || '',
+        shelter: shelter ? '' : filters.shelter || '',
+        city: shelter ? '' : filters.city || '',
     });
+    useEffect(() => {
+        f.setData({
+            q: filters.q || '',
+            species: filters.species || '',
+            breed: filters.breed || '',
+            size: filters.size || '',
+            age: filters.age || '',
+            status: filters.status || '',
+            shelter: shelter ? '' : filters.shelter || '',
+            city: shelter ? '' : filters.city || '',
+        });
+    }, [filters, shelter?.id]);
     const options: [keyof Filters, string, (string | [string, string])[]][] = [
         ['species', 'Especie', ['Perro', 'Gato', 'Otro']],
         ['breed', 'Raza', breeds],
@@ -80,11 +93,11 @@ export default function Catalog({
         adult: 'De 1 a 7 años',
         senior: '8 años o más',
     };
-    const applied = Object.entries(filters).filter(([key, value]) => key in f.data && value);
+    const applied = Object.entries(filters).filter(
+        ([key, value]) => value && (key === 'q' || options.some(([option]) => option === key)),
+    );
     const withoutFilter = (key: string) => {
-        const query = new URLSearchParams(
-            Object.entries(filters).filter(([k, v]) => k !== key && k in f.data && v),
-        );
+        const query = new URLSearchParams(applied.filter(([k]) => k !== key));
         return catalogUrl + (query.size ? '?' + query.toString() : '');
     };
     return (
@@ -125,6 +138,14 @@ export default function Catalog({
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
+                        f.transform((data) =>
+                            Object.fromEntries(
+                                Object.entries(data).filter(
+                                    ([key, value]) =>
+                                        value && (!shelter || !['shelter', 'city'].includes(key)),
+                                ),
+                            ),
+                        );
                         f.get(catalogUrl, { preserveState: true, preserveScroll: true });
                     }}
                     aria-label="Buscar y filtrar animales"
@@ -152,6 +173,16 @@ export default function Catalog({
                                     <option value="">
                                         {key === 'breed' ? 'Todas las razas' : 'Todas las opciones'}
                                     </option>
+                                    {f.data[key] &&
+                                        !values.some(
+                                            (value) =>
+                                                (typeof value === 'string' ? value : value[0]) ===
+                                                f.data[key],
+                                        ) && (
+                                            <option value={f.data[key]}>
+                                                {f.data[key]} (sin coincidencias)
+                                            </option>
+                                        )}
                                     {values.map((value) => (
                                         <option
                                             key={typeof value === 'string' ? value : value[0]}
@@ -205,7 +236,11 @@ export default function Catalog({
                             >
                                 <span className="min-w-0 break-words">
                                     {labels[key]}:{' '}
-                                    {key === 'age' ? ageLabels[value] || value : value}
+                                    {key === 'age'
+                                        ? ageLabels[value] || value
+                                        : key === 'shelter'
+                                          ? refuges.find((s) => s.slug === value)?.name || value
+                                          : value}
                                 </span>
                                 <Icon name="close" className="h-4 w-4 shrink-0" />
                             </Link>

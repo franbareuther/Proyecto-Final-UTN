@@ -23,6 +23,10 @@ class CatalogController extends Controller
     {
         if ($shelter) {
             abort_unless($shelter->active, 404);
+            // Network filters never apply inside an institution's catalog.
+            if ($r->query->has('shelter') || $r->query->has('city')) {
+                return redirect()->route('shelters.catalog', ['shelter' => $shelter] + $r->except(['shelter', 'city']));
+            }
         }
         $f = $r->validate(['q' => 'nullable|string|max:100', 'species' => 'nullable|string|max:100', 'breed' => 'nullable|string|max:100', 'size' => 'nullable|string|max:30', 'age' => 'nullable|in:young,adult,senior', 'status' => 'nullable|in:Disponible,En proceso de adopción,Adoptado,No disponible temporalmente', 'shelter' => 'nullable|string|max:100', 'city' => 'nullable|string|max:100']);
         $base = Animal::whereHas('shelter', fn ($q) => $q->where('active', true));
@@ -63,7 +67,7 @@ class CatalogController extends Controller
             });
         }
 
-        return Inertia::render('Public/Catalog', ['animals' => $q->latest()->paginate(12)->withQueryString(), 'filters' => $f, 'shelter' => $shelter, 'catalogUrl' => $shelter ? route('shelters.catalog', $shelter) : route('catalog'), 'breeds' => $breeds, 'refuges' => $shelter ? [] : Shelter::where('active', true)->orderBy('name')->get(['id', 'name', 'slug']), 'cities' => $shelter ? [] : Shelter::where('active', true)->whereNotNull('city')->where('city', '!=', '')->distinct()->orderBy('city')->pluck('city')]);
+        return Inertia::render('Public/Catalog', ['animals' => $q->latest()->orderByDesc('id')->paginate(12)->withQueryString(), 'filters' => $f, 'shelter' => $shelter, 'catalogUrl' => $shelter ? route('shelters.catalog', $shelter) : route('catalog'), 'breeds' => $breeds, 'refuges' => $shelter ? [] : Shelter::where('active', true)->orderBy('name')->get(['id', 'name', 'slug']), 'cities' => $shelter ? [] : Shelter::where('active', true)->whereNotNull('city')->where('city', '!=', '')->distinct()->orderBy('city')->pluck('city')]);
     }
 
     public function scopedShow(Shelter $shelter, Animal $animal)

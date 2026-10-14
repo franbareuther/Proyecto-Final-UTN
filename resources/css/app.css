@@ -106,6 +106,9 @@
     .public-shell h3 {
         overflow-wrap: anywhere;
     }
+    .public-shell main :where(p, a, dd, dt) {
+        overflow-wrap: anywhere;
+    }
     .public-heading {
         font-size: clamp(2rem, 4.6vw, 4rem);
         line-height: 1.12;
