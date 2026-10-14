@@ -398,12 +398,12 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
         </>
     );
     return (
-        <div className={'min-h-screen ' + (internal ? '' : 'public-shell')}>
+        <div className={'min-h-screen ' + (internal ? 'internal-shell' : 'public-shell')}>
             <a className="skip-link" href="#main">
                 Saltar al contenido
             </a>
             <header className="relative z-20 border-b border-stone-200 bg-white/95">
-                <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
+                <div className="site-gutter flex w-full min-w-0 items-center justify-between gap-4 py-4">
                     <Link
                         href="/"
                         aria-label={`${shelterName} — Inicio`}
@@ -451,14 +451,14 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                     aria-label="Navegación móvil"
                     className={
                         (open ? 'flex' : 'hidden') +
-                        ' flex-col gap-1 border-t border-stone-200 bg-white px-5 py-4 lg:hidden'
+                        ' site-gutter flex-col gap-1 border-t border-stone-200 bg-white py-4 lg:hidden'
                     }
                 >
                     {navigation}
                     {internal && navLink('/animales', 'Ver sitio público')}
                 </nav>
             </header>
-            <div className={internal ? 'mx-auto flex max-w-screen-2xl' : ''}>
+            <div className={'app-frame ' + (internal ? 'flex' : '')}>
                 {internal && (
                     <aside className="hidden min-h-[85vh] w-60 shrink-0 border-r border-stone-200 bg-white p-5 lg:block">
                         <p className="eyebrow mb-6 px-3">Espacio del refugio</p>
@@ -467,14 +467,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                         </nav>
                     </aside>
                 )}
-                <main
-                    id="main"
-                    tabIndex={-1}
-                    className={
-                        'mx-auto w-full min-w-0 max-w-7xl px-5 py-10 sm:px-8 ' +
-                        (internal ? 'lg:p-10' : '')
-                    }
-                >
+                <main id="main" tabIndex={-1} className="app-main site-gutter py-10">
                     {flash.error && (
                         <div
                             role="alert"
@@ -495,12 +488,12 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                 </main>
             </div>
             {internal ? (
-                <footer className="border-t border-stone-200 px-5 py-6 text-center text-sm text-stone-600">
+                <footer className="site-gutter border-t border-stone-200 py-6 text-center text-sm text-stone-600">
                     {shelterName} · Proyecto académico UTN
                 </footer>
             ) : (
                 <footer className="bg-huella-forest text-white">
-                    <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-8 md:grid-cols-[1.5fr_1fr_1fr] md:py-16">
+                    <div className="site-gutter grid min-w-0 gap-10 py-12 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)] md:py-16">
                         <div>
                             <div className="flex items-center gap-3 text-2xl font-semibold">
                                 <Icon name="paw" className="h-7 w-7" />
@@ -546,7 +539,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                             </Link>
                         </nav>
                     </div>
-                    <div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-3 border-t border-white/20 px-5 py-6 text-xs leading-relaxed text-emerald-100 sm:px-8">
+                    <div className="site-gutter flex min-w-0 flex-wrap justify-between gap-3 border-t border-white/20 py-6 text-xs leading-relaxed text-emerald-100">
                         <p>{shelterName} · Cada adopción deja una huella.</p>
                         <p>Proyecto final · UTN</p>
                     </div>

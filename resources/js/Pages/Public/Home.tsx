@@ -11,9 +11,9 @@ export default function Home({ animals }: { animals: Animal[] }) {
             <Head title="Un encuentro puede cambiarlo todo" />
             <section
                 aria-labelledby="hero-title"
-                className="public-hero grid items-center gap-8 overflow-hidden rounded-[1.75rem] p-5 sm:gap-10 sm:rounded-[2.5rem] sm:p-8 lg:grid-cols-[1.05fr_1fr] lg:p-12"
+                className="public-hero items-center overflow-hidden rounded-[1.75rem] sm:rounded-[2.5rem]"
             >
-                <div className="min-w-0 py-3 sm:py-6">
+                <div className="hero-copy min-w-0 py-3 sm:py-6">
                     <p className="eyebrow flex items-center gap-2">
                         <Icon name="paw" className="h-4 w-4 shrink-0" />
                         Segundas oportunidades, nuevas historias
@@ -27,7 +27,7 @@ export default function Home({ animals }: { animals: Animal[] }) {
                             Toda una vida.
                         </span>
                     </h1>
-                    <p className="mt-6 max-w-md text-base leading-relaxed text-stone-700 sm:text-lg">
+                    <p className="reading-copy mt-6 text-base leading-relaxed text-stone-700 sm:text-lg">
                         Hay una historia esperando cruzarse con la tuya. Conocé a los animales del
                         refugio y encontrá a tu próximo compañero.
                     </p>
@@ -57,7 +57,7 @@ export default function Home({ animals }: { animals: Animal[] }) {
                                 : 'Una nueva historia en el refugio'
                         }
                         loading="eager"
-                        className="relative aspect-[4/5] max-h-[580px] w-full rounded-[1.5rem] bg-[#e2e9db] object-cover sm:aspect-square lg:aspect-[4/5]"
+                        className="hero-photo relative rounded-[1.5rem] bg-[#e2e9db]"
                     />
                     <div className="relative mx-3 -mt-16 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm sm:mx-5 sm:p-5">
                         <p className="eyebrow">
@@ -100,7 +100,7 @@ export default function Home({ animals }: { animals: Animal[] }) {
                     </Link>
                 </div>
                 {animals.length ? (
-                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="animal-grid">
                         {animals.map((a) => (
                             <AnimalCard key={a.id} animal={a} />
                         ))}
@@ -179,7 +179,7 @@ export default function Home({ animals }: { animals: Animal[] }) {
                     </h2>
                 </div>
                 <div className="min-w-0">
-                    <p className="text-lg leading-relaxed text-stone-700">
+                    <p className="reading-copy text-lg leading-relaxed text-stone-700">
                         En Huella creemos en las segundas oportunidades. Cuidamos y acompañamos a
                         cada animal mientras encuentra una familia que respete sus tiempos y lo
                         quiera durante toda su vida.

@@ -186,7 +186,7 @@ export default function Catalog({
                     </div>
                 )}
                 {animals.data.length ? (
-                    <div className="grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="animal-grid">
                         {animals.data.map((animal) => (
                             <AnimalCard key={animal.id} animal={animal} />
                         ))}

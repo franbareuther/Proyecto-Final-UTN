@@ -33,7 +33,7 @@ export default function Animal({ animal: a }: { animal: AnimalType }) {
                     {a.name}
                 </span>
             </nav>
-            <div className="grid min-w-0 items-start gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
+            <div className="profile-layout">
                 <section aria-label={`Fotografías de ${a.name}`} className="min-w-0">
                     <div className="relative">
                         <AnimalImage
@@ -151,7 +151,7 @@ export default function Animal({ animal: a }: { animal: AnimalType }) {
                         >
                             Un poquito sobre mí
                         </h2>
-                        <p className="mt-3 whitespace-pre-line break-words leading-relaxed text-stone-700">
+                        <p className="reading-copy mt-3 whitespace-pre-line break-words leading-relaxed text-stone-700">
                             {a.description}
                         </p>
                     </section>
@@ -162,7 +162,7 @@ export default function Animal({ animal: a }: { animal: AnimalType }) {
                         >
                             Mi personalidad
                         </h2>
-                        <p className="mt-3 whitespace-pre-line break-words leading-relaxed text-stone-700">
+                        <p className="reading-copy mt-3 whitespace-pre-line break-words leading-relaxed text-stone-700">
                             {a.personality || 'El refugio te contará más sobre mí.'}
                         </p>
                     </section>
@@ -177,7 +177,7 @@ export default function Animal({ animal: a }: { animal: AnimalType }) {
                             <Icon name="leaf" className="h-5 w-5 shrink-0" />
                             Mis cuidados
                         </h2>
-                        <p className="mt-3 whitespace-pre-line break-words text-sm leading-relaxed text-emerald-950">
+                        <p className="reading-copy mt-3 whitespace-pre-line break-words text-sm leading-relaxed text-emerald-950">
                             {a.public_health_info ||
                                 'Consultá al refugio para conocer los cuidados que necesito.'}
                         </p>
