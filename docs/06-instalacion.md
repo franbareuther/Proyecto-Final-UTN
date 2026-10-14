@@ -1,3 +1,5 @@
+> Actualización multirrefugio: consultar [diseño y actualización vigentes](10-multirrefugio.md). Las referencias a un refugio único y al estado previo de los PR pertenecen a la etapa inicial.
+
 # Instalación en Windows / XAMPP
 
 1. Instalar XAMPP con PHP 8.2 o superior y habilitar PDO MySQL, mbstring, openssl, fileinfo, DOM/XML y ZIP en el PHP utilizado por Composer. Comprobar `where.exe php` y `php -v`. Reiniciar terminal/Apache si se cambia php.ini. PHP de CLI y Apache deben ser compatibles.

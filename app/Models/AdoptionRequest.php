@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ScopedToStaffShelter;
 use Illuminate\Database\Eloquent\Model;
 
 class AdoptionRequest extends Model
 {
+    use ScopedToStaffShelter;
+
     public const ACTIVE = ['Nueva', 'En revisión', 'Aprobada'];
 
     protected $fillable = ['phone', 'address', 'housing_type', 'has_other_pets', 'previous_experience', 'motivation', 'additional_information'];

@@ -28,6 +28,9 @@ export default function Apply({ animal }: { animal: Animal }) {
                     />
                     <div>
                         <h2 className="font-semibold">{animal.name}</h2>
+                        {animal.shelter && (
+                            <p className="text-sm text-emerald-800">{animal.shelter.name}</p>
+                        )}
                         <p className="text-sm text-stone-500">
                             Solicitud de {auth.user?.name} {auth.user?.last_name} ·{' '}
                             {auth.user?.email}

@@ -25,8 +25,11 @@ export default function Animal({ animal: a }: { animal: AnimalType }) {
                 aria-label="Ruta de navegación"
                 className="mb-6 flex flex-wrap items-center gap-2 text-sm text-stone-600"
             >
-                <Link href="/animales" className="text-link">
-                    Animales del refugio
+                <Link
+                    href={a.shelter ? `/refugios/${a.shelter.slug}/animales` : '/refugios'}
+                    className="text-link"
+                >
+                    {a.shelter?.name || 'Animales del refugio'}
                 </Link>
                 <Icon name="chevron" className="h-3 w-3" />
                 <span className="min-w-0 break-words" aria-current="page">
@@ -220,7 +223,14 @@ export default function Animal({ animal: a }: { animal: AnimalType }) {
                                         : 'Por el momento no recibe nuevas solicitudes. Podés conocer a otros compañeros del refugio.'}
                                 </p>
                                 {a.availability_status !== 'Disponible' && (
-                                    <Link href="/animales" className="text-link mt-3">
+                                    <Link
+                                        href={
+                                            a.shelter
+                                                ? `/refugios/${a.shelter.slug}/animales`
+                                                : '/refugios'
+                                        }
+                                        className="text-link mt-3"
+                                    >
                                         Conocer otros animales{' '}
                                         <Icon name="arrow" className="h-4 w-4" />
                                     </Link>

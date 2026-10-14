@@ -1,3 +1,5 @@
+> Actualización multirrefugio: consultar [diseño y actualización vigentes](10-multirrefugio.md). Las referencias a un refugio único y al estado previo de los PR pertenecen a la etapa inicial.
+
 # Revisión de plataforma y guía manual — 14 de octubre de 2026
 
 ## Alcance y evidencia

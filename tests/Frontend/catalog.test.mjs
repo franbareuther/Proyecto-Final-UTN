@@ -133,15 +133,24 @@ test('el catálogo mantiene filtros al quitar uno y ofrece salida del resultado 
 });
 
 test('la navegación anuncia página activa, acceso al contenido y estado inicial del menú', async () => {
-    const html = await renderPage('Public/Catalog', {
-        animals: page([animal]),
-        filters: {},
-        breeds: [],
-    });
+    const html = await renderPage(
+        'Public/Catalog',
+        {
+            animals: page([animal]),
+            filters: {},
+            breeds: [],
+            currentShelter: { id: 1, name: 'Sur', slug: 'sur', active: true },
+            catalogUrl: '/refugios/sur/animales',
+        },
+        null,
+        '/refugios/sur/animales',
+    );
     assert.match(html, /href="#main"/);
     assert.ok(
         [...html.matchAll(/<a\b[^>]*>/g)].some(
-            ([tag]) => tag.includes('href="/animales"') && tag.includes('aria-current="page"'),
+            ([tag]) =>
+                tag.includes('href="/refugios/sur/animales"') &&
+                tag.includes('aria-current="page"'),
         ),
     );
     assert.match(html, /aria-expanded="false" aria-controls="[^"]+" aria-label="Abrir menú"/);
@@ -246,4 +255,61 @@ test('el panel mantiene las tablas en un contenedor con desplazamiento propio', 
     assert.match(html, /class="[^"]*overflow-x-auto[^"]*"><table/);
     assert.match(html, /href="\/admin\/animales\/7\/edit"/);
     assert.match(html, /href="\/veterinaria\/7"/);
+});
+
+test('quitar un filtro y limpiar conserva el catálogo del refugio seleccionado', async () => {
+    const shelter = { id: 1, name: 'Patitas del Sur', slug: 'sur', active: true };
+    const html = await renderPage(
+        'Public/Catalog',
+        {
+            animals: page([]),
+            filters: { q: 'Mora', species: 'Gato' },
+            breeds: [],
+            shelter,
+            currentShelter: shelter,
+            catalogUrl: '/refugios/sur/animales',
+        },
+        null,
+        '/refugios/sur/animales?q=Mora&species=Gato',
+    );
+    assert.match(html, /href="\/refugios\/sur\/animales\?q=Mora"/);
+    assert.match(html, /href="\/refugios\/sur\/animales"/);
+    assert.match(html, /Patitas del Sur/);
+    assert.doesNotMatch(html, /href="\/animales\?/);
+});
+
+test('perfil y tarjeta enlazan al catálogo y animal del refugio correcto', async () => {
+    const shelter = { id: 1, name: 'Patitas del Sur', slug: 'sur', active: true };
+    const html = await renderPage('Public/Animal', {
+        animal: { ...animal, shelter },
+        currentShelter: shelter,
+    });
+    assert.match(html, /href="\/refugios\/sur\/animales"/);
+    const card = renderToStaticMarkup(
+        createElement(components.AnimalCard, { animal: { ...animal, shelter } }),
+    );
+    assert.match(card, /href="\/refugios\/sur\/animales\/7"/);
+});
+
+test('directorio y perfil ofrecen salida para refugios vacíos y sin contacto', async () => {
+    const empty = await renderPage('Public/Shelters', { shelters: page([]), filters: {} });
+    assert.match(empty, /No encontramos refugios/);
+    const html = await renderPage('Public/Shelter', {
+        shelter: { id: 1, name: 'Sur', slug: 'sur', active: true },
+    });
+    assert.match(html, /href="\/refugios\/sur\/animales"/);
+    assert.match(html, /Los datos de contacto estarán disponibles próximamente/);
+});
+
+test('superadministrador tiene navegación y alta manual sin acciones clínicas', async () => {
+    const html = await renderPage(
+        'Superadmin/Shelters',
+        { shelters: [] },
+        { id: 1, name: 'Equipo', role: 'superadmin' },
+        '/superadmin/refugios',
+    );
+    assert.match(html, /Gestionar refugios/);
+    assert.match(html, /Nuevo refugio/);
+    assert.doesNotMatch(html, /href="\/admin\/adopciones"/);
+    assert.doesNotMatch(html, /href="\/veterinaria"/);
 });

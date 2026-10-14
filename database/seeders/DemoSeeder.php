@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Animal;
+use App\Models\Shelter;
 use App\Models\User;
 use App\Services\AdoptionService;
 use Illuminate\Database\Seeder;
@@ -31,12 +32,14 @@ class DemoSeeder extends Seeder
             foreach (['admin', 'veterinario', 'adoptante'] as $role) {
                 $u = new User(['name' => ucfirst($role), 'last_name' => 'Demostración', 'email' => $role.'@huella.test', 'password' => Hash::make($password)]);
                 $u->role = $role;
+                $u->shelter_id = $role === 'adoptante' ? null : Shelter::where('slug', 'huella-inicial')->value('id');
                 $u->save();
                 $users[$role] = $u;
             }
             $animals = [];
             foreach (['Mora', 'Simón', 'Luna', 'Coco', 'Nina', 'Toto', 'Oliva', 'Félix', 'Alma', 'Rocco', 'Milo', 'Frida', 'Pipa', 'Bruno'] as $i => $name) {
                 $animals[] = Animal::create([
+                    'shelter_id' => Shelter::where('slug', 'huella-inicial')->value('id'),
                     'name' => $name, 'species' => $i % 3 === 0 ? 'Gato' : 'Perro', 'breed' => 'Mestizo', 'sex' => $i % 2 ? 'Macho' : 'Hembra',
                     'estimated_age' => [8, 24, 48, 100][$i % 4], 'size' => ['Pequeño', 'Mediano', 'Grande'][$i % 3],
                     'color' => ['Marrón', 'Negro y blanco', 'Dorado'][$i % 3],

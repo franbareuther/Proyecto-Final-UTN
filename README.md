@@ -1,3 +1,5 @@
+> Actualización multirrefugio: consultar [implementación, roles y actualización](docs/10-multirrefugio.md). Las referencias a un refugio único y al estado previo de los PR pertenecen a la etapa inicial.
+
 ﻿# Huella · Proyecto Final UTN
 
 Plataforma de gestión de refugio y adopciones: Laravel 12, React 18, Inertia 2, TypeScript, Tailwind CSS 4, Vite 7 y MySQL. Identidad visual provisional y datos demo claramente identificados.

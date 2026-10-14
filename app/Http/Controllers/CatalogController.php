@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Animal;
+use App\Models\Shelter;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -10,13 +11,14 @@ class CatalogController extends Controller
 {
     public function home()
     {
-        return Inertia::render('Public/Home', ['animals' => Animal::with('photos')->where('availability_status', 'Disponible')->latest()->take(3)->get()]);
+        return Inertia::render('Public/Home', ['animals' => Animal::with(['photos', 'shelter'])->whereHas('shelter', fn ($q) => $q->where('active', true))->where('availability_status', 'Disponible')->latest()->take(3)->get()]);
     }
 
-    public function index(Request $r)
+    public function index(Request $r, Shelter $shelter)
     {
+        abort_unless($shelter->active, 404);
         $f = $r->validate(['q' => 'nullable|string|max:100', 'species' => 'nullable|string|max:100', 'breed' => 'nullable|string|max:100', 'size' => 'nullable|string|max:30', 'age' => 'nullable|in:young,adult,senior', 'status' => 'nullable|in:Disponible,En proceso de adopción,Adoptado,No disponible temporalmente']);
-        $q = Animal::with('photos');
+        $q = $shelter->animals()->with(['photos', 'shelter']);
         if ($r->filled('q')) {
             $q->where('name', 'like', '%'.$f['q'].'%');
         }
@@ -42,11 +44,20 @@ class CatalogController extends Controller
             });
         }
 
-        return Inertia::render('Public/Catalog', ['animals' => $q->latest()->paginate(12)->withQueryString(), 'filters' => $f, 'breeds' => Animal::whereNotNull('breed')->distinct()->orderBy('breed')->pluck('breed')]);
+        return Inertia::render('Public/Catalog', ['animals' => $q->latest()->paginate(12)->withQueryString(), 'filters' => $f, 'shelter' => $shelter, 'catalogUrl' => route('shelters.catalog', $shelter), 'breeds' => $shelter->animals()->whereNotNull('breed')->distinct()->orderBy('breed')->pluck('breed')]);
+    }
+
+    public function scopedShow(Shelter $shelter, Animal $animal)
+    {
+        abort_unless($shelter->id === $animal->shelter_id, 404);
+
+        return $this->show($animal);
     }
 
     public function show(Animal $animal)
     {
-        return Inertia::render('Public/Animal', ['animal' => $animal->load('photos')]);
+        abort_unless($animal->shelter?->active, 404);
+
+        return Inertia::render('Public/Animal', ['animal' => $animal->load(['photos', 'shelter']), 'shelter' => $animal->shelter]);
     }
 }

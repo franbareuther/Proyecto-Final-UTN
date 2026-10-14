@@ -72,7 +72,7 @@ class ShelterTest extends TestCase
         $a = Animal::factory()->create(['name' => 'Mora', 'species' => 'Gato', 'breed' => 'Mestizo', 'estimated_age' => 8, 'size' => 'Pequeño']);
         Animal::factory()->create(['name' => 'Bruno', 'estimated_age' => 50]);
         $a->consultations()->create(['veterinarian_id' => $this->user('veterinario')->id, 'consultation_date' => today(), 'reason' => 'Interno', 'diagnosis' => 'DATO CLINICO PRIVADO']);
-        $this->get('/animales?q=Mora&species=Gato&breed=Mestizo&age=young&size=Pequeño')->assertInertia(fn (Assert $p) => $p->component('Public/Catalog')->has('animals.data', 1)->where('animals.data.0.id', $a->id));
+        $this->get('/refugios/huella-inicial/animales?q=Mora&species=Gato&breed=Mestizo&age=young&size=Pequeño')->assertInertia(fn (Assert $p) => $p->component('Public/Catalog')->has('animals.data', 1)->where('animals.data.0.id', $a->id));
         $this->get('/animales/'.$a->id)->assertInertia(fn (Assert $p) => $p->missing('animal.consultations')->missing('animal.requests'))->assertDontSee('DATO CLINICO PRIVADO');
     }
 

@@ -6,14 +6,19 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MedicalController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ShelterController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [CatalogController::class, 'home'])->name('home');
-Route::get('/animales', [CatalogController::class, 'index'])->name('catalog');
+Route::redirect('/animales', '/refugios')->name('catalog');
+Route::get('/refugios', [ShelterController::class, 'index'])->name('shelters.index');
+Route::get('/refugios/{shelter}', [ShelterController::class, 'show'])->name('shelters.show');
+Route::get('/refugios/{shelter}/animales', [CatalogController::class, 'index'])->name('shelters.catalog');
+Route::get('/refugios/{shelter}/animales/{animal}', [CatalogController::class, 'scopedShow'])->name('shelters.animals.show');
 Route::get('/animales/{animal}', [CatalogController::class, 'show'])->name('animals.show');
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', fn () => redirect(match (auth()->user()->role) {
-        'admin' => '/admin','veterinario' => '/veterinaria',default => '/mis-solicitudes'
+        'superadmin' => '/superadmin/refugios', 'admin' => '/admin','veterinario' => '/veterinaria',default => '/mis-solicitudes'
     }))->name('dashboard');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -23,7 +28,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/animales/{animal}/solicitar', [AdoptionRequestController::class, 'store'])->middleware('throttle:20,1')->name('requests.store');
     });
     Route::get('/solicitudes/{adoptionRequest}', [AdoptionRequestController::class, 'show'])->name('requests.show');
+    Route::middleware('role:superadmin')->prefix('superadmin')->group(function () {
+        Route::get('/refugios', [ShelterController::class, 'manage'])->name('superadmin.shelters');
+        Route::post('/refugios', [ShelterController::class, 'store'])->name('superadmin.shelters.store');
+        Route::patch('/refugios/{shelter}', [ShelterController::class, 'update'])->name('superadmin.shelters.update');
+        Route::post('/refugios/{shelter}/personal', [ShelterController::class, 'staff'])->name('superadmin.staff.store');
+    });
     Route::middleware('role:admin')->prefix('admin')->group(function () {
+        Route::match(['get', 'patch'], '/refugio', [ShelterController::class, 'profile'])->name('admin.shelter');
         Route::get('/', DashboardController::class)->name('admin.dashboard');
         Route::resource('animales', AnimalController::class)->parameters(['animales' => 'animal'])->except('show')->names('admin.animals');
         Route::delete('/animales/{animal}/fotos/{photo}', [AnimalController::class, 'deletePhoto'])->name('admin.photos.delete');

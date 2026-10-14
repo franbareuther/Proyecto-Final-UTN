@@ -1,3 +1,5 @@
+> Actualización multirrefugio: consultar [diseño y actualización vigentes](10-multirrefugio.md). Las referencias a un refugio único y al estado previo de los PR pertenecen a la etapa inicial.
+
 # Plan y estado de desarrollo
 
 ## Implementado en esta entrega

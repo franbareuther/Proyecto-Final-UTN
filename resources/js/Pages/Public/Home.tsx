@@ -28,11 +28,11 @@ export default function Home({ animals }: { animals: Animal[] }) {
                         </span>
                     </h1>
                     <p className="reading-copy mt-6 text-base leading-relaxed text-stone-700 sm:text-lg">
-                        Hay una historia esperando cruzarse con la tuya. Conocé a los animales del
-                        refugio y encontrá a tu próximo compañero.
+                        Hay una historia esperando cruzarse con la tuya. Elegí un refugio de nuestra
+                        red y encontrá a tu próximo compañero.
                     </p>
                     <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
-                        <Link href="/animales" className="btn">
+                        <Link href="/refugios" className="btn">
                             Encontrá tu compañero <Icon name="arrow" className="h-5 w-5" />
                         </Link>
                         <a href="#como-funciona" className="text-link">
@@ -95,8 +95,8 @@ export default function Home({ animals }: { animals: Animal[] }) {
                             Conocé sus personalidades, sus cuidados y todo lo que los hace únicos.
                         </p>
                     </div>
-                    <Link href="/animales" className="text-link">
-                        Ver todos los animales <Icon name="arrow" className="h-4 w-4" />
+                    <Link href="/refugios" className="text-link">
+                        Conocer los refugios <Icon name="arrow" className="h-4 w-4" />
                     </Link>
                 </div>
                 {animals.length ? (
@@ -137,7 +137,7 @@ export default function Home({ animals }: { animals: Animal[] }) {
                         {
                             number: '01',
                             title: 'Encontrá esa conexión',
-                            text: 'Explorá el catálogo y conocé la historia, personalidad y cuidados de cada animal.',
+                            text: 'Elegí un refugio, explorá su catálogo y conocé la historia, personalidad y cuidados de cada animal.',
                         },
                         {
                             number: '02',
@@ -180,9 +180,9 @@ export default function Home({ animals }: { animals: Animal[] }) {
                 </div>
                 <div className="min-w-0">
                     <p className="reading-copy text-lg leading-relaxed text-stone-700">
-                        En Huella creemos en las segundas oportunidades. Cuidamos y acompañamos a
-                        cada animal mientras encuentra una familia que respete sus tiempos y lo
-                        quiera durante toda su vida.
+                        En la red Huella creemos en las segundas oportunidades. Cuidamos y
+                        acompañamos a cada animal mientras encuentra una familia que respete sus
+                        tiempos y lo quiera durante toda su vida.
                     </p>
                     <div className="mt-7 grid gap-4 sm:grid-cols-2">
                         <div className="rounded-2xl border border-stone-200 bg-white p-5">

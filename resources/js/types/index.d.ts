@@ -2,7 +2,7 @@ export interface User {
     id: number;
     name: string;
     last_name: string;
-    role: 'admin' | 'adoptante' | 'veterinario';
+    role: 'superadmin' | 'admin' | 'adoptante' | 'veterinario';
     email: string;
     email_verified_at?: string;
 }

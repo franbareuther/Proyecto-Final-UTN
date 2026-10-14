@@ -2,7 +2,7 @@
 
 `main` es la rama estable. No hacer commits de funcionalidad ni merges automáticos sobre ella. Toda implementación se propone mediante Pull Request y se revisa por otro integrante.
 
-**Antes de la integración inicial:** main todavía no contiene la aplicación. Revisar PR #1 y su PR dependiente de `review/revision-equipo`, siguiendo la [secuencia de integración y reparto de archivos](docs/08-distribucion-equipo.md). Crear las ramas de funcionalidad desde main solamente después de que el equipo autorice e integre esa base. Las [Issues #2–#5](https://github.com/franbareuther/Proyecto-Final-UTN/issues) ya distribuyen las cuatro responsabilidades; reutilizarlas para no duplicar trabajo.
+Los PR #1 y #6 ya integraron la aplicación inicial. Para la nueva etapa, revisar el PR #7 y la base multirrefugio siguiendo la [distribución actual](docs/08-distribucion-equipo.md). Crear ramas desde main cuando incluya esa base revisada. Los [issues #2–#5](https://github.com/franbareuther/Proyecto-Final-UTN/issues) siguen identificando las áreas; su alcance anterior se complementa con ese documento.
 
 ## Preparar el entorno
 

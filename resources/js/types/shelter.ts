@@ -4,14 +4,27 @@ export interface Person {
     last_name: string;
     email: string;
     email_verified_at?: string;
-    role: 'admin' | 'adoptante' | 'veterinario';
+    role: 'superadmin' | 'admin' | 'adoptante' | 'veterinario';
 }
 export interface Photo {
     id: number;
     file_path: string;
     is_primary: boolean;
 }
+export interface Refuge {
+    id: number;
+    name: string;
+    slug: string;
+    description: string | null;
+    city: string | null;
+    address: string | null;
+    email: string | null;
+    phone: string | null;
+    active: boolean;
+    staff?: Person[];
+}
 export interface Animal {
+    shelter?: Refuge;
     id: number;
     name: string;
     species: string;
@@ -74,5 +87,6 @@ export type Shared = {
     auth: { user: Person | null };
     flash: { success?: string; error?: string };
     shelterName: string;
+    currentShelter?: Refuge | null;
     [key: string]: unknown;
 };
