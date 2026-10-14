@@ -238,7 +238,7 @@ class ShelterTest extends TestCase
         $photo = $a->photos()->firstOrFail();
         Storage::disk('public')->assertExists($photo->file_path);
         $this->delete('/admin/animales/'.$b->id.'/fotos/'.$photo->id)->assertNotFound();
-        $this->put('/admin/animales/'.$a->id, array_merge($a->getAttributes(), ['photos' => [UploadedFile::fake()->create('malicioso.svg',10,'image/svg+xml')]]))->assertSessionHasErrors('photos.0');
+        $this->put('/admin/animales/'.$a->id, array_merge($a->getAttributes(), ['photos' => [UploadedFile::fake()->create('malicioso.svg', 10, 'image/svg+xml')]]))->assertSessionHasErrors('photos.0');
         $this->delete('/admin/animales/'.$a->id.'/fotos/'.$photo->id)->assertSessionHasNoErrors();
         Storage::disk('public')->assertMissing($photo->file_path);
     }

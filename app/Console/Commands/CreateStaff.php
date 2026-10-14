@@ -23,7 +23,7 @@ class CreateStaff extends Command
                 $this->error($error);
             }
 
-return self::FAILURE;
+            return self::FAILURE;
         }
         $u = new User(collect($data)->except('role')->all());
         $u->role = $data['role'];

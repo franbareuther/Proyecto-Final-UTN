@@ -126,6 +126,6 @@ class AnimalController extends Controller
             $photo->update(['is_primary' => true]);
         });
 
-        return back()->with('success','Imagen principal actualizada.');
+        return back()->with('success', 'Imagen principal actualizada.');
     }
 }
