@@ -32,6 +32,8 @@ export interface Animal {
 export interface Page<T> {
     data: T[];
     total: number;
+    from?: number | null;
+    to?: number | null;
     links: { url: string | null; label: string; active: boolean }[];
 }
 export interface Application {
