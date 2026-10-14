@@ -220,3 +220,30 @@ test('la paleta de marca supera contraste 4.5:1 para los pares usados en texto',
         context.diagnostic(`${name}: ${ratio.toFixed(2)}:1`);
     }
 });
+
+test('los layouts fluidos conservan los formularios acotados de login y edición', async () => {
+    const login = await renderPage('Auth/Login', {}, null, '/login');
+    assert.match(login, /max-w-lg/);
+    assert.match(login, /type="email"/);
+    assert.match(login, /type="password"/);
+    const edit = await renderPage(
+        'Admin/AnimalForm',
+        { animal },
+        { id: 1, name: 'Equipo', role: 'admin' },
+        '/admin/animales/7/edit',
+    );
+    assert.match(edit, /max-w-4xl/);
+    assert.match(edit, /Guardar animal/);
+});
+
+test('el panel mantiene las tablas en un contenedor con desplazamiento propio', async () => {
+    const html = await renderPage(
+        'Admin/Animals',
+        { animals: page([animal]), filters: {} },
+        { id: 1, name: 'Equipo', role: 'admin' },
+        '/admin/animales',
+    );
+    assert.match(html, /class="[^"]*overflow-x-auto[^"]*"><table/);
+    assert.match(html, /href="\/admin\/animales\/7\/edit"/);
+    assert.match(html, /href="\/veterinaria\/7"/);
+});
