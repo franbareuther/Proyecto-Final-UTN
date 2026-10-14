@@ -1,6 +1,7 @@
 # Validación del sitio público — Laureano, issue #2
 
 Fecha: 14 de octubre de 2026. Rama: `feature/equipo-1-publico-ux`.
+Actualización final de implementación: imagen opcional del refugio; ver resultados y contrato al final de este informe. Los resultados iniciales se conservan como antecedente.
 Base publicada: `origin/feature/huella-multirrefugio`, commit `3c3e0fc`.
 Entrega publicada: [PR #9 en borrador](https://github.com/franbareuther/Proyecto-Final-UTN/pull/9), con `Refs #2` y revisión solicitada por responsabilidad en la descripción. El conector devolvió 403 al crearlo; se publicó mediante la autenticación Git existente, sin mostrar credenciales.
 Los PR #7 y #8 continúan abiertos y sin integrar; esta entrega depende de ellos y propone su diff contra la base multirrefugio.
@@ -85,3 +86,74 @@ Se solicita revisión principal del integrante 3; apoyo del 4 en accesibilidad y
 El usuario informó los nombres León Comolli, Luciano Brea y Francisco Bareuther, pero no conoce su correspondencia con integrantes 2–4. Sus usuarios de GitHub y esa correspondencia quedan por confirmar; no se inventan asignaciones ni se afirma que haya una solicitud nominal enviada.
 
 Git estaba limpio antes de cambiar de rama. Se actualizó `origin` con fetch y se creó una rama nueva, sin sobrescribir ramas ni hacer merges. Se verificó que `.env` conserva su hash durante el trabajo. No se aplicaron migraciones, seeders ni escrituras sobre MariaDB; no se tocaron APP_KEY, fotografías o historiales. Todas las escrituras de pruebas fueron en SQLite en memoria. No se enviaron correos reales, ni se probaron concurrencia real, despliegue o MySQL en esta entrega.
+
+## Imagen opcional del refugio — implementación final
+
+Se conserva el diseño existente. El superadministrador carga la imagen al crear o editar cualquier refugio. El administrador carga, reemplaza o quita la imagen únicamente desde «Mi refugio». La autorización está en middleware y controller; no se acepta seleccionar una institución ajena desde el formulario. No cambia la gestión de adopciones, animales, personal o salud.
+
+`ShelterForm` conserva sus props `shelter` y `admin`. Envía siempre `POST` multipart con `forceFormData` y `_method=patch` en edición, siguiendo el patrón existente de carga de fotos. El selector muestra el archivo pendiente, permite descartarlo, revoca la URL temporal y se vacía después de un guardado exitoso. Quitar una imagen es reversible antes de guardar. La vista previa distingue fotografía y logo y advierte que los cambios se publican al guardar. Los mensajes de validación de imágenes están en español; los mensajes de éxito del refugio se conservan.
+
+`ShelterImage` presenta un marco 16:9: fotografía con `object-cover`, logo con `object-contain`, espacio interior y fondo neutro para transparencia. Ante ausencia o error muestra un respaldo con icono y texto. No elimina el nombre, ciudad, descripción ni enlaces de las tarjetas. El mismo componente se usa en inicio, directorio y perfil público, además de la vista previa.
+
+### Migración y contrato para el equipo
+
+Nueva migración: `database/migrations/2026_10_14_000004_add_shelter_image.php`. Agrega `shelters.image_path` nullable y `shelters.image_type` con valor inicial `photo`. No cambia migraciones previas, asignaciones, fotografías ni historiales. Los refugios anteriores conservan sus datos y funcionan sin imagen después de aplicar la migración.
+
+| Contrato | Uso |
+|---|---|
+| `image` | Archivo opcional de entrada: JPEG, PNG o WebP, hasta 5120 KB; dimensiones legibles. PNG admite transparencia. SVG, GIF, texto y archivos falsificados se rechazan. |
+| `image_type` | `photo` o `logo`; puede cambiarse conservando el archivo actual. |
+| `remove_image` | Booleano de entrada; quitar y subir simultáneamente se rechaza. |
+| `image_path` | Ruta interna generada por el servidor en `shelters/` del disco `public`. Está prohibido enviarla desde el cliente. No es mass assignable. |
+| `image_url` | Prop calculado por Shelter, nullable; nunca se acepta como entrada. |
+| `Refuge.image_url`, `Refuge.image_type` | Campos opcionales aditivos en TypeScript, compatibles con consumidores anteriores. |
+| `ShelterImage` | Props `src`, `name`, `kind` (`photo`/`logo`) y `className` opcional. |
+
+El catálogo del inicio selecciona los nuevos campos para construir la misma URL del directorio y del perfil. Las imágenes se guardan con nombres aleatorios, nunca con rutas o nombres elegidos por el cliente. La carga nueva ocurre antes de la transacción; se conoce su ruta incluso si falla la escritura. Un error o cancelación de guardado limpia el archivo nuevo y conserva el anterior. El registro se bloquea durante la actualización. Solo después del commit se retira el archivo anterior, y únicamente si su ruta tiene el formato generado bajo `shelters/`; nunca se borran rutas de animales.
+
+Como en cualquier almacenamiento de archivos, un fallo físico al eliminar o una interrupción del proceso entre DB y filesystem requiere reconciliación operativa. No se afirma atomicidad distribuida ni recuperación frente a caída del sistema. Se probaron explícitamente los fallos normales de guardado y su limpieza.
+
+En una **instalación desechable de prueba con base y Storage propios**, sin reutilizar MariaDB ni la base local original, compilar y aplicar las migraciones pendientes:
+
+```powershell
+npm.cmd run build
+# Solo con la conexión apuntando a la base exclusiva de esa instalación de prueba:
+php artisan migrate
+```
+
+No necesita seeder ni credenciales nuevas para mostrar el sitio público. No usar fresh/reset/rollback. En esta ejecución la migración se aplicó únicamente a una copia desechable `.local/pr9-image/preview_testing.sqlite`, con Storage y sesiones separados. La base de la demo anterior `.local/pr9-manual/preview_testing.sqlite` se conservó; para la mejora usar **http://127.0.0.1:8016/**. Las cuentas ficticias de esa instancia están en `.local/pr9-image/accounts.json`, ignorado por Git; no se publican contraseñas. Los archivos locales de preparación no forman parte de la entrega.
+
+### Verificación final ejecutada
+
+- `php artisan test --compact`, con `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:` y `DB_URL` vacío: **76 pruebas, 859 aserciones, aprobadas**.
+- `npm.cmd run test:frontend`: **24 pruebas aprobadas**. Son contratos SSR, sin eventos de navegador.
+- `npm.cmd run build`: TypeScript/Vite aprobados. Pint, Prettier de los archivos modificados y `git diff --check`: aprobados.
+- Casos nuevos en `tests/Feature/Catalog/ShelterImageTest.php`: formatos permitidos, multipart en alta/edición, formatos y tamaño inválidos, rutas forjadas, reemplazo, eliminación, conservar imagen sin nueva carga, acceso ajeno/adoptante, archivo nuevo sin huérfanos ante excepción/cancelación del guardado, fotos de animales intactas, refugios sin imagen y props de las tres ubicaciones públicas. Los fixtures de imagen usan bytes reales sin requerir GD.
+- `tests/Frontend/shelter-image.test.mjs` verifica las tres ubicaciones con imagen/nombre/enlace, texto alternativo, ausencia de imagen y campos de ambos consumidores administrativos. No repite el CSS como prueba de layout.
+- Recorrido **HTTP real**, con cookies, CSRF y FormData contra 8016, sobre SQLite y Storage desechables: alta, reemplazo y eliminación por superadmin; carga, reemplazo y eliminación del refugio propio por admin; PNG transparente y JPEG servidos con 200; imagen correcta en inicio, directorio y perfil; adoptante recibe 403. Resultado local en `.local/pr9-image/http-result.json`. Esto comprueba multipart en PHP real, no interacción visual ni selector del navegador.
+
+Se volvió a intentar Computer Use. Chrome pudo enumerarse, pero la captura del estado del navegador fue bloqueada de nuevo por no poder verificar su URL con confianza. Se detuvo la UI. **No hay nuevas capturas ni comprobaciones visuales aprobadas**, aunque el usuario haya valorado favorablemente el diseño anterior.
+
+### Pendiente preciso antes de completar #2
+
+1. En 1440×900, 768×1024, 390×844 y 320 px, cargar/reemplazar/quitar una foto horizontal y una vertical y un PNG transparente desde ambos paneles. Confirmar vista previa, logo completo sin deformación, recorte uniforme de foto, nombre largo y respaldo sin imagen/ante 404 en las tres ubicaciones públicas. Capturar con datos ficticios.
+2. Guardar y verificar que el selector queda vacío, la imagen publicada coincide y los errores de formato/5 MB permiten corregir el archivo. Probar descartar archivo y deshacer «quitar» antes de guardar.
+3. Completar la matriz pública anterior: filtros/chips/limpiar/paginación/historial, galería y miniaturas de animal, teclado/foco/menú con Escape, contraste computado y zoom real 200%, sin desbordamiento horizontal de página. Adjuntar capturas y pasos; SSR/HTTP no sustituyen estos casos.
+4. Revisión principal del integrante 3 por Shelter, ShelterController, migración y consumidores administrativos; integrante 4 por accesibilidad/calidad; integrantes 2 y 4 por contratos compartidos. La correspondencia de nombres/usuarios con los números de integrante sigue sin confirmarse. No se afirma una revisión completada.
+
+Por esos pendientes, **PR #9 permanece en borrador e issue #2 abierto**. El usuario autorizó únicamente esta ampliación de la gestión del refugio; no se implementan otras tareas del integrante 3.
+
+### Continuidad de los compañeros
+
+La entrega está en **`feature/equipo-1-publico-ux`**, dentro del PR #9 existente. El SHA exacto publicado se registra en la descripción del PR después del push y se obtiene con `git rev-parse origin/feature/equipo-1-publico-ux`. No duplicar migración, campos, carga de imagen ni componentes.
+
+Se verificaron PR #7 y #8: ambos abiertos y sin merge. PR #9 conserva base `feature/huella-multirrefugio`; no se presupone que main contenga estos cambios.
+
+Si un compañero necesita la imagen antes de integrar #9, una **rama nueva** debe partir de la entrega publicada del integrante 1:
+
+```powershell
+git fetch origin
+git switch -c feature/mi-modulo origin/feature/equipo-1-publico-ux
+```
+
+Usar un nombre nuevo propio. Si ya tiene una rama con trabajo, conservarla y coordinar la incorporación revisando el diff de #9; no resetearla, forzarla ni repetir la mejora. La base alternativa publicada incluye también la dependencia multirrefugio. Aplicar la migración solo en su instalación de prueba aislada antes de abrir las pantallas actualizadas.

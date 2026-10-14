@@ -22,6 +22,8 @@ export interface Refuge {
     phone: string | null;
     active: boolean;
     staff?: Person[];
+    image_url?: string | null;
+    image_type?: 'photo' | 'logo';
 }
 export interface Animal {
     shelter?: Refuge;

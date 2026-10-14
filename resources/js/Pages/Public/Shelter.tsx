@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { Shell, Title } from '@/Components/Shelter';
 import { Refuge } from '@/types/shelter';
+import ShelterImage from '@/Components/ShelterImage';
 
 export default function Shelter({ shelter: s }: { shelter: Refuge }) {
     return (
@@ -12,6 +13,12 @@ export default function Shelter({ shelter: s }: { shelter: Refuge }) {
             <Title title={s.name} text={s.city || undefined} />
             <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
                 <section className="card">
+                    <ShelterImage
+                        src={s.image_url}
+                        name={s.name}
+                        kind={s.image_type}
+                        className="mb-6"
+                    />
                     <h2 className="mb-4 text-2xl font-semibold">Conocé nuestro refugio</h2>
                     <p className="whitespace-pre-line break-words leading-relaxed text-stone-600">
                         {s.description || 'Pronto compartiremos más sobre nuestra historia.'}

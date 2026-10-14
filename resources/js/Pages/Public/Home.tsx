@@ -3,6 +3,7 @@ import { Animal, Refuge } from '@/types/shelter';
 import { AnimalCard, Badge, Empty, Shell } from '@/Components/Shelter';
 import AnimalImage from '@/Components/AnimalImage';
 import Icon from '@/Components/Icon';
+import ShelterImage from '@/Components/ShelterImage';
 
 export default function Home({ animals, refuges = [] }: { animals: Animal[]; refuges?: Refuge[] }) {
     const featured = animals[0];
@@ -128,6 +129,12 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
                             className="card hover:border-emerald-800"
                             href={`/refugios/${s.slug}`}
                         >
+                            <ShelterImage
+                                src={s.image_url}
+                                name={s.name}
+                                kind={s.image_type}
+                                className="mb-4"
+                            />
                             <p className="eyebrow">{s.city || 'Red Huella'}</p>
                             <h3 className="mt-3 text-xl font-semibold">{s.name}</h3>
                             <p className="mt-4 text-sm text-emerald-800">
