@@ -30,7 +30,7 @@ class PasswordResetLinkController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'email' => 'required|email',
+            'email' => 'required|string|email|max:255',
         ]);
 
         // We will send the password reset link to this user. Once we have attempted
@@ -40,8 +40,8 @@ class PasswordResetLinkController extends Controller
             $request->only('email')
         );
 
-        if ($status == Password::RESET_LINK_SENT) {
-            return back()->with('status', __($status));
+        if (in_array($status, [Password::RESET_LINK_SENT, Password::INVALID_USER, Password::RESET_THROTTLED], true)) {
+            return back()->with('status', 'Si existe una cuenta con ese correo, recibirás un enlace de recuperación. Si ya lo pediste, esperá unos minutos y revisá tu correo.');
         }
 
         throw ValidationException::withMessages([

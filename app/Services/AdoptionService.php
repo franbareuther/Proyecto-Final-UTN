@@ -40,10 +40,10 @@ class AdoptionService
         }, 3);
     }
 
-    public function transition(AdoptionRequest $request, User $actor, string $next, string $note): void
+    public function transition(AdoptionRequest $request, User $actor, string $next, string $note, ?string $internalNotes = null): void
     {
         abort_unless($actor->role === 'admin', 403);
-        DB::transaction(function () use ($request, $actor, $next, $note) {
+        DB::transaction(function () use ($request, $actor, $next, $note, $internalNotes) {
             // Siempre bloquear primero el animal: serializa solicitudes y decisiones concurrentes.
             $animal = Animal::withTrashed()->lockForUpdate()->findOrFail($request->animal_id);
             $r = AdoptionRequest::lockForUpdate()->findOrFail($request->id);
@@ -68,22 +68,22 @@ class AdoptionService
             if ($r->status === 'Aprobada' && $next === 'Rechazada') {
                 $animal->update(['availability_status' => 'Disponible']);
             }
-            $this->setStatus($r, $actor, $next, $note);
+            $this->setStatus($r, $actor, $next, $note, $internalNotes);
         }, 3);
     }
 
-    private function setStatus(AdoptionRequest $r, User $actor, string $next, string $note): void
+    private function setStatus(AdoptionRequest $r, User $actor, string $next, string $note, ?string $internalNotes = null): void
     {
         $before = $r->status;
         $r->status = $next;
         $r->reviewed_by = $actor->id;
         $r->reviewed_at = now();
         $r->save();
-        $this->history($r, $actor, $before, $next, $note);
+        $this->history($r, $actor, $before, $next, $note, $internalNotes);
     }
 
-    private function history(AdoptionRequest $r, User $actor, ?string $before, string $next, string $note): void
+    private function history(AdoptionRequest $r, User $actor, ?string $before, string $next, string $note, ?string $internalNotes = null): void
     {
-        $r->history()->create(['changed_by' => $actor->id, 'previous_status' => $before, 'new_status' => $next, 'observations' => $note]);
+        $r->history()->create(['changed_by' => $actor->id, 'previous_status' => $before, 'new_status' => $next, 'observations' => $note, 'internal_notes' => $internalNotes]);
     }
 }

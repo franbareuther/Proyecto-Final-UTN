@@ -14,9 +14,13 @@ use Inertia\Inertia;
 
 class AdoptionRequestController extends Controller
 {
-    public function create(Animal $animal)
+    public function create(Request $request, Animal $animal)
     {
         abort_unless($animal->shelter?->active, 404);
+        $existing = $request->user()->adoptionRequests()->where('animal_id', $animal->id)->whereIn('status', AdoptionRequest::ACTIVE)->latest('id')->first();
+        if ($existing) {
+            return to_route('requests.show', $existing)->with('success', 'Ya tenés una solicitud activa. Podés seguir sus próximos pasos aquí.');
+        }
         if ($animal->availability_status !== 'Disponible') {
             return to_route('animals.show', $animal)->with('error', 'Este animal ya no recibe nuevas solicitudes. Podés consultar su estado en el perfil.');
         }
@@ -36,11 +40,23 @@ class AdoptionRequestController extends Controller
         return Inertia::render('Adoptante/Requests', ['requests' => $r->user()->adoptionRequests()->with('animal.photos', 'animal.shelter')->latest()->paginate(10)]);
     }
 
-    public function show(AdoptionRequest $adoptionRequest)
+    public function show(Request $request, AdoptionRequest $adoptionRequest)
     {
         Gate::authorize('view', $adoptionRequest);
 
-        return Inertia::render('Adoptante/RequestDetail', ['application' => $adoptionRequest->load(['animal.photos', 'animal.shelter', 'user:id,name,last_name,email', 'history'])]);
+        $admin = $request->user()->role === 'admin';
+        $adoptionRequest->load(['animal.photos', 'animal.shelter', 'user:id,name,last_name,email',
+            'history' => function ($query) use ($admin) {
+                if (! $admin) {
+                    $query->select(['id', 'adoption_request_id', 'previous_status', 'new_status', 'observations', 'created_at'])->without('actor');
+                }
+            },
+        ]);
+        if (! $admin) {
+            $adoptionRequest->makeHidden(['reviewed_by']);
+        }
+
+        return Inertia::render('Adoptante/RequestDetail', ['application' => $adoptionRequest]);
     }
 
     public function index(Request $r)
@@ -60,8 +76,8 @@ class AdoptionRequestController extends Controller
     public function update(Request $r, AdoptionRequest $adoptionRequest, AdoptionService $service)
     {
         Gate::authorize('update', $adoptionRequest);
-        $data = $r->validate(['status' => ['required', Rule::in(['En revisión', 'Aprobada', 'Rechazada', 'Adoptado'])], 'observations' => 'required|string|min:5|max:2000']);
-        $service->transition($adoptionRequest, $r->user(), $data['status'], $data['observations']);
+        $data = $r->validate(['status' => ['required', Rule::in(['En revisión', 'Aprobada', 'Rechazada', 'Adoptado'])], 'observations' => 'required|string|min:5|max:2000', 'internal_notes' => 'nullable|string|max:2000']);
+        $service->transition($adoptionRequest, $r->user(), $data['status'], $data['observations'], $data['internal_notes'] ?? null);
 
         return back()->with('success', 'Cambio registrado en el historial.');
     }

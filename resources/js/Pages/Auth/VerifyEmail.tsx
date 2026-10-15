@@ -1,48 +1,36 @@
-import PrimaryButton from '@/Components/PrimaryButton';
-import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
-
+import { Errors, Shell, Title } from '@/Components/Shelter';
 export default function VerifyEmail({ status }: { status?: string }) {
-    const { post, processing } = useForm({});
-
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
-
-        post(route('verification.send'));
-    };
-
+    const f = useForm({});
     return (
-        <GuestLayout>
-            <Head title="Email Verification" />
-
-            <div className="mb-4 text-sm text-gray-600">
-                Thanks for signing up! Before getting started, could you verify your email address
-                by clicking on the link we just emailed to you? If you didn't receive the email, we
-                will gladly send you another.
-            </div>
-
-            {status === 'verification-link-sent' && (
-                <div className="mb-4 text-sm font-medium text-green-600">
-                    A new verification link has been sent to the email address you provided during
-                    registration.
-                </div>
-            )}
-
-            <form onSubmit={submit}>
-                <div className="mt-4 flex items-center justify-between">
-                    <PrimaryButton disabled={processing}>Resend Verification Email</PrimaryButton>
-
-                    <Link
-                        href={route('logout')}
-                        method="post"
-                        as="button"
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Log Out
+        <Shell>
+            <Head title="Verificar correo" />
+            <div className="mx-auto max-w-lg">
+                <Title
+                    title="Verificá tu correo"
+                    text="Abrí el enlace del correo de verificación. Si no llegó, revisá la carpeta de correo no deseado o pedí otro enlace."
+                />
+                <form
+                    className="card space-y-5"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        f.post('/email/verification-notification');
+                    }}
+                >
+                    <Errors errors={f.errors} />
+                    {status === 'verification-link-sent' && (
+                        <p role="status" className="text-emerald-900">
+                            Enviamos un nuevo enlace de verificación.
+                        </p>
+                    )}
+                    <button className="btn" disabled={f.processing}>
+                        Reenviar enlace de verificación
+                    </button>
+                    <Link href="/logout" method="post" as="button" className="btn-secondary">
+                        Cerrar sesión
                     </Link>
-                </div>
-            </form>
-        </GuestLayout>
+                </form>
+            </div>
+        </Shell>
     );
 }

@@ -8,7 +8,7 @@ export default function Login({ status }: { status?: string }) {
             <div className="mx-auto max-w-lg">
                 <Title
                     title="Qué bueno volver a verte."
-                    text="Ingresá para continuar tu historia con el refugio."
+                    text="Ingresá a tu cuenta de Huella para continuar."
                 />
                 {status && (
                     <p role="status" className="mb-4">
@@ -25,6 +25,7 @@ export default function Login({ status }: { status?: string }) {
                     <Errors errors={f.errors} />
                     <Field label="Correo electrónico" error={f.errors.email}>
                         <input
+                            name="email"
                             type="email"
                             autoComplete="username"
                             required
@@ -34,6 +35,7 @@ export default function Login({ status }: { status?: string }) {
                     </Field>
                     <Field label="Contraseña" error={f.errors.password}>
                         <input
+                            name="password"
                             type="password"
                             autoComplete="current-password"
                             required

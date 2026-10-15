@@ -14,7 +14,7 @@ export default function Register() {
             <div className="mx-auto max-w-lg">
                 <Title
                     title="Tu próxima historia empieza acá."
-                    text="Creá tu cuenta para solicitar una adopción."
+                    text="Una cuenta para solicitar en todos los refugios de la red Huella."
                 />
                 <form
                     className="card space-y-5"
@@ -42,6 +42,9 @@ export default function Register() {
                     ).map(([k, l, t, ac]) => (
                         <Field label={l} key={k} error={f.errors[k]}>
                             <input
+                                name={k}
+                                minLength={t === 'password' ? 8 : undefined}
+                                maxLength={t === 'password' ? undefined : 255}
                                 type={t}
                                 autoComplete={ac}
                                 required
