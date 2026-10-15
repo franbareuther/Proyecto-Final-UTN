@@ -54,13 +54,21 @@ export default function Dashboard({
             <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {Object.entries(stats).map(([k, v]) => (
                     <div key={k} className="card">
-                        <p className="text-sm text-stone-500">{k}</p>
+                        <p className="text-sm text-stone-600">
+                            {k === 'Animales registrados' ? 'Animales sin archivar' : k}
+                        </p>
                         <p className="mt-3 text-4xl font-semibold tracking-tight text-emerald-900">
                             {v}
                         </p>
                     </div>
                 ))}
             </div>
+            <p className="mb-8 max-w-3xl text-sm text-stone-600">
+                Animales y disponibilidad excluyen archivados. Adopciones, solicitudes e indicadores
+                de salud conservan antecedentes de animales archivados. Tratamientos cuenta animales
+                distintos con estado Activo; controles cuenta registros Pendientes desde hoy hasta
+                30 días inclusive.
+            </p>
             <div className="mb-8 grid gap-5 xl:grid-cols-3">
                 <Chart title="Adopciones por mes" items={months} />
                 <Chart title="Animales por especie" items={species} />
@@ -95,7 +103,7 @@ export default function Dashboard({
                     )}
                 </section>
                 <section>
-                    <h2 className="mb-4 text-xl font-semibold">Agenda veterinaria</h2>
+                    <h2 className="mb-4 text-xl font-semibold">Próximos cuidados del refugio</h2>
                     {controls.length ? (
                         <div className="card space-y-5">
                             {controls.map((c) => (
