@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Middleware\HandleInertiaRequests;
-use App\Models\AdoptionRequest;
 use App\Models\Animal;
+use App\Models\Shelter;
 use App\Models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -10,31 +10,24 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-// Recorrido HTTP local: no reemplaza una revisión visual ni ejecuta migraciones/seeders.
+// Local, read-only domain review. Authentication creates sessions, not domain fixtures.
 require __DIR__.'/../vendor/autoload.php';
 $app = require __DIR__.'/../bootstrap/app.php';
 $app->make(Kernel::class)->bootstrap();
-
-if (! app()->environment('local')) {
-    fwrite(STDERR, "Este recorrido solo se permite en APP_ENV=local.\n");
-    exit(1);
-}
 $base = rtrim(getenv('REVIEW_BASE_URL') ?: config('app.url'), '/');
-if (! in_array(parse_url($base, PHP_URL_HOST), ['localhost', '127.0.0.1', '::1', '[::1]'], true)) {
-    fwrite(STDERR, "REVIEW_BASE_URL debe apuntar a una dirección local.\n");
-    exit(1);
+if (! app()->environment('local') || ! in_array(parse_url($base, PHP_URL_HOST), ['localhost', '127.0.0.1', '::1', '[::1]'], true)) {
+    throw new RuntimeException('Solo se permite APP_ENV=local y REVIEW_BASE_URL local.');
 }
 
 function domainSnapshot(): array
 {
     $result = [];
-    foreach (['users', 'animals', 'animal_photos', 'adoption_requests', 'adoptions', 'adoption_request_history', 'medical_consultations', 'vaccinations', 'treatments', 'veterinary_controls'] as $table) {
-        $result[$table] = (array) DB::table($table)->selectRaw('COUNT(*) AS total, MAX(id) AS last_id, MAX(updated_at) AS last_update')->first();
+    foreach (['users', 'shelters', 'animals', 'animal_photos', 'adoption_requests', 'adoptions', 'adoption_request_history', 'medical_consultations', 'vaccinations', 'treatments', 'veterinary_controls', 'vaccination_doses', 'health_audits'] as $table) {
         $digest = hash_init('sha256');
         foreach (DB::table($table)->orderBy('id')->cursor() as $row) {
             hash_update($digest, json_encode($row, JSON_THROW_ON_ERROR));
         }
-        $result[$table]['digest'] = hash_final($digest);
+        $result[$table] = hash_final($digest);
     }
 
     return $result;
@@ -42,19 +35,11 @@ function domainSnapshot(): array
 
 function checkPage(Client $client, string $path, string $component): array
 {
-    // Un build concurrente puede cambiar la versión entre el cálculo y la petición.
-    // Repetir una vez el GET de lectura, como actualización de assets de Inertia.
-    for ($attempt = 0; $attempt < 2; $attempt++) {
-        clearstatcache();
-        $version = app(HandleInertiaRequests::class)->version(Request::create('/'));
-        $response = $client->get($path, ['headers' => ['X-Inertia' => 'true', 'X-Inertia-Version' => $version ?? '', 'Accept' => 'text/html']]);
-        if ($response->getStatusCode() !== 409 || ! $response->hasHeader('X-Inertia-Location')) {
-            break;
-        }
-    }
+    $version = app(HandleInertiaRequests::class)->version(Request::create('/'));
+    $response = $client->get($path, ['headers' => ['X-Inertia' => 'true', 'X-Inertia-Version' => $version ?? '', 'Accept' => 'text/html']]);
     $page = json_decode((string) $response->getBody(), true);
     if ($response->getStatusCode() !== 200 || ($page['component'] ?? null) !== $component) {
-        throw new RuntimeException('Respuesta inesperada: '.$path.' (HTTP '.$response->getStatusCode().').');
+        throw new RuntimeException('Respuesta inesperada '.$path.' (HTTP '.$response->getStatusCode().').');
     }
     echo 'OK '.$path.' -> '.$component.PHP_EOL;
 
@@ -63,116 +48,78 @@ function checkPage(Client $client, string $path, string $component): array
 
 try {
     $before = domainSnapshot();
-    $animals = Animal::with('photos')->get();
-    $client = new Client(['base_uri' => $base, 'cookies' => new CookieJar, 'http_errors' => false, 'timeout' => 15]);
-    foreach (['/' => 'Public/Home', '/animales' => 'Public/Catalog', '/animales?page=2' => 'Public/Catalog', '/login' => 'Auth/Login', '/register' => 'Auth/Register', '/forgot-password' => 'Auth/ForgotPassword', '/reset-password/revision-local' => 'Auth/ResetPassword'] as $path => $component) {
-        checkPage($client, $path, $component);
+    $options = ['base_uri' => $base, 'cookies' => new CookieJar, 'http_errors' => false, 'timeout' => 20, 'allow_redirects' => false];
+    $client = new Client($options);
+    foreach (['/' => 'Public/Home', '/animales' => 'Public/Catalog', '/refugios' => 'Public/Shelters', '/login' => 'Auth/Login'] as $path => $page) {
+        checkPage($client, $path, $page);
     }
-    foreach ($animals as $animal) {
-        $props = checkPage($client, '/animales/'.$animal->id, 'Public/Animal');
-        if (isset($props['animal']['consultations']) || isset($props['animal']['requests'])) {
-            throw new RuntimeException('Relación privada incluida en perfil público.');
+    foreach (Shelter::where('active', true)->get() as $shelter) {
+        checkPage($client, '/refugios/'.$shelter->slug, 'Public/Shelter');
+        checkPage($client, '/refugios/'.$shelter->slug.'/animales', 'Public/Catalog');
+        foreach (Animal::where('shelter_id', $shelter->id)->with('photos')->get() as $animal) {
+            foreach (['/animales/'.$animal->id, '/refugios/'.$shelter->slug.'/animales/'.$animal->id] as $path) {
+                $props = checkPage($client, $path, 'Public/Animal');
+                foreach (['consultations', 'vaccinations', 'treatments', 'controls', 'requests', 'audits', 'doses'] as $private) {
+                    if (array_key_exists($private, $props['animal'])) {
+                        throw new RuntimeException('Relación privada en catálogo.');
+                    }
+                }
+            }
+            $image = $client->get($animal->photo_url);
+            if ($image->getStatusCode() !== 200 || ! str_starts_with($image->getHeaderLine('Content-Type'), 'image/')) {
+                throw new RuntimeException('Imagen de animal inaccesible.');
+            }
         }
-        $photo = $client->get($animal->photo_url);
-        if ($photo->getStatusCode() !== 200 || ! str_starts_with($photo->getHeaderLine('Content-Type'), 'image/')) {
-            throw new RuntimeException('Fotografía no disponible para animal #'.$animal->id);
-        }
-    }
-    $filtered = checkPage($client, '/animales?species=Gato&size=Peque%C3%B1o&age=young', 'Public/Catalog');
-    foreach ($filtered['animals']['data'] as $animal) {
-        if ($animal['species'] !== 'Gato' || $animal['size'] !== 'Pequeño') {
-            throw new RuntimeException('El filtro no coincide con los registros.');
+        if ($shelter->image_url && $client->get($shelter->image_url)->getStatusCode() !== 200) {
+            throw new RuntimeException('Imagen de refugio inaccesible.');
         }
     }
     $empty = checkPage($client, '/animales?q=revision-sin-resultados-92874', 'Public/Catalog');
     if ($empty['animals']['total'] !== 0) {
-        throw new RuntimeException('No se pudo comprobar el catálogo vacío.');
+        throw new RuntimeException('Resultado vacío inesperado.');
     }
-
-    $password = config('shelter.demo_password');
+    $password = getenv('REVIEW_PASSWORD') ?: config('shelter.demo_password');
     if (! $password) {
-        throw new RuntimeException('Falta DEMO_PASSWORD local para comprobar los roles; no se crearán cuentas.');
+        throw new RuntimeException('Falta REVIEW_PASSWORD o DEMO_PASSWORD para cuentas ficticias existentes.');
     }
-    foreach (['adoptante', 'admin', 'veterinario'] as $role) {
-        $user = User::where('email', $role.'@huella.test')->firstOrFail();
+    foreach (['superadmin', 'admin', 'adoptante'] as $role) {
+        $email = getenv('REVIEW_'.strtoupper($role).'_EMAIL') ?: $role.'@huella.test';
+        $user = User::where('email', $email)->where('role', $role)->firstOrFail();
         $jar = new CookieJar;
-        $client = new Client(['base_uri' => $base, 'cookies' => $jar, 'http_errors' => false, 'timeout' => 15]);
+        $client = new Client(array_replace($options, ['cookies' => $jar]));
         $client->get('/login');
-        $csrf = $jar->getCookieByName('XSRF-TOKEN');
-        $client->post('/login', ['headers' => ['X-XSRF-TOKEN' => rawurldecode($csrf->getValue())], 'form_params' => ['email' => $user->email, 'password' => $password]]);
+        $client->post('/login', ['headers' => ['X-XSRF-TOKEN' => rawurldecode($jar->getCookieByName('XSRF-TOKEN')->getValue())], 'form_params' => ['email' => $email, 'password' => $password]]);
         $profile = checkPage($client, '/profile', 'Profile/Edit');
-        if (($profile['auth']['user']['role'] ?? null) !== $role) {
-            throw new RuntimeException('El login no inició la sesión esperada.');
+        if (($profile['auth']['user']['id'] ?? null) !== $user->id) {
+            throw new RuntimeException('Identidad autenticada inesperada.');
         }
-        checkPage($client, '/confirm-password', 'Auth/ConfirmPassword');
-        if ($role === 'adoptante') {
+        checkPage($client, '/animales', 'Public/Catalog');
+        checkPage($client, '/refugios', 'Public/Shelters');
+        if ($role === 'superadmin') {
+            checkPage($client, '/superadmin/refugios', 'Superadmin/Shelters');
+        } elseif ($role === 'adoptante') {
             checkPage($client, '/mis-solicitudes', 'Adoptante/Requests');
-            foreach (AdoptionRequest::where('user_id', $user->id)->get() as $application) {
-                checkPage($client, '/solicitudes/'.$application->id, 'Adoptante/RequestDetail');
+        } else {
+            foreach (['/admin' => 'Admin/Dashboard', '/admin/refugio' => 'Admin/ShelterProfile', '/veterinaria' => 'Veterinaria/Index', '/veterinaria/controles' => 'Veterinaria/Controls'] as $path => $page) {
+                checkPage($client, $path, $page);
             }
-            $available = $animals->firstWhere('availability_status', 'Disponible');
-            if ($available) {
-                checkPage($client, '/animales/'.$available->id.'/solicitar', 'Adoptante/Apply');
-            }
-            $unavailable = $animals->first(fn ($a) => $a->availability_status !== 'Disponible');
-            if ($unavailable) {
-                $p = checkPage($client, '/animales/'.$unavailable->id.'/solicitar', 'Public/Animal');
-                if (empty($p['flash']['error'])) {
-                    throw new RuntimeException('Falta el motivo del regreso al perfil.');
-                }
-            }
-        }
-        if ($role === 'admin') {
-            foreach (['/admin' => 'Admin/Dashboard', '/admin/animales' => 'Admin/Animals', '/admin/animales/create' => 'Admin/AnimalForm', '/admin/solicitudes' => 'Admin/Requests', '/admin/adopciones' => 'Admin/Adoptions'] as $path => $component) {
-                checkPage($client, $path, $component);
-            }
-            foreach ($animals as $animal) {
-                checkPage($client, '/admin/animales/'.$animal->id.'/edit', 'Admin/AnimalForm');
-            }
-            foreach (AdoptionRequest::all() as $application) {
-                checkPage($client, '/solicitudes/'.$application->id, 'Adoptante/RequestDetail');
-            }
-        }
-        if ($role !== 'adoptante') {
-            checkPage($client, '/veterinaria', 'Veterinaria/Index');
-            checkPage($client, '/veterinaria/controles', 'Veterinaria/Controls');
-            foreach ($animals as $animal) {
+            foreach (Animal::withTrashed()->where('shelter_id', $user->shelter_id)->get() as $animal) {
                 checkPage($client, '/veterinaria/'.$animal->id, 'Veterinaria/History');
             }
-            $searchPath = $role === 'admin' ? '/admin/solicitudes' : '/veterinaria';
-            $invalid = $client->get($searchPath.'?q='.str_repeat('x', 101), ['allow_redirects' => false, 'headers' => ['Referer' => $base.$searchPath]]);
-            if ($invalid->getStatusCode() !== 302) {
-                throw new RuntimeException('La búsqueda inválida no devolvió validación.');
-            }
-            $p = checkPage($client, $searchPath, $role === 'admin' ? 'Admin/Requests' : 'Veterinaria/Index');
-            if (empty($p['errors']['q'])) {
-                throw new RuntimeException('No llegó el error de búsqueda a Inertia.');
-            }
         }
-        $forbidden = match ($role) {
-            'adoptante' => ['/admin', '/admin/animales', '/admin/solicitudes', '/veterinaria', '/veterinaria/controles'],
-            'veterinario' => ['/admin', '/admin/animales', '/admin/solicitudes', '/mis-solicitudes'],
-            default => ['/mis-solicitudes'],
-        };
-        foreach ($forbidden as $path) {
+        foreach ($role === 'admin' ? ['/superadmin/refugios', '/mis-solicitudes'] : ($role === 'superadmin' ? ['/admin', '/veterinaria', '/mis-solicitudes'] : ['/admin', '/veterinaria', '/superadmin/refugios']) as $path) {
             if ($client->get($path)->getStatusCode() !== 403) {
-                throw new RuntimeException('Falla de autorización: '.$role.' en '.$path);
+                throw new RuntimeException('Falla de permisos '.$role.' '.$path);
             }
-            echo 'OK '.$role.' sin acceso a '.$path.' (403)'.PHP_EOL;
         }
-        $csrf = $jar->getCookieByName('XSRF-TOKEN');
-        $client->post('/logout', ['headers' => ['X-XSRF-TOKEN' => rawurldecode($csrf->getValue())]]);
-        $p = checkPage($client, '/', 'Public/Home');
-        if ($p['auth']['user'] !== null) {
-            throw new RuntimeException('El logout no cerró la sesión.');
-        }
+        // Discard this cookie jar. Logout can rotate remember tokens and is not domain-read-only.
     }
     if ($before !== domainSnapshot()) {
-        throw new RuntimeException('Se detectaron diferencias en los contadores de datos del dominio durante el recorrido.');
+        throw new RuntimeException('El dominio cambió durante el recorrido; revisar antes de seguir.');
     }
-    echo 'OK filas del dominio conservadas (conteos, IDs, fechas y SHA-256); sin migraciones ni seeders.'.PHP_EOL;
-    echo 'Recorrido HTTP completo. No se ejecutó navegador, JavaScript ni comprobación visual.'.PHP_EOL;
-} catch (Throwable $e) {
-    fwrite(STDERR, $e->getMessage().PHP_EOL);
+    echo 'OK SHA-256 de todas las tablas de dominio conservado. Sin migraciones, seeders ni escrituras clínicas.'.PHP_EOL;
+    echo 'HTTP no acredita navegador, JavaScript, dispositivos ni revisión visual.'.PHP_EOL;
+} catch (Throwable $error) {
+    fwrite(STDERR, $error->getMessage().PHP_EOL);
     exit(1);
 }

@@ -2,7 +2,7 @@
 
 # Casos de uso
 
-Actores: visitante, adoptante, administrador y veterinario.
+Actores: visitante, adoptante, administrador del refugio y superadministrador. No existe perfil veterinario. El profesional que atendió se registra como dato clínico, separado del usuario autor.
 
 ## CU01 — Gestionar una adopción
 
@@ -28,6 +28,7 @@ flowchart LR
 ## Otros casos
 
 - CU02: administrador registra o edita un animal y administra sus fotos. Si tiene solicitudes activas no puede archivarlo ni ponerlo temporalmente no disponible. El archivo es lógico y conserva relaciones.
-- CU03: veterinario consulta antecedentes, registra una atención y programa controles. Solo el autor puede corregir su registro; no existe borrado clínico.
-- CU04: personal autorizado consulta controles pendientes y dosis próximas. Se distingue control vencido de próximo. Al realizarlo, el veterinario actualiza su estado desde la historia clínica.
+- CU03: un administrador del refugio activo consulta antecedentes y registra o corrige una atención de un animal sin archivar. Otro administrador del mismo refugio puede corregirla; recorded_by se conserva y updated_by identifica al editor. La auditoría guarda actor, fecha y valores anteriores/nuevos en la misma transacción. No hay borrado clínico.
+- CU04: el administrador consulta agenda vencida, de hoy, próximos 30 días, realizados/aplicadas, cancelados o todos. Actualiza el estado de un control en la historia. Para una dosis programada registra una aplicación real enlazada, o cancela con motivo; una segunda resolución se rechaza. La migración marca programaciones anteriores sin cumplimiento verificado, sin fabricar aplicaciones. El animal archivado solo admite lectura de antecedentes y auditoría por su refugio.
+- CU06: el superadministrador crea/habilita refugios y sus administradores; no opera adopciones ni salud. Ambos catálogos permiten explorar la red a cualquier visitante o rol, sin conceder permisos internos ajenos.
 - CU05: administrador consulta indicadores y actividad reciente. Los gráficos muestran datos reales y no generan valores simulados.

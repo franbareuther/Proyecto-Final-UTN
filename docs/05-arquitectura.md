@@ -11,14 +11,17 @@ Laravel 12 se eligió por compatibilidad con PHP 8.2 de XAMPP. Las versiones con
 - `app/Http/Middleware/RequireRole`: barrera de rutas por rol.
 - `app/Policies`: permisos sobre animales y solicitudes individuales.
 - `app/Services/AdoptionService`: transiciones, bloqueo, transacciones, adopción e historial.
+- `app/Services/HealthService`: bloquea primero el animal, autoriza pertenencia/refugio activo, rechaza escrituras en archivados y guarda registros, programación/cumplimiento y auditoría en una transacción. Los formularios no asignan autores ni relaciones de cumplimiento.
 - `app/Models`: Eloquent y relaciones; no hay SQL concatenado con datos del usuario.
 - `resources/js/Components/Shelter.tsx`: controles, layout, mensajes, paginación y confirmaciones.
 - `resources/js/Pages`: módulos público, adoptante, administrador y veterinaria.
 - `database`: esquema versionado, factory de animales y datos demo explícitos.
 - `tests/Feature`: autenticación, autorización, reglas de negocio y persistencia.
 
-CSRF y sesiones provienen del grupo web de Laravel. La identidad de adoptante/profesional y los estados iniciales se asignan en servidor. Campos de rol, revisión y adopción no entran por asignación masiva del formulario público. Fotografías admitidas: JPG/PNG/WebP, máximo 4 MB y 8 archivos por envío; se excluye SVG. Storage usa el disco público y se limpian archivos si falla el guardado.
+CSRF y sesiones provienen del grupo web de Laravel. La identidad de adoptante/autor y los estados iniciales se asignan en servidor; el profesional es un dato ingresado de acuerdo con la atención. Campos de rol, revisión y adopción no entran por asignación masiva del formulario público. Fotografías de animales: JPG/PNG/WebP, máximo 4 MB y 8 archivos por envío; imagen opcional de refugio: hasta 5 MB, foto o logo. Se excluye SVG. Storage usa el disco público y se limpian archivos si falla el guardado.
 
 Solo el perfil sanitario público llega al catálogo; las relaciones clínicas se cargan en rutas internas. Los datos personales de solicitudes se restringen al dueño y al administrador. Los motivos de decisiones son visibles para el adoptante; no escribir información administrativa confidencial en ellos.
+
+Solo hay superadmin, admin y adoptante. El profesional no es un rol de acceso: practitioner_name es un dato separado de recorded_by/updated_by. El GET `medical.show` admite binding de archivados con autorización del refugio; los POST/PATCH siguen excluyéndolos y HealthService vuelve a comprobar bajo bloqueo. Auditoría y dosis se consultan por la relación al animal y no tienen rutas de edición/borrado. Las rutas técnicas `/veterinaria` se conservan por compatibilidad.
 
 Las páginas compartidas ocultan navegación según rol, pero la autorización siempre se aplica en Laravel. Las fotos son públicas por diseño; nunca subir documentos personales al módulo de imágenes. Para producción se requiere HTTPS, APP_DEBUG=false, configuración SMTP y respaldos. La configuración de despliegue no forma parte de esta entrega.
