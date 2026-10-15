@@ -1,6 +1,7 @@
 # Cuentas y adopciones — entrega del integrante 2
 
 Fecha: 15 de octubre de 2026. Issue #3. Rama `feature/equipo-2-cuentas-adopciones`.
+Entrega: [PR #10 en borrador](https://github.com/franbareuther/Proyecto-Final-UTN/pull/10). Implementación y pruebas publicadas en `f8932cc0db6a689d0c172aea98000d84d149e7ff` (cuentas en `ce9f922`, adopciones/privacidad/concurrencia en `f8932cc`); el commit documental posterior agrega este enlace.
 
 Base verificada con fetch: `origin/feature/equipo-1-publico-ux`, `b8b07b42cf5d3232f723eaa320a83bbd43458529`. Se creó una rama nueva con Git limpio; no se modificó la rama del integrante 1, main ni sus commits. Las imágenes de refugios se heredan, no se duplican. No se cambió stack, dependencias o lockfiles.
 
