@@ -69,10 +69,12 @@ export interface Application {
         new_status: string;
         observations: string;
         created_at: string;
-        actor: Person;
+        actor?: Person;
+        internal_notes?: string | null;
     }[];
 }
 export interface Adoption {
+    adoption_request_id?: number;
     id: number;
     animal: Animal;
     user: Person;

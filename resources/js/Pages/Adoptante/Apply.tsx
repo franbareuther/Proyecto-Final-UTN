@@ -1,6 +1,7 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { Animal, Shared } from '@/types/shelter';
 import { Errors, Field, Shell, Title } from '@/Components/Shelter';
+import AnimalImage from '@/Components/AnimalImage';
 export default function Apply({ animal }: { animal: Animal }) {
     const { auth } = usePage<Shared>().props;
     const f = useForm({
@@ -20,13 +21,13 @@ export default function Apply({ animal }: { animal: Animal }) {
                     title={`Una nueva historia con ${animal.name}`}
                     text="Completá la solicitud con información sincera. El refugio la evaluará y podrás seguir su estado."
                 />
-                <div className="card mb-6 flex items-center gap-5">
-                    <img
+                <div className="card mb-6 flex flex-wrap items-center gap-5">
+                    <AnimalImage
                         src={animal.photo_url}
                         alt={animal.name}
                         className="h-20 w-20 rounded-2xl object-cover"
                     />
-                    <div>
+                    <div className="min-w-0 break-words">
                         <h2 className="font-semibold">{animal.name}</h2>
                         {animal.shelter && (
                             <p className="text-sm text-emerald-800">{animal.shelter.name}</p>
@@ -63,7 +64,7 @@ export default function Apply({ animal }: { animal: Animal }) {
                                 onChange={(e) => f.setData('address', e.target.value)}
                             />
                         </Field>
-                        <Field label="Tipo de vivienda">
+                        <Field label="Tipo de vivienda" error={f.errors.housing_type}>
                             <select
                                 value={f.data.housing_type}
                                 onChange={(e) => f.setData('housing_type', e.target.value)}
@@ -101,8 +102,9 @@ export default function Apply({ animal }: { animal: Animal }) {
                         </Field>
                     ))}
                     <p className="text-sm text-stone-500">
-                        Usamos tus datos para evaluar esta solicitud. La aprobación se confirma
-                        antes del registro definitivo de adopción.
+                        El refugio responsable recibe tus datos para evaluar esta solicitud.
+                        Aprobarla reserva el animal; la adopción definitiva se registra en un paso
+                        posterior.
                     </p>
                     <button disabled={f.processing} className="btn">
                         {f.processing ? 'Enviando…' : 'Enviar solicitud'}
