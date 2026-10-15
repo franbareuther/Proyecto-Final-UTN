@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/refugios', [ShelterController::class, 'store'])->name('superadmin.shelters.store');
         Route::patch('/refugios/{shelter}', [ShelterController::class, 'update'])->name('superadmin.shelters.update');
         Route::post('/refugios/{shelter}/personal', [ShelterController::class, 'staff'])->name('superadmin.staff.store');
+        Route::patch('/refugios/{shelter}/personal/{staff}', [ShelterController::class, 'updateStaff'])->name('superadmin.staff.update');
     });
     Route::middleware('role:admin')->prefix('admin')->group(function () {
         Route::match(['get', 'patch'], '/refugio', [ShelterController::class, 'profile'])->name('admin.shelter');

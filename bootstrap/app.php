@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureStaffAccess;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\RequireRole;
 use Illuminate\Foundation\Application;
@@ -16,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias(['role' => RequireRole::class]);
         $middleware->web(append: [
+            EnsureStaffAccess::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
