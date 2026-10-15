@@ -47,7 +47,9 @@ export default function Animal({ animal: a }: { animal: AnimalType }) {
                             className="gallery-photo"
                         />
                         <div className="absolute left-4 top-4 right-4">
-                            <Badge>{a.availability_status}</Badge>
+                            {a.availability_status !== 'Disponible' && (
+                                <Badge>{a.availability_status}</Badge>
+                            )}
                         </div>
                         {photos.length > 1 && (
                             <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3">
@@ -112,13 +114,10 @@ export default function Animal({ animal: a }: { animal: AnimalType }) {
                     </p>
                 </section>
                 <div className="min-w-0">
-                    <p className="eyebrow">Un nuevo capítulo puede empezar acá</p>
-                    <h1 className="public-heading mt-4">
+                    <h1 className="public-heading">
                         Hola, soy
                         <br />
-                        <span className="font-serif italic font-normal text-huella-clay">
-                            {a.name}.
-                        </span>
+                        <span className="font-medium text-huella-clay">{a.name}.</span>
                     </h1>
                     <p className="mt-4 break-words text-lg text-stone-600">
                         {a.species} · {a.breed || 'Raza sin especificar'}

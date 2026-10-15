@@ -26,14 +26,14 @@ erDiagram
  animals ||--o{ vaccinations : vacunas
  animals ||--o{ treatments : tratamientos
  animals ||--o{ veterinary_controls : controles
- users ||--o{ medical_consultations : profesional
- users ||--o{ vaccinations : profesional
- users ||--o{ treatments : profesional
- users ||--o{ veterinary_controls : profesional
+ users ||--o{ medical_consultations : registra
+ users ||--o{ vaccinations : registra
+ users ||--o{ treatments : registra
+ users ||--o{ veterinary_controls : registra
  users {
    bigint id PK
    string email UK
-   enum role
+   string role
  }
  animals {
    bigint id PK
@@ -62,3 +62,21 @@ erDiagram
 ```
 
 El historial incluye actor, estado anterior/nuevo, observaciones y timestamps. Al finalizar una adopción, otras solicitudes pendientes pasan a Rechazada con un motivo explícito visible en su seguimiento; no se rechazan al aprobar, para permitir reanudar la evaluación si la aprobación no se concreta.
+
+## Programación de dosis y auditoría sanitaria
+
+La migración aditiva `2026_10_15_000003_add_health_agenda_and_audits` conserva todas las tablas y campos anteriores. `vaccination_doses` tiene animal_id, source_vaccination_id único, application_vaccination_id nullable único, scheduled_date, status (Pendiente/Aplicada/Cancelada), legacy_unverified, cancellation_reason, resolved_by y resolved_at. Las claves foráneas son restrictivas; una resolución no borra la vacunación de origen. Se copian próximas fechas previas como pendientes sin cumplimiento verificado, sin aplicaciones ni autorías inventadas.
+
+`health_audits` guarda animal_id, record_type, record_id, actor_id, action, before_values/after_values JSON y created_at. No se modifica desde la interfaz. El servicio escribe auditoría y cambio en la misma transacción; migrar no reconstruye auditorías previas. Los cuatro registros conservan recorded_by y actualizan updated_by desde la sesión; practitioner_name identifica al profesional que atendió, no a un rol del sistema.
+
+```mermaid
+erDiagram
+ animals ||--o{ vaccination_doses : programa
+ vaccinations ||--o| vaccination_doses : origina
+ vaccinations o|--o| vaccination_doses : cumple
+ users ||--o{ vaccination_doses : resuelve
+ animals ||--o{ health_audits : conserva
+ users ||--o{ health_audits : registra
+```
+
+Solo GET de historia permite archivados, siempre dentro del refugio activo y con rol admin. Las escrituras vuelven a verificar archivo/permisos bajo bloqueo. Ver [criterios y compatibilidad](13-salud-agenda-entrega.md).

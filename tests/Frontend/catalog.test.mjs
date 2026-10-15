@@ -154,6 +154,7 @@ test('la navegación anuncia página activa, acceso al contenido y estado inicia
         ),
     );
     assert.match(html, /aria-expanded="false" aria-controls="[^"]+" aria-label="Abrir menú"/);
+    assert.match(html, /<header[^>]*data-scrolled="false"/);
 });
 
 test('la paginación conserva la búsqueda en sus enlaces y anuncia la página actual', () => {
@@ -198,12 +199,31 @@ test('el perfil conserva disponibilidad y acceso a solicitud según el rol', asy
 test('home y perfil toleran lista vacía, ausencia de fotos y nombres extensos', async () => {
     const home = await renderPage('Public/Home', { animals: [] }, null, '/');
     assert.match(home, /Pronto vas a conocer/);
-    assert.match(home, /src="\/images\/animal-placeholder.svg"/);
+    assert.match(home, /src="\/images\/hero\/golden-retriever-cara.webp"/);
     const profile = await renderPage('Public/Animal', {
         animal: { ...animal, name: 'Nombre largo '.repeat(12), photo_url: '', photos: [] },
     });
     assert.match(profile, /src="\/images\/animal-placeholder.svg"/);
     assert.match(profile, /Nombre largo/);
+});
+
+test('el hero explica la plataforma y conserva seis caras decorativas sin controles de movimiento', async () => {
+    const home = await renderPage('Public/Home', { animals: [] }, null, '/');
+    const images = [...home.matchAll(/src="\/images\/hero\/([^"/]+\.webp)"/g)];
+    assert.equal(images.length, 6);
+    assert.equal(new Set(images.map((match) => match[1])).size, 6);
+    for (const [, file] of images) {
+        assert.ok(file.endsWith('-cara.webp'), `El hero debe usar solo la cara de ${file}`);
+        const image = readFileSync(`public/images/hero/${file}`);
+        assert.equal(image.toString('ascii', 0, 4), 'RIFF');
+        assert.equal(image.toString('ascii', 8, 12), 'WEBP');
+    }
+    assert.match(home, /Encontrá a tu próximo compañero de/);
+    assert.match(home, /class="hero-marker-underline">huellas<\/span>\./);
+    assert.match(home, /Conectamos a familias con refugios/);
+    assert.match(home, /gato-gris-cara.webp/);
+    assert.doesNotMatch(home, /Pausar animación|Reanudar animación|Imágenes ilustrativas/);
+    assert.match(home, /href="\/animales"/);
 });
 
 test('la paleta de marca supera contraste 4.5:1 para los pares usados en texto', (context) => {
@@ -299,6 +319,35 @@ test('directorio y perfil ofrecen salida para refugios vacíos y sin contacto', 
     });
     assert.match(html, /href="\/refugios\/sur\/animales"/);
     assert.match(html, /Los datos de contacto estarán disponibles próximamente/);
+});
+
+test('inicio y catálogo muestran la localidad del refugio de cada animal', async () => {
+    const animals = [
+        {
+            ...animal,
+            shelter: { id: 1, name: 'Refugio Sur', slug: 'sur', city: 'Rosario', active: true },
+        },
+        {
+            ...animal,
+            id: 8,
+            name: 'Luna',
+            shelter: { id: 2, name: 'Refugio Norte', slug: 'norte', city: 'Córdoba', active: true },
+        },
+    ];
+    for (const [component, props] of [
+        ['Public/Home', { animals, refuges: [] }],
+        ['Public/Catalog', { animals: page(animals), filters: {}, breeds: [] }],
+    ]) {
+        const html = await renderPage(component, props);
+        assert.match(html, /aria-label="Localidad: Rosario"/);
+        assert.match(html, /aria-label="Localidad: Córdoba"/);
+        assert.match(html, /href="\/refugios\/sur\/animales\/7"/);
+        assert.match(html, /href="\/refugios\/norte\/animales\/8"/);
+    }
+    const withoutCity = renderToStaticMarkup(
+        createElement(components.AnimalCard, { animal, compact: true }),
+    );
+    assert.match(withoutCity, /Localidad sin informar/);
 });
 
 test('superadministrador tiene navegación y alta manual sin acciones clínicas', async () => {

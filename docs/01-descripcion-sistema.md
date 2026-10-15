@@ -7,3 +7,5 @@ El alta de refugios es manual, por un superadministrador, después de conversar 
 Huella es la marca de la plataforma (APP_NAME); el nombre de cada refugio se guarda en shelters. Los registros anteriores se conservan bajo un refugio inicial configurable. Los permisos se validan en el servidor y las decisiones de adopción conservan historial y transacciones.
 
 Quedan fuera pagos, donaciones, chat, autorregistro de refugios, traslados de animales, diagnósticos automáticos y despliegue automático. Ver [diseño y actualización](10-multirrefugio.md).
+
+Salud distingue el profesional que atendió, el autor inicial y el último editor. La agenda vincula dosis previstas con su aplicación o cancelación explícita; las correcciones se auditan transaccionalmente. Los animales archivados conservan antecedentes internos de solo lectura. No se infieren cumplimientos de vacunas por fecha ni se crean cuentas privilegiadas al migrar. Ver [salud y agenda](13-salud-agenda-entrega.md).

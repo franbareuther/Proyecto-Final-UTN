@@ -16,6 +16,11 @@ class Treatment extends Model
         return $this->belongsTo(Animal::class)->withTrashed();
     }
 
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
     public function recorder()
     {
         return $this->belongsTo(User::class, 'recorded_by');

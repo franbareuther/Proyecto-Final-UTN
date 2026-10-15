@@ -2,7 +2,7 @@
 
 > Actualización multirrefugio: consultar [implementación, roles y actualización](docs/10-multirrefugio.md). Las referencias a un refugio único y al estado previo de los PR pertenecen a la etapa inicial.
 
-﻿# Huella · Proyecto Final UTN
+# Huella · Proyecto Final UTN
 
 Plataforma de gestión de refugio y adopciones: Laravel 12, React 18, Inertia 2, TypeScript, Tailwind CSS 4, Vite 7 y MySQL. Identidad visual provisional y datos demo claramente identificados.
 
@@ -10,7 +10,7 @@ Implementa autenticación por sesión, tres roles, catálogo filtrado, perfiles 
 
 ## Ejecutar localmente
 
-Requisitos: PHP >=8.2 con extensiones Laravel/PDO MySQL/ZIP, Composer 2, Node 24 y MySQL de XAMPP. Crear `refugio_animales` desde phpMyAdmin e iniciar MySQL.
+Requisitos: PHP >=8.2 con extensiones Laravel/PDO MySQL/ZIP, Composer 2, Node 24 y MySQL/MariaDB. Los siguientes pasos son para una **carpeta y base nuevas**. En una instalación existente conservar `.env`, APP_KEY y Storage; respaldar y probar la actualización en una copia antes de aplicar migraciones.
 
 ```powershell
 composer install
@@ -27,12 +27,13 @@ php artisan serve
 
 En otra terminal ejecutar `npm run dev` y abrir http://localhost:8000. Con `npm run build` se pueden usar los recursos compilados sin mantener Vite en ejecución.
 
-Cuentas demo: `admin@huella.test`, `veterinario@huella.test` y `adoptante@huella.test`; contraseña elegida en DEMO_PASSWORD. No hay una contraseña fija versionada. DemoSeeder solo funciona en local/testing. Para cuentas reales del personal: `php artisan shelter:create-staff` (interactivo).
+Cuentas demo: `admin@huella.test` y `adoptante@huella.test`; contraseña elegida en DEMO_PASSWORD. DemoSeeder solo funciona en local/testing y no crea superadministradores. Crear explícitamente el primer superadministrador con `php artisan shelter:create-staff`, elegir `superadmin`; luego crea refugios y sus administradores desde su panel. No hay perfil veterinario ni contraseña fija versionada.
 
 ## Verificar
 
 ```powershell
 php artisan test
+npm run test:frontend
 npm run build
 php vendor/laravel/pint/builds/pint --test
 ```
@@ -53,6 +54,8 @@ Por defecto los tests usan SQLite en memoria **solo para testing**. La aplicaci�
 - [Informe de ejecución](docs/informe-ejecucion.md)
 - [Contribuir mediante ramas y PRs](CONTRIBUTING.md)
 - [Créditos de fotografías demo](docs/creditos-imagenes.md)
+- [Cumplimiento de dosis, auditoría y contratos de salud](docs/13-salud-agenda-entrega.md)
+- [Respaldo/restauración y preparación de publicación](docs/14-operacion-y-publicacion.md)
 
 ## Política de adopciones
 

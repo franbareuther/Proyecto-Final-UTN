@@ -17,17 +17,21 @@
 
 ## Roles y permisos
 
-| Operación | Público | Adoptante | Administrador | Veterinario |
+| Operación | Público | Adoptante | Admin del refugio | Superadmin |
 |---|---|---|---|---|
-| Consultar catálogo/perfiles | Sí | Sí | Sí | Sí |
+| Explorar ambos catálogos y refugios activos | Sí | Sí | Toda la red | Toda la red |
 | Enviar solicitud | No | Sí | No | No |
-| Consultar solicitudes | No | Propias | Todas | No |
-| Evaluar/registrar adopción | No | No | Sí | No |
-| Gestionar animales y fotos | No | No | Sí | No |
-| Leer historia clínica | No | No | Sí | Sí |
-| Crear registro veterinario | No | No | No | Sí |
-| Corregir registro veterinario | No | No | No | Solo autor |
-| Consultar dashboard | No | No | Sí | No |
+| Consultar solicitudes | No | Propias | De su refugio | No |
+| Evaluar/registrar adopción | No | No | Su refugio | No |
+| Gestionar animales y fotos | No | No | Su refugio | No |
+| Salud, agenda y auditoría | No | No | Su refugio activo | No |
+| Corregir salud / resolver dosis | No | No | Cualquier admin del mismo refugio; animal sin archivar | No |
+| Consultar antecedentes archivados | No | No | Solo lectura, su refugio activo | No |
+| Perfil público del refugio | No | No | Edita el propio | Crea/edita cualquiera |
+| Habilitación, slug y alta de personal | No | No | No | Sí |
+| Dashboard | No | No | Su refugio | No |
+
+RF11: cumplimiento explícito de dosis programadas mediante aplicación enlazada o cancelación con motivo; conserva antecedentes y no deduce aplicaciones históricas. RF12: auditoría interna de correcciones y resoluciones, atómica con la escritura, sin edición/borrado. Ver [criterios de salud](13-salud-agenda-entrega.md).
 
 ## No funcionales
 

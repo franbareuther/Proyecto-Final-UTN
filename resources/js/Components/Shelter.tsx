@@ -9,7 +9,7 @@ import {
     useRef,
     useState,
 } from 'react';
-import { DialogTitle } from '@headlessui/react';
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { Animal, Application, Page, Shared } from '@/types/shelter';
 import Modal from '@/Components/Modal';
 import AnimalImage from '@/Components/AnimalImage';
@@ -52,10 +52,7 @@ export function Title({
     return (
         <div className="mb-8 flex min-w-0 flex-wrap items-end justify-between gap-5 sm:mb-10">
             <div className="min-w-0 max-w-3xl">
-                <p className="eyebrow">HUELLA / RED DE REFUGIOS</p>
-                <h1 className="mt-3 break-words text-3xl font-semibold tracking-tight text-emerald-950 sm:text-4xl">
-                    {title}
-                </h1>
+                <h1 className="page-heading break-words">{title}</h1>
                 {text && (
                     <p className="mt-4 max-w-2xl text-base leading-relaxed text-stone-600">
                         {text}
@@ -231,7 +228,8 @@ export function Confirm({
         </>
     );
 }
-export function AnimalCard({ animal }: { animal: Animal }) {
+export function AnimalCard({ animal, compact = false }: { animal: Animal; compact?: boolean }) {
+    const city = animal.shelter?.city?.trim() || 'Localidad sin informar';
     return (
         <Link
             href={
@@ -248,37 +246,74 @@ export function AnimalCard({ animal }: { animal: Animal }) {
                     alt={animal.name}
                     className="animal-card-photo"
                 />
-                <div className="absolute left-3 top-3 right-3">
-                    <Badge>{animal.availability_status}</Badge>
-                </div>
-            </div>
-            <div className="flex flex-1 flex-col p-5 sm:p-6">
-                {animal.shelter && (
-                    <p className="mb-3 text-xs font-semibold text-emerald-800">
-                        {animal.shelter.name}
-                    </p>
+                {animal.availability_status !== 'Disponible' && (
+                    <div className="absolute left-3 top-3 right-3">
+                        <Badge>{animal.availability_status}</Badge>
+                    </div>
                 )}
-                <div className="flex min-w-0 items-start justify-between gap-3">
-                    <h3 className="min-w-0 break-words text-2xl font-semibold tracking-tight text-emerald-950">
-                        {animal.name}
-                    </h3>
-                    <span className="rounded-full bg-[#f3f4ec] p-2 text-emerald-900 transition group-hover:bg-emerald-900 group-hover:text-white">
-                        <Icon name="arrow" className="h-5 w-5" />
-                    </span>
-                </div>
-                <p className="mt-2 break-words text-sm text-stone-600">
-                    {animal.species} · {animal.breed || 'Raza sin especificar'}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium text-stone-700">
-                    <span className="rounded-md bg-stone-100 px-2.5 py-1.5">{animal.sex}</span>
-                    <span className="rounded-md bg-stone-100 px-2.5 py-1.5">{animal.size}</span>
-                </div>
-                <p className="mt-4 border-t border-stone-100 pt-4 text-sm text-stone-600">
-                    {animal.birth_date
-                        ? `Nació el ${date(animal.birth_date)}`
-                        : animal.estimated_age !== null
-                          ? `${animal.estimated_age} meses aprox.`
-                          : 'Edad a confirmar con el refugio'}
+            </div>
+            <div className="animal-card-body flex min-w-0 flex-1 flex-col p-5 sm:p-6">
+                {compact ? (
+                    <>
+                        <h3
+                            className="truncate font-semibold tracking-tight text-emerald-950"
+                            title={animal.name}
+                        >
+                            {animal.name}
+                        </h3>
+                        <p className="mt-1 truncate text-sm text-stone-600" title={animal.species}>
+                            {animal.species}
+                        </p>
+                        {animal.shelter && (
+                            <p
+                                className="mt-3 truncate text-xs text-emerald-800"
+                                title={animal.shelter.name}
+                            >
+                                {animal.shelter.name}
+                            </p>
+                        )}
+                    </>
+                ) : (
+                    <>
+                        {animal.shelter && (
+                            <p className="mb-3 text-xs font-semibold text-emerald-800">
+                                {animal.shelter.name}
+                            </p>
+                        )}
+                        <div className="flex min-w-0 items-start justify-between gap-3">
+                            <h3 className="min-w-0 break-words text-2xl font-semibold tracking-tight text-emerald-950">
+                                {animal.name}
+                            </h3>
+                            <span className="rounded-full bg-[#f3f4ec] p-2 text-emerald-900 transition group-hover:bg-emerald-900 group-hover:text-white">
+                                <Icon name="arrow" className="h-5 w-5" />
+                            </span>
+                        </div>
+                        <p className="mt-2 break-words text-sm text-stone-600">
+                            {animal.species} · {animal.breed || 'Raza sin especificar'}
+                        </p>
+                        <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium text-stone-700">
+                            <span className="rounded-md bg-stone-100 px-2.5 py-1.5">
+                                {animal.sex}
+                            </span>
+                            <span className="rounded-md bg-stone-100 px-2.5 py-1.5">
+                                {animal.size}
+                            </span>
+                        </div>
+                        <p className="mt-4 border-t border-stone-100 pt-4 text-sm text-stone-600">
+                            {animal.birth_date
+                                ? `Nació el ${date(animal.birth_date)}`
+                                : animal.estimated_age !== null
+                                  ? `${animal.estimated_age} meses aprox.`
+                                  : 'Edad a confirmar con el refugio'}
+                        </p>
+                    </>
+                )}
+                <p
+                    className="mt-1 truncate text-xs text-stone-600"
+                    title={city}
+                    aria-label={`Localidad: ${city}`}
+                >
+                    {city}
                 </p>
             </div>
         </Link>
@@ -323,27 +358,43 @@ export function RequestList({
         <Empty>No hay solicitudes con estos criterios.</Empty>
     );
 }
+function MenuGlyph({ expanded = false }: { expanded?: boolean }) {
+    return (
+        <span className="mobile-menu-icon" data-open={expanded} aria-hidden="true">
+            <span />
+            <span />
+        </span>
+    );
+}
+
 export function Shell({ children, internal = false }: PropsWithChildren<{ internal?: boolean }>) {
     const { auth, flash, shelterName, currentShelter } = usePage<Shared>().props;
     const currentPath = usePage().url.split(/[?#]/)[0];
     const [open, setOpen] = useState(false);
-    const menuButton = useRef<HTMLButtonElement>(null);
+    const [scrolled, setScrolled] = useState(false);
+    const [menuScrollbarGap, setMenuScrollbarGap] = useState(0);
+    const closeMenuButton = useRef<HTMLButtonElement>(null);
     const menuId = useId();
     const admin = auth.user?.role === 'admin';
     const superadmin = auth.user?.role === 'superadmin';
     const staff = admin;
     const catalogUrl = currentShelter ? `/refugios/${currentShelter.slug}/animales` : '/animales';
+    useEffect(() => {
+        const updateScroll = () => setScrolled(window.scrollY > 0);
+        updateScroll();
+        window.addEventListener('scroll', updateScroll, { passive: true });
+        return () => window.removeEventListener('scroll', updateScroll);
+    }, []);
     useEffect(() => router.on('navigate', () => setOpen(false)), []);
     useEffect(() => {
         if (!open) return;
-        const escape = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                setOpen(false);
-                menuButton.current?.focus();
-            }
+        const desktop = window.matchMedia('(min-width: 1024px)');
+        const closeOnDesktop = () => {
+            if (desktop.matches) setOpen(false);
         };
-        document.addEventListener('keydown', escape);
-        return () => document.removeEventListener('keydown', escape);
+        closeOnDesktop();
+        desktop.addEventListener('change', closeOnDesktop);
+        return () => desktop.removeEventListener('change', closeOnDesktop);
     }, [open]);
     const navLink = (href: string, label: string, active = currentPath === href) => (
         <Link
@@ -356,7 +407,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
             {label}
         </Link>
     );
-    const navigation = (
+    const primaryNavigation = (
         <>
             {internal && superadmin && navLink('/superadmin/refugios', 'Gestionar refugios')}
             {internal && admin && (
@@ -393,53 +444,62 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                     {navLink('/#nosotros', 'Huella', false)}
                 </>
             )}
-            {auth.user ? (
-                <>
-                    {!internal &&
-                        navLink(
-                            '/dashboard',
-                            staff || superadmin ? 'Mi panel' : 'Mis solicitudes',
-                            currentPath === '/mis-solicitudes',
-                        )}
-                    {navLink('/profile', 'Mi perfil')}
-                    <Link as="button" href="/logout" method="post" className="nav-link text-left">
-                        Salir
-                    </Link>
-                </>
-            ) : (
-                <>
-                    {navLink('/login', 'Ingresar')}
-                    <Link className="btn" href="/register" onClick={() => setOpen(false)}>
-                        Crear cuenta <Icon name="arrow" className="h-4 w-4" />
-                    </Link>
-                </>
-            )}
         </>
+    );
+    const accountNavigation = auth.user ? (
+        <>
+            {!internal &&
+                navLink(
+                    '/dashboard',
+                    staff || superadmin ? 'Mi panel' : 'Mis solicitudes',
+                    currentPath === '/mis-solicitudes',
+                )}
+            {navLink('/profile', 'Mi perfil')}
+            <Link
+                as="button"
+                href="/logout"
+                method="post"
+                className="nav-link text-left"
+                onClick={() => setOpen(false)}
+            >
+                Salir
+            </Link>
+        </>
+    ) : (
+        <>
+            {navLink('/login', 'Ingresar')}
+            <Link className="btn" href="/register" onClick={() => setOpen(false)}>
+                Crear cuenta <Icon name="arrow" className="h-4 w-4" />
+            </Link>
+        </>
+    );
+    const navigation = (
+        <>
+            {primaryNavigation}
+            {accountNavigation}
+        </>
+    );
+    const brand = (
+        <Link
+            href="/"
+            aria-label={`${shelterName} — Inicio`}
+            className="site-brand flex shrink-0 items-center gap-2.5"
+            onClick={() => setOpen(false)}
+        >
+            <Icon name="paw" className="h-9 w-9 shrink-0" />
+            <span className="font-display text-3xl font-bold leading-none tracking-tight">
+                huella
+            </span>
+        </Link>
     );
     return (
         <div className={'min-h-screen ' + (internal ? 'internal-shell' : 'public-shell')}>
             <a className="skip-link" href="#main">
                 Saltar al contenido
             </a>
-            <header className="relative z-20 border-b border-stone-200 bg-white/95">
-                <div className="site-gutter flex w-full min-w-0 items-center justify-between gap-4 py-4">
-                    <Link
-                        href="/"
-                        aria-label={`${shelterName} — Inicio`}
-                        className="flex shrink-0 items-center gap-3 text-emerald-950"
-                    >
-                        <span className="rounded-xl bg-emerald-900 p-2.5 text-white">
-                            <Icon name="paw" className="h-6 w-6" />
-                        </span>
-                        <span>
-                            <span className="block text-2xl font-bold leading-none tracking-tight">
-                                huella<span className="text-huella-clay">.</span>
-                            </span>
-                            <span className="mt-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em]">
-                                Red de refugios
-                            </span>
-                        </span>
-                    </Link>
+            <header className="site-header sticky top-0 z-40" data-scrolled={scrolled}>
+                <div className="mobile-menu-masthead site-gutter flex w-full min-w-0 items-center justify-between gap-4">
+                    {brand}
                     <nav
                         aria-label="Navegación principal"
                         className="hidden items-center gap-1 lg:flex"
@@ -453,36 +513,79 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                         )}
                     </nav>
                     <button
-                        ref={menuButton}
                         type="button"
-                        className="btn-secondary lg:hidden"
-                        onClick={() => setOpen(!open)}
+                        className="mobile-menu-toggle lg:hidden"
+                        onClick={() => {
+                            setMenuScrollbarGap(
+                                Math.max(
+                                    0,
+                                    window.innerWidth - document.documentElement.clientWidth,
+                                ),
+                            );
+                            setOpen(true);
+                        }}
                         aria-expanded={open}
                         aria-controls={menuId}
                         aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+                        aria-haspopup="dialog"
                     >
-                        <Icon name={open ? 'close' : 'menu'} className="h-5 w-5" />
-                        <span className="hidden min-[360px]:inline">Menú</span>
+                        <MenuGlyph expanded={open} />
                     </button>
                 </div>
-                <nav
-                    id={menuId}
-                    aria-label="Navegación móvil"
-                    className={
-                        (open ? 'flex' : 'hidden') +
-                        ' site-gutter flex-col gap-1 border-t border-stone-200 bg-white py-4 lg:hidden'
-                    }
-                >
-                    {navigation}
-                    {internal && navLink(catalogUrl, 'Ver sitio público')}
-                </nav>
             </header>
+            <Dialog
+                transition
+                open={open}
+                onClose={() => setOpen(false)}
+                initialFocus={closeMenuButton}
+                className="mobile-menu-layer"
+            >
+                <DialogPanel
+                    transition
+                    className="mobile-menu-panel"
+                    style={{ paddingRight: menuScrollbarGap }}
+                >
+                    <DialogTitle className="sr-only">Menú de navegación</DialogTitle>
+                    <div className="mobile-menu-masthead site-gutter flex shrink-0 items-center justify-between gap-4">
+                        {brand}
+                        <button
+                            ref={closeMenuButton}
+                            type="button"
+                            className="mobile-menu-toggle"
+                            aria-label="Cerrar menú"
+                            onClick={() => setOpen(false)}
+                        >
+                            <MenuGlyph expanded />
+                        </button>
+                    </div>
+                    <nav
+                        id={menuId}
+                        aria-label="Navegación móvil"
+                        className="mobile-menu-navigation site-gutter"
+                    >
+                        <div className="mobile-menu-items">
+                            <div className="mobile-menu-primary">
+                                {navLink('/', 'Inicio')}
+                                {primaryNavigation}
+                                {auth.user && accountNavigation}
+                                {internal && navLink(catalogUrl, 'Ver sitio público')}
+                            </div>
+                            {!auth.user && (
+                                <div
+                                    className="mobile-menu-account"
+                                    role="group"
+                                    aria-label="Acceso a tu cuenta"
+                                >
+                                    {accountNavigation}
+                                </div>
+                            )}
+                        </div>
+                    </nav>
+                </DialogPanel>
+            </Dialog>
             <div className={'app-frame ' + (internal ? 'flex' : '')}>
                 {internal && (
                     <aside className="hidden min-h-[85vh] w-60 shrink-0 border-r border-stone-200 bg-white p-5 lg:block">
-                        <p className="eyebrow mb-6 px-3">
-                            {superadmin ? 'Administración de Huella' : 'Espacio del refugio'}
-                        </p>
                         <nav aria-label="Panel del refugio" className="flex flex-col gap-1">
                             {navigation}
                         </nav>

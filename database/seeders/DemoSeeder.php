@@ -6,6 +6,7 @@ use App\Models\Animal;
 use App\Models\Shelter;
 use App\Models\User;
 use App\Services\AdoptionService;
+use App\Services\HealthService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -37,6 +38,7 @@ class DemoSeeder extends Seeder
                 $users[$role] = $u;
             }
             $animals = [];
+            $images = ['gato', 'perro', 'companero', 'gato-2', 'perro-2', 'perro-3', 'gato-3', 'perro-4', 'perro-5', 'gato-4', 'perro-6', 'perro-7', 'gato-5', 'perro-8'];
             foreach (['Mora', 'Simón', 'Luna', 'Coco', 'Nina', 'Toto', 'Oliva', 'Félix', 'Alma', 'Rocco', 'Milo', 'Frida', 'Pipa', 'Bruno'] as $i => $name) {
                 $animals[] = Animal::create([
                     'shelter_id' => Shelter::where('slug', 'huella-inicial')->value('id'),
@@ -49,7 +51,7 @@ class DemoSeeder extends Seeder
                     'public_health_info' => 'Seguimiento sanitario al día. Consultá al refugio sobre sus cuidados específicos.',
                 ]);
                 $animal = end($animals);
-                $image = $animal->species === 'Gato' ? 'gato' : ($i % 2 ? 'perro' : 'companero');
+                $image = $images[$i];
                 $path = 'animals/demo-'.$animal->id.'.jpg';
                 Storage::disk('public')->put($path, file_get_contents(public_path('images/demo/'.$image.'.jpg')));
                 $animal->photos()->create(['file_path' => $path, 'is_primary' => true]);
@@ -69,7 +71,7 @@ class DemoSeeder extends Seeder
             foreach (array_slice($animals, 0, 5) as $i => $animal) {
                 $vet = ['recorded_by' => $users['admin']->id, 'observations' => '[DEMOSTRACIÓN] Registro académico.'];
                 $animal->consultations()->create($vet + ['consultation_date' => today()->subDays(10), 'reason' => 'Control de ingreso', 'symptoms' => 'Sin síntomas referidos', 'diagnosis' => 'Evaluación clínica de demostración', 'instructions' => 'Seguimiento por profesional.']);
-                $animal->vaccinations()->create($vet + ['vaccine_name' => 'Vacuna de demostración', 'application_date' => today()->subMonths(11), 'dose' => 'Primera', 'next_dose_date' => today()->addDays(10 + $i)]);
+                app(HealthService::class)->save($animal, $users['admin'], 'vaccinations', ['vaccine_name' => 'Vacuna de demostración', 'application_date' => today()->subMonths(11)->toDateString(), 'dose' => 'Primera', 'next_dose_date' => today()->addDays(10 + $i)->toDateString(), 'observations' => '[DEMOSTRACIÓN] Registro académico.']);
                 $animal->treatments()->create($vet + ['description' => 'Tratamiento de demostración indicado por profesional', 'start_date' => today()->subDays(3), 'estimated_end_date' => today()->addDays(10), 'status' => $i % 2 ? 'Finalizado' : 'Activo']);
                 $animal->controls()->create($vet + ['control_type' => 'Control general', 'scheduled_date' => today()->addDays($i * 4 - 2), 'status' => 'Pendiente']);
             }

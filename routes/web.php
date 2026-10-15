@@ -47,7 +47,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::get('/veterinaria', [MedicalController::class, 'index'])->name('medical.index');
         Route::get('/veterinaria/controles', [MedicalController::class, 'controls'])->name('medical.controls');
-        Route::get('/veterinaria/{animal}', [MedicalController::class, 'show'])->name('medical.show');
+        Route::get('/veterinaria/{animal}', [MedicalController::class, 'show'])->withTrashed()->name('medical.show');
+        Route::post('/veterinaria/{animal}/dosis/{dose}/{action}', [MedicalController::class, 'resolveDose'])->whereIn('action', ['apply', 'cancel'])->name('medical.doses.resolve');
         Route::post('/veterinaria/{animal}/{type}', [MedicalController::class, 'store'])->middleware('role:admin')->name('medical.store');
         Route::patch('/veterinaria/{animal}/{type}/{record}', [MedicalController::class, 'update'])->middleware('role:admin')->name('medical.update');
     });

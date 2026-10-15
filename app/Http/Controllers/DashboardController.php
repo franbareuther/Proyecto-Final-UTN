@@ -6,6 +6,7 @@ use App\Models\Adoption;
 use App\Models\AdoptionRequest;
 use App\Models\Animal;
 use App\Models\Treatment;
+use App\Models\VaccinationDose;
 use App\Models\VeterinaryControl;
 use Inertia\Inertia;
 
@@ -25,6 +26,7 @@ class DashboardController extends Controller
                 'Adopciones realizadas' => Adoption::count(), 'Solicitudes pendientes' => AdoptionRequest::whereIn('status', ['Nueva', 'En revisión'])->count(),
                 'Animales en tratamiento' => Treatment::where('status', 'Activo')->distinct()->count('animal_id'),
                 'Controles en 30 días' => VeterinaryControl::where('status', 'Pendiente')->whereBetween('scheduled_date', [today(), today()->addDays(30)])->count(),
+                'Dosis pendientes hasta 30 días (incluye vencidas)' => VaccinationDose::where('status', 'Pendiente')->whereDate('scheduled_date', '<=', today()->addDays(30))->count(),
             ],
             'species' => Animal::selectRaw('species as label, COUNT(*) as total')->groupBy('species')->get(),
             'statuses' => AdoptionRequest::selectRaw('status as label, COUNT(*) as total')->groupBy('status')->get(),
