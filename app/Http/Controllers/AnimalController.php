@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
@@ -17,9 +18,19 @@ class AnimalController extends Controller
 {
     public function index(Request $r)
     {
-        $f = $r->validate(['q' => 'nullable|string|max:100']);
+        $f = $r->validate(['q' => 'nullable|string|max:100', 'species' => ['nullable', Rule::in(['Perro', 'Gato', 'Otro'])],
+            'status' => ['nullable', Rule::in(['Disponible', 'No disponible temporalmente', 'En proceso de adopción', 'Adoptado'])], 'archive' => 'nullable|in:active,archived,all']);
+        $animals = Animal::with('photos');
+        if (($f['archive'] ?? 'active') === 'archived') {
+            $animals->onlyTrashed();
+        } elseif (($f['archive'] ?? 'active') === 'all') {
+            $animals->withTrashed();
+        }
+        $animals->when($f['q'] ?? null, fn ($q, $term) => $q->where('name', 'like', '%'.$term.'%'))
+            ->when($f['species'] ?? null, fn ($q, $species) => $q->where('species', $species))
+            ->when($f['status'] ?? null, fn ($q, $status) => $q->where('availability_status', $status));
 
-        return Inertia::render('Admin/Animals', ['animals' => Animal::with('photos')->when($r->filled('q'), fn ($q) => $q->where('name', 'like', '%'.$f['q'].'%'))->latest()->paginate(15)->withQueryString(), 'filters' => $f]);
+        return Inertia::render('Admin/Animals', ['animals' => $animals->latest()->orderByDesc('id')->paginate(15)->withQueryString(), 'filters' => $f]);
     }
 
     public function create()
@@ -57,7 +68,11 @@ class AnimalController extends Controller
         $paths = [];
         try {
             foreach ($r->file('photos', []) as $file) {
-                $paths[] = $file->store('animals', 'public');
+                $path = 'animals/'.$file->hashName();
+                $paths[] = $path;
+                if (! Storage::disk('public')->putFileAs('animals', $file, $file->hashName())) {
+                    throw ValidationException::withMessages(['photos' => 'No se pudieron guardar las fotografías. Intentá nuevamente.']);
+                }
             }
 
             return DB::transaction(function () use ($r, $animal, $paths) {
@@ -69,12 +84,20 @@ class AnimalController extends Controller
                     } elseif ($data['availability_status'] !== 'Disponible' && $animal->requests()->whereIn('status', AdoptionRequest::ACTIVE)->exists()) {
                         throw ValidationException::withMessages(['availability_status' => 'Primero resolvé las solicitudes activas.']);
                     }
-                    $animal->update($data);
+                    if (! $animal->fill($data)->save()) {
+                        throw ValidationException::withMessages(['animal' => 'No se pudieron guardar los cambios.']);
+                    }
                 } else {
-                    $animal = Animal::create($data + ['shelter_id' => $r->user()->shelter_id]);
+                    $animal = new Animal($data + ['shelter_id' => $r->user()->shelter_id]);
+                    if (! $animal->save()) {
+                        throw ValidationException::withMessages(['animal' => 'No se pudo registrar el animal.']);
+                    }
                 }
                 foreach ($paths as $path) {
-                    $animal->photos()->create(['file_path' => $path, 'is_primary' => ! $animal->photos()->exists()]);
+                    $photo = $animal->photos()->make(['file_path' => $path, 'is_primary' => ! $animal->photos()->exists()]);
+                    if (! $photo->save()) {
+                        throw ValidationException::withMessages(['photos' => 'No se pudieron guardar las fotografías.']);
+                    }
                 }
 
                 return $animal;
@@ -103,15 +126,19 @@ class AnimalController extends Controller
     {
         Gate::authorize('update', $animal);
         abort_unless($photo->animal_id === $animal->id, 404);
-        DB::transaction(function () use ($animal, $photo) {
-            Animal::lockForUpdate()->findOrFail($animal->id);
-            $photo->delete();
-            $first = $animal->photos()->first();
+        $path = DB::transaction(function () use ($animal, $photo) {
+            $lockedAnimal = Animal::lockForUpdate()->findOrFail($animal->id);
+            $lockedPhoto = $lockedAnimal->photos()->whereKey($photo->id)->lockForUpdate()->firstOrFail();
+            $path = $lockedPhoto->file_path;
+            $lockedPhoto->delete();
+            $first = $lockedAnimal->photos()->first();
             if ($first) {
                 $first->update(['is_primary' => true]);
             }
+
+            return $path;
         });
-        Storage::disk('public')->delete($photo->file_path);
+        Storage::disk('public')->delete($path);
 
         return back()->with('success', 'Fotografía eliminada.');
     }
@@ -121,9 +148,10 @@ class AnimalController extends Controller
         Gate::authorize('update', $animal);
         abort_unless($photo->animal_id === $animal->id, 404);
         DB::transaction(function () use ($animal, $photo) {
-            Animal::lockForUpdate()->findOrFail($animal->id);
-            $animal->photos()->update(['is_primary' => false]);
-            $photo->update(['is_primary' => true]);
+            $lockedAnimal = Animal::lockForUpdate()->findOrFail($animal->id);
+            $lockedPhoto = $lockedAnimal->photos()->whereKey($photo->id)->lockForUpdate()->firstOrFail();
+            $lockedAnimal->photos()->update(['is_primary' => false]);
+            $lockedPhoto->update(['is_primary' => true]);
         });
 
         return back()->with('success', 'Imagen principal actualizada.');

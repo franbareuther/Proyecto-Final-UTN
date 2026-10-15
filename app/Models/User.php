@@ -33,6 +33,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'access_version',
     ];
 
     public function shelter()
@@ -42,7 +43,12 @@ class User extends Authenticatable
 
     public function belongsToShelter(int $id): bool
     {
-        return (int) $this->shelter_id === $id && $this->shelter?->active === true;
+        return ! $this->isSuspended() && (int) $this->shelter_id === $id && $this->shelter?->active === true;
+    }
+
+    public function isSuspended(): bool
+    {
+        return $this->role === 'admin' && $this->suspended_at !== null;
     }
 
     public function adoptionRequests()
@@ -60,6 +66,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'suspended_at' => 'datetime',
+            'access_version' => 'integer',
         ];
     }
 }

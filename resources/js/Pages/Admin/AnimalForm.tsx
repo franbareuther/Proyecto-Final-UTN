@@ -1,7 +1,13 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import { Animal } from '@/types/shelter';
 import { Confirm, Errors, Field, Shell, Title } from '@/Components/Shelter';
+import { useRef, useState } from 'react';
+import AnimalImage from '@/Components/AnimalImage';
 export default function AnimalForm({ animal: a }: { animal?: Animal }) {
+    const fileInput = useRef<HTMLInputElement>(null);
+    const submitting = useRef(false);
+    const photoPending = useRef(false);
+    const [photoBusy, setPhotoBusy] = useState(false);
     const f = useForm({
         name: a?.name || '',
         species: a?.species || 'Perro',
@@ -23,6 +29,25 @@ export default function AnimalForm({ animal: a }: { animal?: Animal }) {
         _method: a ? 'put' : 'post',
     });
     const locked = a && ['Adoptado', 'En proceso de adopción'].includes(a.availability_status);
+    const changePhoto = (id: number, remove = false) => {
+        if (!a || photoPending.current || submitting.current) return;
+        photoPending.current = true;
+        setPhotoBusy(true);
+        const options = {
+            preserveScroll: true,
+            onFinish: () => {
+                photoPending.current = false;
+                setPhotoBusy(false);
+            },
+        };
+        if (remove) router.delete(`/admin/animales/${a.id}/fotos/${id}`, options);
+        else router.patch(`/admin/animales/${a.id}/fotos/${id}`, {}, options);
+    };
+    const photoError =
+        Object.entries(f.errors)
+            .filter(([key]) => key === 'photos' || key.startsWith('photos.'))
+            .map(([, error]) => error)
+            .join(' ') || undefined;
     return (
         <Shell internal>
             <Head title={a ? 'Editar animal' : 'Registrar animal'} />
@@ -34,9 +59,17 @@ export default function AnimalForm({ animal: a }: { animal?: Animal }) {
                 className="card max-w-4xl space-y-6"
                 onSubmit={(e) => {
                     e.preventDefault();
+                    if (photoPending.current || submitting.current) return;
+                    submitting.current = true;
                     f.post(a ? '/admin/animales/' + a.id : '/admin/animales', {
                         forceFormData: true,
-                        onSuccess: () => f.setData('photos', []),
+                        onFinish: () => {
+                            submitting.current = false;
+                        },
+                        onSuccess: () => {
+                            f.setData('photos', []);
+                            if (fileInput.current) fileInput.current.value = '';
+                        },
                     });
                 }}
             >
@@ -80,7 +113,7 @@ export default function AnimalForm({ animal: a }: { animal?: Animal }) {
                             ],
                         ] as const
                     ).map(([k, l, opts]) => (
-                        <Field key={k} label={l}>
+                        <Field key={k} label={l} error={f.errors[k]}>
                             <select
                                 disabled={k === 'availability_status' && !!locked}
                                 value={f.data[k]}
@@ -109,7 +142,7 @@ export default function AnimalForm({ animal: a }: { animal?: Animal }) {
                         ],
                     ] as const
                 ).map(([k, l]) => (
-                    <Field key={k} label={l}>
+                    <Field key={k} label={l} error={f.errors[k]}>
                         <textarea
                             rows={4}
                             required={k === 'description'}
@@ -118,18 +151,45 @@ export default function AnimalForm({ animal: a }: { animal?: Animal }) {
                         />
                     </Field>
                 ))}
-                <Field label="Fotografías (JPG, PNG o WebP, hasta 8 por envío, 4 MB cada una)">
+                <Field
+                    label="Fotografías (JPG, PNG o WebP, hasta 8 por envío, 4 MB cada una)"
+                    error={photoError}
+                >
                     <input
+                        ref={fileInput}
+                        name="photos[]"
+                        className="block w-full min-w-0 max-w-full"
+                        disabled={f.processing || photoBusy}
                         type="file"
                         multiple
                         accept="image/jpeg,image/png,image/webp"
                         onChange={(e) => f.setData('photos', Array.from(e.target.files || []))}
                     />
                 </Field>
-                {f.progress && (
-                    <progress className="w-full" value={f.progress.percentage} max={100} />
+                {f.data.photos.length > 0 && (
+                    <div role="status" className="text-sm text-stone-700">
+                        <p>{f.data.photos.length} fotografías pendientes de guardar.</p>
+                        <ul
+                            aria-label="Archivos seleccionados"
+                            className="mt-2 list-inside list-disc"
+                        >
+                            {f.data.photos.map((photo, index) => (
+                                <li className="break-words" key={index}>
+                                    {photo.name}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 )}
-                <button className="btn" disabled={f.processing}>
+                {f.progress && (
+                    <progress
+                        aria-label="Carga de fotografías"
+                        className="w-full"
+                        value={f.progress.percentage}
+                        max={100}
+                    />
+                )}
+                <button className="btn" disabled={f.processing || photoBusy}>
                     {f.processing ? 'Guardando…' : 'Guardar animal'}
                 </button>
             </form>
@@ -139,26 +199,23 @@ export default function AnimalForm({ animal: a }: { animal?: Animal }) {
                     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         {a.photos.map((p) => (
                             <div className="card space-y-3" key={p.id}>
-                                <img
+                                <AnimalImage
                                     src={'/storage/' + p.file_path}
                                     alt={a.name}
                                     className="h-40 w-full rounded-xl object-cover"
                                 />
                                 <button
                                     className="btn-secondary w-full"
-                                    disabled={p.is_primary}
-                                    onClick={() =>
-                                        router.patch(`/admin/animales/${a.id}/fotos/${p.id}`)
-                                    }
+                                    disabled={p.is_primary || f.processing || photoBusy}
+                                    onClick={() => changePhoto(p.id)}
                                 >
                                     {p.is_primary ? 'Imagen principal' : 'Usar como principal'}
                                 </button>
                                 <Confirm
                                     label="Eliminar foto"
                                     title="Eliminar fotografía"
-                                    onConfirm={() =>
-                                        router.delete(`/admin/animales/${a.id}/fotos/${p.id}`)
-                                    }
+                                    busy={f.processing || photoBusy}
+                                    onConfirm={() => changePhoto(p.id, true)}
                                 >
                                     Esta fotografía se eliminará del almacenamiento.
                                 </Confirm>

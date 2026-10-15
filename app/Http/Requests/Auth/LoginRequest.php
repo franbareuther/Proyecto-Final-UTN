@@ -50,6 +50,17 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        if (Auth::user()->isSuspended()) {
+            Auth::guard('web')->logout();
+            $this->session()->invalidate();
+            $this->session()->regenerateToken();
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages(['email' => 'Tu cuenta del refugio está suspendida. Consultá al responsable de Huella.']);
+        }
+        if (Auth::user()->role === 'admin') {
+            $this->session()->put('staff_access_version', (int) Auth::user()->access_version);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

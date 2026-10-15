@@ -34,6 +34,8 @@ erDiagram
    bigint id PK
    string email UK
    enum role
+   timestamp suspended_at "nullable; acceso del admin"
+   int access_version "default 0; revocación de sesiones"
  }
  animals {
    bigint id PK
@@ -62,3 +64,5 @@ erDiagram
 ```
 
 El historial incluye actor, estado anterior/nuevo, observaciones y timestamps. Al finalizar una adopción, otras solicitudes pendientes pasan a Rechazada con un motivo explícito visible en su seguimiento; no se rechazan al aprobar, para permitir reanudar la evaluación si la aprobación no se concreta.
+
+La migración nueva `2026_10_15_000002_add_staff_access_controls` agrega `users.suspended_at` (nullable) y `access_version` (entero sin signo, 0 inicialmente). No cambia credenciales, roles, refugios ni relaciones anteriores. Solo el superadministrador modifica estos campos para cuentas `admin` de la institución indicada; no hay traslado de cuentas. Suspender, reactivar o cambiar el correo incrementa la versión y rota el token de recordar acceso. El middleware compara la versión persistida con la sesión para impedir recuperar sesiones anteriores tras una reactivación. `access_version` está oculto en JSON y ambos campos quedan fuera de asignación masiva. Ver [contratos y validación de gestión](equipo/03-validacion-gestion-refugios.md).

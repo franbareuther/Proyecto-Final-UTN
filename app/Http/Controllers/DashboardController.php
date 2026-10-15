@@ -21,7 +21,7 @@ class DashboardController extends Controller
 
         return Inertia::render('Admin/Dashboard', [
             'stats' => [
-                'Animales registrados' => Animal::count(), 'Disponibles' => Animal::where('availability_status', 'Disponible')->count(),
+                'Animales registrados' => Animal::count(), 'Animales archivados' => Animal::onlyTrashed()->count(), 'Disponibles' => Animal::where('availability_status', 'Disponible')->count(),
                 'Adopciones realizadas' => Adoption::count(), 'Solicitudes pendientes' => AdoptionRequest::whereIn('status', ['Nueva', 'En revisión'])->count(),
                 'Animales en tratamiento' => Treatment::where('status', 'Activo')->distinct()->count('animal_id'),
                 'Controles en 30 días' => VeterinaryControl::where('status', 'Pendiente')->whereBetween('scheduled_date', [today(), today()->addDays(30)])->count(),

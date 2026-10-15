@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -30,10 +31,25 @@ class ShelterController extends Controller
         return Inertia::render('Public/Shelter', ['shelter' => $shelter]);
     }
 
-    public function manage()
+    public function manage(Request $request)
     {
+        $filters = $request->validate(['q' => 'nullable|string|max:100', 'state' => 'nullable|in:active,inactive',
+            'selected' => 'nullable|integer|min:1', 'staff_q' => 'nullable|string|max:100', 'staff_state' => 'nullable|in:active,suspended']);
+        $page = Shelter::query()->when($filters['q'] ?? null, fn ($q, $term) => $q->where(fn ($q) => $q->where('name', 'like', '%'.$term.'%')->orWhere('city', 'like', '%'.$term.'%')->orWhere('slug', 'like', '%'.$term.'%')))
+            ->when($filters['state'] ?? null, fn ($q, $state) => $q->where('active', $state === 'active'))->orderBy('name')->orderBy('id')->paginate(12)->withQueryString();
+        $selected = isset($filters['selected']) ? Shelter::findOrFail($filters['selected']) : null;
+        $staffPage = null;
+        if ($selected) {
+            $staffPage = $selected->staff()->where('role', 'admin')
+                ->when($filters['staff_q'] ?? null, fn ($q, $term) => $q->where(fn ($q) => $q->where('name', 'like', '%'.$term.'%')->orWhere('last_name', 'like', '%'.$term.'%')->orWhere('email', 'like', '%'.$term.'%')))
+                ->when($filters['staff_state'] ?? null, fn ($q, $state) => $state === 'suspended' ? $q->whereNotNull('suspended_at') : $q->whereNull('suspended_at'))
+                ->select(['id', 'shelter_id', 'name', 'last_name', 'email', 'role', 'suspended_at'])->orderBy('name')->orderBy('id')->paginate(10, ['*'], 'staff_page')->withQueryString();
+            $selected->setRelation('staff', collect($staffPage->items()));
+        }
+
         return Inertia::render('Superadmin/Shelters', [
-            'shelters' => Shelter::with(['staff' => fn ($q) => $q->select('id', 'shelter_id', 'name', 'last_name', 'email', 'role')])->orderBy('name')->get(),
+            'shelters' => $page->items(), 'pagination' => $page, 'selectedShelter' => $selected,
+            'staffPagination' => $staffPage, 'filters' => $filters,
         ]);
     }
 
@@ -118,17 +134,64 @@ class ShelterController extends Controller
 
     public function staff(Request $request, Shelter $shelter)
     {
+        abort_unless($request->user()?->role === 'superadmin', 403);
         $data = $request->validate([
             'name' => 'required|string|max:255', 'last_name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users', 'password' => 'required|string|min:12|confirmed',
             'role' => ['required', Rule::in(['admin'])],
-        ]);
+        ], $this->staffMessages());
         $user = new User(collect($data)->except('role')->all());
         $user->role = $data['role'];
         $user->shelter_id = $shelter->id;
         $user->save();
 
         return back()->with('success', 'Cuenta del refugio creada.');
+    }
+
+    public function updateStaff(Request $request, Shelter $shelter, User $staff)
+    {
+        abort_unless($request->user()?->role === 'superadmin', 403);
+        abort_unless($staff->role === 'admin' && (int) $staff->shelter_id === (int) $shelter->id, 404);
+        $data = $request->validate([
+            'name' => 'required|string|max:255', 'last_name' => 'required|string|max:255',
+            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($staff->id)],
+            'role' => ['sometimes', Rule::in(['admin'])], 'shelter_id' => 'prohibited',
+            'suspended' => 'required|boolean', 'password' => 'prohibited',
+        ], $this->staffMessages());
+        DB::transaction(function () use ($staff, $shelter, $data) {
+            $user = User::whereKey($staff->id)->lockForUpdate()->firstOrFail();
+            abort_unless($user->role === 'admin' && (int) $user->shelter_id === (int) $shelter->id, 404);
+            $changed = $user->isSuspended() !== (bool) $data['suspended'] || $user->email !== $data['email'];
+            $user->fill(collect($data)->only(['name', 'last_name', 'email'])->all());
+            if ($user->isDirty('email')) {
+                $user->email_verified_at = null;
+            }
+            if ($changed) {
+                $user->access_version = (int) $user->access_version + 1;
+                $user->remember_token = Str::random(60);
+            }
+            $user->suspended_at = $data['suspended'] ? ($user->suspended_at ?? now()) : null;
+            if (! $user->save()) {
+                throw ValidationException::withMessages(['email' => 'No se pudieron guardar los cambios de la cuenta. Intentá nuevamente.']);
+            }
+        });
+
+        return back()->with('success', 'Cuenta actualizada. Si cambió el acceso, deberá iniciar sesión nuevamente. Su historial se conserva.');
+    }
+
+    private function staffMessages(): array
+    {
+        return [
+            'name.required' => 'Ingresá el nombre.', 'last_name.required' => 'Ingresá el apellido.',
+            'name.max' => 'El nombre admite hasta 255 caracteres.', 'last_name.max' => 'El apellido admite hasta 255 caracteres.',
+            'email.required' => 'Ingresá un correo de acceso.', 'email.email' => 'Ingresá un correo válido.',
+            'email.max' => 'El correo admite hasta 255 caracteres.', 'email.unique' => 'Ya existe una cuenta con ese correo.',
+            'password.required' => 'Ingresá una contraseña inicial.', 'password.min' => 'Usá al menos 12 caracteres.',
+            'password.confirmed' => 'Las contraseñas no coinciden.', 'password.prohibited' => 'La contraseña se cambia desde el perfil o la recuperación de acceso.',
+            'role.required' => 'Elegí Administrador del refugio.', 'role.in' => 'Solo se gestionan administradores del refugio.',
+            'shelter_id.prohibited' => 'No se permite trasladar cuentas entre refugios.',
+            'suspended.required' => 'Indicá si el acceso queda suspendido.', 'suspended.boolean' => 'El estado de acceso no es válido.',
+        ];
     }
 
     public function profile(Request $request)

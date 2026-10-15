@@ -10,6 +10,8 @@ import {
     Shell,
     Title,
 } from '@/Components/Shelter';
+import { useEffect, useRef, useState } from 'react';
+import AnimalImage from '@/Components/AnimalImage';
 export default function Animals({
     animals,
     filters,
@@ -17,7 +19,35 @@ export default function Animals({
     animals: Page<Animal>;
     filters: Record<string, string>;
 }) {
-    const f = useForm({ q: filters.q || '' });
+    const f = useForm({
+        q: filters.q || '',
+        species: filters.species || '',
+        status: filters.status || '',
+        archive: filters.archive || 'active',
+    });
+    useEffect(
+        () =>
+            f.setData({
+                q: filters.q || '',
+                species: filters.species || '',
+                status: filters.status || '',
+                archive: filters.archive || 'active',
+            }),
+        [filters.q, filters.species, filters.status, filters.archive],
+    );
+    const pending = useRef(false);
+    const [busy, setBusy] = useState(false);
+    const archive = (id: number) => {
+        if (pending.current) return;
+        pending.current = true;
+        setBusy(true);
+        router.delete('/admin/animales/' + id, {
+            onFinish: () => {
+                pending.current = false;
+                setBusy(false);
+            },
+        });
+    };
     const errors = usePage().props.errors;
     return (
         <Shell internal>
@@ -31,18 +61,67 @@ export default function Animals({
                 </Link>
             </Title>
             <form
-                className="mb-6 flex items-end gap-3"
+                className="mb-6 flex flex-wrap items-end gap-3"
                 onSubmit={(e) => {
                     e.preventDefault();
                     f.get('/admin/animales');
                 }}
             >
-                <Field label="Buscar por nombre">
-                    <input value={f.data.q} onChange={(e) => f.setData('q', e.target.value)} />
+                <Field label="Buscar por nombre" error={f.errors.q}>
+                    <input
+                        name="q"
+                        type="search"
+                        maxLength={100}
+                        value={f.data.q}
+                        onChange={(e) => f.setData('q', e.target.value)}
+                    />
+                </Field>
+                <Field label="Especie" error={f.errors.species}>
+                    <select
+                        name="species"
+                        value={f.data.species}
+                        onChange={(e) => f.setData('species', e.target.value)}
+                    >
+                        <option value="">Todas</option>
+                        {['Perro', 'Gato', 'Otro'].map((x) => (
+                            <option key={x}>{x}</option>
+                        ))}
+                    </select>
+                </Field>
+                <Field label="Disponibilidad" error={f.errors.status}>
+                    <select
+                        name="status"
+                        value={f.data.status}
+                        onChange={(e) => f.setData('status', e.target.value)}
+                    >
+                        <option value="">Todas</option>
+                        {[
+                            'Disponible',
+                            'En proceso de adopción',
+                            'Adoptado',
+                            'No disponible temporalmente',
+                        ].map((x) => (
+                            <option key={x}>{x}</option>
+                        ))}
+                    </select>
+                </Field>
+                <Field label="Archivo" error={f.errors.archive}>
+                    <select
+                        name="archive"
+                        value={f.data.archive}
+                        onChange={(e) => f.setData('archive', e.target.value)}
+                    >
+                        <option value="active">Sin archivar</option>
+                        <option value="archived">Archivados</option>
+                        <option value="all">Todos</option>
+                    </select>
                 </Field>
                 <button className="btn" disabled={f.processing}>
                     Buscar
                 </button>
+                <Link className="text-link" href="/admin/animales">
+                    Limpiar filtros
+                </Link>
             </form>
             <Errors errors={errors} />
             {animals.data.length ? (
@@ -62,12 +141,14 @@ export default function Animals({
                                 <tr key={a.id}>
                                     <td className="p-5">
                                         <div className="flex items-center gap-3">
-                                            <img
+                                            <AnimalImage
                                                 src={a.photo_url}
                                                 alt=""
                                                 className="h-12 w-12 rounded-xl object-cover"
                                             />
-                                            <strong>{a.name}</strong>
+                                            <strong className="max-w-64 break-words">
+                                                {a.name}
+                                            </strong>
                                         </div>
                                     </td>
                                     <td className="p-5">
@@ -76,34 +157,44 @@ export default function Animals({
                                     </td>
                                     <td className="p-5">
                                         <Badge>{a.availability_status}</Badge>
+                                        {a.deleted_at && (
+                                            <p className="mt-2 font-semibold text-stone-600">
+                                                Archivado
+                                            </p>
+                                        )}
                                     </td>
                                     <td className="p-5">
-                                        <div className="flex flex-wrap gap-2">
-                                            <Link
-                                                className="btn-secondary"
-                                                href={'/admin/animales/' + a.id + '/edit'}
-                                            >
-                                                Editar
-                                            </Link>
-                                            <Link
-                                                className="btn-secondary"
-                                                href={'/veterinaria/' + a.id}
-                                            >
-                                                Historia clínica
-                                            </Link>
-                                            <Confirm
-                                                label="Archivar"
-                                                title={'Archivar a ' + a.name}
-                                                onConfirm={() =>
-                                                    router.delete('/admin/animales/' + a.id)
-                                                }
-                                            >
-                                                <p>
-                                                    Se retirará del catálogo. Conservaremos las
-                                                    adopciones y los antecedentes veterinarios.
-                                                </p>
-                                            </Confirm>
-                                        </div>
+                                        {!a.deleted_at ? (
+                                            <div className="flex flex-wrap gap-2">
+                                                <Link
+                                                    className="btn-secondary"
+                                                    href={'/admin/animales/' + a.id + '/edit'}
+                                                >
+                                                    Editar
+                                                </Link>
+                                                <Link
+                                                    className="btn-secondary"
+                                                    href={'/veterinaria/' + a.id}
+                                                >
+                                                    Historia clínica
+                                                </Link>
+                                                <Confirm
+                                                    label="Archivar"
+                                                    title={'Archivar a ' + a.name}
+                                                    busy={busy}
+                                                    onConfirm={() => archive(a.id)}
+                                                >
+                                                    <p>
+                                                        Se retirará del catálogo. Conservaremos las
+                                                        adopciones y los antecedentes veterinarios.
+                                                    </p>
+                                                </Confirm>
+                                            </div>
+                                        ) : (
+                                            <p className="text-stone-600">
+                                                Historial conservado. Sin acciones de restauración.
+                                            </p>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
@@ -111,7 +202,7 @@ export default function Animals({
                     </table>
                 </div>
             ) : (
-                <Empty>El refugio todavía no tiene animales registrados.</Empty>
+                <Empty>No hay animales con estos criterios. Podés limpiar los filtros.</Empty>
             )}
             <Pagination page={animals} />
         </Shell>

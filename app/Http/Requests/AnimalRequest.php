@@ -23,7 +23,15 @@ class AnimalRequest extends FormRequest
             'entry_date' => ['required', 'date', 'before_or_equal:today'],
             'availability_status' => ['required', Rule::in(['Disponible', 'No disponible temporalmente'])],
             'public_health_info' => ['nullable', 'string', 'max:2000'],
-            'photos' => ['nullable', 'array', 'max:8'], 'photos.*' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+            'photos' => ['nullable', 'array', 'max:8'], 'photos.*' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'mimetypes:image/jpeg,image/png,image/webp', 'dimensions:min_width=1,min_height=1', 'max:4096'],
         ];
+    }
+
+    public function messages(): array
+    {
+        return ['photos.max' => 'Podés cargar hasta 8 fotografías por envío.',
+            'photos.*.image' => 'Elegí una imagen válida.', 'photos.*.mimes' => 'Solo se admiten JPEG, PNG y WebP.',
+            'photos.*.mimetypes' => 'Solo se admiten JPEG, PNG y WebP.',
+            'photos.*.dimensions' => 'No se pudo leer la imagen.', 'photos.*.max' => 'Cada fotografía puede pesar hasta 4 MB.'];
     }
 }

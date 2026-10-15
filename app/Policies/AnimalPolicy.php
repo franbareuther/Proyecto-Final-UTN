@@ -9,7 +9,7 @@ class AnimalPolicy
 {
     public function create(User $u): bool
     {
-        return $u->role === 'admin' && $u->shelter?->active === true;
+        return $u->role === 'admin' && ! $u->isSuspended() && $u->shelter?->active === true;
     }
 
     public function update(User $u, Animal $a): bool

@@ -1,10 +1,12 @@
-import { Head, useForm } from '@inertiajs/react';
-import { useState } from 'react';
-import { Errors, Field, Shell, Title } from '@/Components/Shelter';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { useEffect, useRef } from 'react';
+import { Empty, Errors, Field, Pagination, Shell, Title } from '@/Components/Shelter';
 import ShelterForm from '@/Components/ShelterForm';
-import { Refuge } from '@/types/shelter';
+import { Page, Person, Refuge } from '@/types/shelter';
+import StaffEditor from './StaffEditor';
 
 function StaffForm({ shelter }: { shelter: Refuge }) {
+    const submitting = useRef(false);
     const f = useForm({
         name: '',
         last_name: '',
@@ -18,10 +20,15 @@ function StaffForm({ shelter }: { shelter: Refuge }) {
             className="space-y-4"
             onSubmit={(e) => {
                 e.preventDefault();
+                if (submitting.current) return;
+                submitting.current = true;
                 f.post(`/superadmin/refugios/${shelter.slug}/personal`, {
                     preserveScroll: true,
                     onSuccess: () => f.reset(),
-                    onFinish: () => f.reset('password', 'password_confirmation'),
+                    onFinish: () => {
+                        submitting.current = false;
+                        f.reset('password', 'password_confirmation');
+                    },
                 });
             }}
         >
@@ -62,9 +69,44 @@ function StaffForm({ shelter }: { shelter: Refuge }) {
     );
 }
 
-export default function Shelters({ shelters }: { shelters: Refuge[] }) {
-    const [selected, setSelected] = useState<number | null>(null);
-    const shelter = shelters.find((s) => s.id === selected);
+export default function Shelters({
+    shelters,
+    pagination,
+    selectedShelter,
+    staffPagination,
+    filters = {},
+}: {
+    shelters: Refuge[];
+    pagination?: Page<Refuge>;
+    selectedShelter?: Refuge | null;
+    staffPagination?: Page<Person> | null;
+    filters?: Record<string, string>;
+}) {
+    const shelter = selectedShelter || undefined;
+    const f = useForm({ q: filters.q || '', state: filters.state || '' });
+    const staffSearch = useForm({
+        staff_q: filters.staff_q || '',
+        staff_state: filters.staff_state || '',
+    });
+    useEffect(
+        () => f.setData({ q: filters.q || '', state: filters.state || '' }),
+        [filters.q, filters.state],
+    );
+    useEffect(
+        () =>
+            staffSearch.setData({
+                staff_q: filters.staff_q || '',
+                staff_state: filters.staff_state || '',
+            }),
+        [filters.staff_q, filters.staff_state, shelter?.id],
+    );
+    const url = usePage().url;
+    const selectUrl = (id?: number) => {
+        const query = new URLSearchParams(url.split('?')[1] || '');
+        for (const key of ['selected', 'staff_q', 'staff_state', 'staff_page']) query.delete(key);
+        if (id) query.set('selected', String(id));
+        return '/superadmin/refugios' + (query.size ? '?' + query.toString() : '');
+    };
     return (
         <Shell internal>
             <Head title="Administrar refugios" />
@@ -72,31 +114,76 @@ export default function Shelters({ shelters }: { shelters: Refuge[] }) {
                 title="Refugios de Huella"
                 text="Alta manual después de conversar con cada refugio. Administrá su perfil y las cuentas de su equipo."
             />
-            <div className="grid gap-6 lg:grid-cols-[1fr_2fr]">
-                <aside className="card self-start space-y-3">
-                    <button
-                        className={selected === null ? 'btn w-full' : 'btn-secondary w-full'}
-                        onClick={() => setSelected(null)}
+            <form
+                className="card mb-6 flex flex-wrap items-end gap-4"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    f.get('/superadmin/refugios');
+                }}
+            >
+                <Field label="Nombre, identificador o ciudad" error={f.errors.q}>
+                    <input
+                        type="search"
+                        name="q"
+                        maxLength={100}
+                        value={f.data.q}
+                        onChange={(e) => f.setData('q', e.target.value)}
+                    />
+                </Field>
+                <Field label="Habilitación" error={f.errors.state}>
+                    <select
+                        name="state"
+                        value={f.data.state}
+                        onChange={(e) => f.setData('state', e.target.value)}
+                    >
+                        <option value="">Todos los refugios</option>
+                        <option value="active">Activos</option>
+                        <option value="inactive">Inactivos</option>
+                    </select>
+                </Field>
+                <button className="btn" disabled={f.processing}>
+                    Buscar refugios
+                </button>
+                <Link className="text-link" href="/superadmin/refugios">
+                    Limpiar búsqueda
+                </Link>
+            </form>
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+                <aside className="card min-w-0 self-start space-y-3">
+                    <Link
+                        className={!shelter ? 'btn w-full' : 'btn-secondary w-full'}
+                        href={selectUrl()}
                     >
                         + Nuevo refugio
-                    </button>
+                    </Link>
                     {shelters.map((s) => (
-                        <button
+                        <Link
                             key={s.id}
-                            className={selected === s.id ? 'btn w-full' : 'btn-secondary w-full'}
-                            onClick={() => setSelected(s.id)}
+                            className={
+                                shelter?.id === s.id
+                                    ? 'btn w-full break-words'
+                                    : 'btn-secondary w-full break-words'
+                            }
+                            href={selectUrl(s.id)}
+                            aria-current={shelter?.id === s.id ? 'page' : undefined}
                         >
                             {s.name} · {s.active ? 'Activo' : 'Inactivo'}
-                        </button>
+                        </Link>
                     ))}
+                    {!shelters.length && (
+                        <p className="text-sm text-stone-600">
+                            No encontramos refugios con esta búsqueda.
+                        </p>
+                    )}
+                    {pagination && <Pagination page={pagination} />}
                 </aside>
-                <div className="space-y-6">
+                <div className="min-w-0 space-y-6">
                     <section className="card">
-                        <h2 className="mb-6 text-2xl font-semibold">
+                        <h2 className="mb-6 break-words text-2xl font-semibold">
                             {shelter ? shelter.name : 'Nuevo refugio'}
                         </h2>
                         <ShelterForm
-                            key={shelter ? JSON.stringify(shelter) : 'new'}
+                            key={shelter ? JSON.stringify({ ...shelter, staff: undefined }) : 'new'}
                             shelter={shelter}
                         />
                     </section>
@@ -104,21 +191,75 @@ export default function Shelters({ shelters }: { shelters: Refuge[] }) {
                         <>
                             <section className="card">
                                 <h2 className="mb-4 text-xl font-semibold">Equipo del refugio</h2>
+                                <form
+                                    className="mb-5 flex flex-wrap items-end gap-4"
+                                    onSubmit={(e) => {
+                                        e.preventDefault();
+                                        staffSearch.transform((data) => ({
+                                            ...data,
+                                            selected: shelter.id,
+                                            q: filters.q || '',
+                                            state: filters.state || '',
+                                        }));
+                                        staffSearch.get('/superadmin/refugios', {
+                                            preserveScroll: true,
+                                        });
+                                    }}
+                                >
+                                    <Field
+                                        label="Nombre o correo del personal"
+                                        error={staffSearch.errors.staff_q}
+                                    >
+                                        <input
+                                            type="search"
+                                            maxLength={100}
+                                            value={staffSearch.data.staff_q}
+                                            onChange={(e) =>
+                                                staffSearch.setData('staff_q', e.target.value)
+                                            }
+                                        />
+                                    </Field>
+                                    <Field
+                                        label="Acceso del personal"
+                                        error={staffSearch.errors.staff_state}
+                                    >
+                                        <select
+                                            value={staffSearch.data.staff_state}
+                                            onChange={(e) =>
+                                                staffSearch.setData('staff_state', e.target.value)
+                                            }
+                                        >
+                                            <option value="">Todas las cuentas</option>
+                                            <option value="active">Habilitadas</option>
+                                            <option value="suspended">Suspendidas</option>
+                                        </select>
+                                    </Field>
+                                    <button
+                                        className="btn-secondary"
+                                        disabled={staffSearch.processing}
+                                    >
+                                        Buscar cuentas
+                                    </button>
+                                    <Link className="text-link" href={selectUrl(shelter.id)}>
+                                        Limpiar personal
+                                    </Link>
+                                </form>
                                 {shelter.staff?.length ? (
-                                    <ul className="divide-y">
+                                    <div className="space-y-5">
                                         {shelter.staff.map((u) => (
-                                            <li className="break-words py-3" key={u.id}>
-                                                {u.name} {u.last_name} · Administrador del refugio
-                                                <br />
-                                                <span className="text-sm text-stone-600">
-                                                    {u.email}
-                                                </span>
-                                            </li>
+                                            <StaffEditor
+                                                key={JSON.stringify(u)}
+                                                person={u}
+                                                shelter={shelter}
+                                            />
                                         ))}
-                                    </ul>
+                                    </div>
                                 ) : (
-                                    <p>Todavía no tiene personal asignado.</p>
+                                    <Empty>
+                                        No hay cuentas con estos criterios en este refugio.
+                                    </Empty>
                                 )}
+                                {staffPagination && <Pagination page={staffPagination} />}
                             </section>
                             <section className="card">
                                 <h2 className="mb-6 text-xl font-semibold">
