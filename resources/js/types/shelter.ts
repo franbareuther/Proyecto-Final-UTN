@@ -26,6 +26,7 @@ export interface Refuge {
     image_type?: 'photo' | 'logo';
 }
 export interface Animal {
+    deleted_at?: string | null;
     shelter?: Refuge;
     id: number;
     name: string;
@@ -79,6 +80,7 @@ export interface Adoption {
     adoption_date: string;
 }
 export interface MedicalRecord {
+    updater?: Person;
     id: number;
     recorded_by: number;
     practitioner_name?: string | null;

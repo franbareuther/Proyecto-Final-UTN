@@ -1,7 +1,9 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { useState } from 'react';
-import { Animal, MedicalRecord, Shared } from '@/types/shelter';
-import { Badge, Errors, Field, Shell, Title, date } from '@/Components/Shelter';
+import { useRef, useState } from 'react';
+import { Animal, MedicalRecord, Page, Shared } from '@/types/shelter';
+import { Badge, Errors, Field, Pagination, Shell, Title, date } from '@/Components/Shelter';
+import { Dose, HealthAudit } from '@/types/health';
+import DoseCard from './DoseCard';
 type Kind = 'consultations' | 'vaccinations' | 'treatments' | 'controls';
 type SchemaField = [string, string, string, string[]?];
 const schemas: Record<Kind, SchemaField[]> = {
@@ -56,14 +58,24 @@ function MedicalForm({
         initial[key] = t === 'date' ? value.slice(0, 10) : value;
     });
     const f = useForm(initial);
+    const sending = useRef(false);
     return (
         <form
             className="card space-y-5"
             onSubmit={(e) => {
                 e.preventDefault();
+                if (sending.current) return;
+                sending.current = true;
                 const url = `/veterinaria/${animalId}/${type}`;
-                if (record) f.patch(url + '/' + record.id, { onSuccess: onDone });
-                else f.post(url, { onSuccess: onDone });
+                const options = {
+                    onSuccess: onDone,
+                    onFinish: () => {
+                        sending.current = false;
+                    },
+                    preserveScroll: true,
+                };
+                if (record) f.patch(url + '/' + record.id, options);
+                else f.post(url, options);
             }}
         >
             <h2 className="text-xl font-semibold">
@@ -104,18 +116,33 @@ function MedicalForm({
                     )}
                 </Field>
             ))}
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3">
                 <button className="btn" disabled={f.processing}>
                     {f.processing ? 'Guardando…' : 'Guardar registro'}
                 </button>
-                <button type="button" className="btn-secondary" onClick={onDone}>
+                <button
+                    type="button"
+                    className="btn-secondary"
+                    disabled={f.processing}
+                    onClick={onDone}
+                >
                     Cancelar
                 </button>
             </div>
         </form>
     );
 }
-export default function History({ animal }: { animal: Animal & Record<Kind, MedicalRecord[]> }) {
+export default function History({
+    animal,
+    readOnly = false,
+    doses,
+    audits,
+}: {
+    animal: Animal & Record<Kind, MedicalRecord[]>;
+    readOnly?: boolean;
+    doses?: Page<Dose>;
+    audits?: Page<HealthAudit>;
+}) {
     const user = usePage<Shared>().props.auth.user;
     const [type, setType] = useState<Kind>('consultations');
     const [form, setForm] = useState(false);
@@ -129,6 +156,12 @@ export default function History({ animal }: { animal: Animal & Record<Kind, Medi
             >
                 <Badge>Información interna del refugio</Badge>
             </Title>
+            {readOnly && (
+                <p role="status" className="card mb-6">
+                    Animal archivado · Antecedentes de solo lectura. No se admiten cargas,
+                    correcciones ni resolución de dosis.
+                </p>
+            )}
             <div className="mb-6 flex flex-wrap gap-3">
                 {(Object.keys(labels) as Kind[]).map((k) => (
                     <button
@@ -146,7 +179,7 @@ export default function History({ animal }: { animal: Animal & Record<Kind, Medi
             </div>
             <div className="grid items-start gap-6 xl:grid-cols-2">
                 <section className="space-y-4">
-                    {user?.role === 'admin' && (
+                    {user?.role === 'admin' && !readOnly && (
                         <button
                             className="btn"
                             onClick={() => {
@@ -187,8 +220,13 @@ export default function History({ animal }: { animal: Animal & Record<Kind, Medi
                                     Profesional que atendió: {r.practitioner_name || 'Sin informar'}
                                     <br />
                                     Registrado por: {r.recorder?.name} {r.recorder?.last_name}
+                                    <br />
+                                    Última actualización:{' '}
+                                    {r.updater
+                                        ? `${r.updater.name} ${r.updater.last_name}`
+                                        : 'Sin correcciones registradas'}
                                 </p>
-                                {user?.role === 'admin' && (
+                                {user?.role === 'admin' && !readOnly && (
                                     <button
                                         className="btn-secondary mt-4"
                                         onClick={() => {
@@ -207,7 +245,7 @@ export default function History({ animal }: { animal: Animal & Record<Kind, Medi
                         </div>
                     )}
                 </section>
-                {form && (
+                {form && !readOnly && (
                     <MedicalForm
                         key={type + '-' + (editing?.id || 'new')}
                         animalId={animal.id}
@@ -220,6 +258,100 @@ export default function History({ animal }: { animal: Animal & Record<Kind, Medi
                     />
                 )}
             </div>
+            {doses && (
+                <section className="mt-10 space-y-4">
+                    <h2 className="text-2xl font-semibold">
+                        Programaciones y cumplimiento de dosis
+                    </h2>
+                    <p className="text-sm text-stone-600">
+                        Las fechas previstas no confirman aplicaciones. Aplicar o cancelar conserva
+                        el antecedente.
+                    </p>
+                    {doses.data.length ? (
+                        doses.data.map((d) => (
+                            <DoseCard key={JSON.stringify(d)} dose={d} readOnly={readOnly} />
+                        ))
+                    ) : (
+                        <p className="card">No hay dosis programadas.</p>
+                    )}
+                    <Pagination page={doses} />
+                </section>
+            )}
+            {audits && (
+                <section className="mt-10 space-y-4">
+                    <h2 className="text-2xl font-semibold">Trazabilidad interna</h2>
+                    <p className="text-sm text-stone-600">
+                        Registro de consulta, sin acciones de edición o eliminación. Los datos
+                        anteriores a esta entrega no tienen auditorías reconstruidas.
+                    </p>
+                    {audits.data.map((a) => (
+                        <article key={a.id} className="card min-w-0 space-y-3">
+                            <h3 className="font-semibold">
+                                {a.action} · {labels[a.record_type as Kind] || 'Dosis'} #
+                                {a.record_id}
+                            </h3>
+                            <p className="text-sm">
+                                {a.actor.name} {a.actor.last_name} ·{' '}
+                                {new Date(a.created_at).toLocaleString('es-AR')}
+                            </p>
+                            <details>
+                                <summary className="text-link cursor-pointer">
+                                    Consultar valores anteriores y nuevos
+                                </summary>
+                                <dl className="mt-3 space-y-3">
+                                    {Array.from(
+                                        new Set([
+                                            ...Object.keys(a.before_values),
+                                            ...Object.keys(a.after_values),
+                                        ]),
+                                    ).map((key) => (
+                                        <div key={key} className="break-words text-sm">
+                                            <dt className="font-semibold">
+                                                {[
+                                                    ...schemas.consultations,
+                                                    ...schemas.vaccinations,
+                                                    ...schemas.treatments,
+                                                    ...schemas.controls,
+                                                ].find(([k]) => k === key)?.[1] ||
+                                                    (
+                                                        {
+                                                            recorded_by: 'ID del autor inicial',
+                                                            updated_by: 'ID del último editor',
+                                                            practitioner_name: 'Profesional',
+                                                            observations: 'Observaciones',
+                                                            scheduled_date: 'Fecha programada',
+                                                            status: 'Estado',
+                                                            resolved_by: 'ID de quien resolvió',
+                                                            resolved_at: 'Fecha de resolución',
+                                                            application_vaccination_id:
+                                                                'ID de la aplicación',
+                                                            source_vaccination_id:
+                                                                'ID del antecedente',
+                                                            cancellation_reason:
+                                                                'Motivo de cancelación',
+                                                            legacy_unverified:
+                                                                'Cumplimiento histórico sin verificar',
+                                                        } as Record<string, string>
+                                                    )[key] ||
+                                                    key}
+                                            </dt>
+                                            <dd className="whitespace-pre-wrap">
+                                                Antes: {String(a.before_values[key] ?? '—')}
+                                                <br />
+                                                Después: {String(a.after_values[key] ?? '—')}
+                                            </dd>
+                                        </div>
+                                    ))}
+                                </dl>
+                            </details>
+                        </article>
+                    ))}
+                    {!audits.data.length && (
+                        <p className="card">No hay modificaciones auditadas en esta etapa.</p>
+                    )}
+                    <Pagination page={audits} />
+                </section>
+            )}
         </Shell>
     );
 }
