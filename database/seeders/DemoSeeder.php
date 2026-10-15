@@ -6,6 +6,7 @@ use App\Models\Animal;
 use App\Models\Shelter;
 use App\Models\User;
 use App\Services\AdoptionService;
+use App\Services\HealthService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -69,7 +70,7 @@ class DemoSeeder extends Seeder
             foreach (array_slice($animals, 0, 5) as $i => $animal) {
                 $vet = ['recorded_by' => $users['admin']->id, 'observations' => '[DEMOSTRACIÓN] Registro académico.'];
                 $animal->consultations()->create($vet + ['consultation_date' => today()->subDays(10), 'reason' => 'Control de ingreso', 'symptoms' => 'Sin síntomas referidos', 'diagnosis' => 'Evaluación clínica de demostración', 'instructions' => 'Seguimiento por profesional.']);
-                $animal->vaccinations()->create($vet + ['vaccine_name' => 'Vacuna de demostración', 'application_date' => today()->subMonths(11), 'dose' => 'Primera', 'next_dose_date' => today()->addDays(10 + $i)]);
+                app(HealthService::class)->save($animal, $users['admin'], 'vaccinations', ['vaccine_name' => 'Vacuna de demostración', 'application_date' => today()->subMonths(11)->toDateString(), 'dose' => 'Primera', 'next_dose_date' => today()->addDays(10 + $i)->toDateString(), 'observations' => '[DEMOSTRACIÓN] Registro académico.']);
                 $animal->treatments()->create($vet + ['description' => 'Tratamiento de demostración indicado por profesional', 'start_date' => today()->subDays(3), 'estimated_end_date' => today()->addDays(10), 'status' => $i % 2 ? 'Finalizado' : 'Activo']);
                 $animal->controls()->create($vet + ['control_type' => 'Control general', 'scheduled_date' => today()->addDays($i * 4 - 2), 'status' => 'Pendiente']);
             }

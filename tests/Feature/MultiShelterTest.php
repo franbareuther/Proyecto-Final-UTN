@@ -6,6 +6,7 @@ use App\Models\Animal;
 use App\Models\Shelter;
 use App\Models\User;
 use App\Services\AdoptionService;
+use App\Services\HealthService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -118,7 +119,7 @@ class MultiShelterTest extends TestCase
         $vet = $this->staff($a);
         foreach ([$own, $foreign] as $animal) {
             $animal->controls()->create(['control_type' => 'Revisión', 'scheduled_date' => today(), 'status' => 'Pendiente', 'recorded_by' => $vet->id]);
-            $animal->vaccinations()->create(['vaccine_name' => 'Prueba', 'application_date' => today(), 'next_dose_date' => today(), 'recorded_by' => $vet->id]);
+            app(HealthService::class)->save($animal, $this->staff($animal->shelter), 'vaccinations', ['vaccine_name' => 'Prueba', 'application_date' => today()->toDateString(), 'next_dose_date' => today()->toDateString()]);
         }
         $this->actingAs($vet);
         $this->get('/veterinaria')->assertInertia(fn (Assert $p) => $p->has('animals.data', 1));
