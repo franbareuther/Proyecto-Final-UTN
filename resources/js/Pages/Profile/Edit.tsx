@@ -29,8 +29,17 @@ export default function Edit() {
                             ['email', 'Correo electrónico'],
                         ] as const
                     ).map(([k, l]) => (
-                        <Field key={k} label={l}>
+                        <Field key={k} label={l} error={f.errors[k]}>
                             <input
+                                name={k}
+                                autoComplete={
+                                    k === 'email'
+                                        ? 'username'
+                                        : k === 'name'
+                                          ? 'given-name'
+                                          : 'family-name'
+                                }
+                                maxLength={255}
                                 type={k === 'email' ? 'email' : 'text'}
                                 required
                                 value={f.data[k]}
@@ -51,7 +60,7 @@ export default function Edit() {
                     className="card space-y-5"
                     onSubmit={(e) => {
                         e.preventDefault();
-                        p.put('/password', { onSuccess: () => p.reset() });
+                        p.put('/password', { onFinish: () => p.reset() });
                     }}
                 >
                     <h2 className="text-xl font-semibold">Cambiar contraseña</h2>
@@ -63,8 +72,10 @@ export default function Edit() {
                             ['password_confirmation', 'Confirmar nueva contraseña'],
                         ] as const
                     ).map(([k, l]) => (
-                        <Field key={k} label={l}>
+                        <Field key={k} label={l} error={p.errors[k]}>
                             <input
+                                name={k}
+                                minLength={k === 'current_password' ? undefined : 8}
                                 type="password"
                                 autoComplete={
                                     k === 'current_password' ? 'current-password' : 'new-password'
