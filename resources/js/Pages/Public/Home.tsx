@@ -1,95 +1,19 @@
 import { Head, Link } from '@inertiajs/react';
 import { Animal, Refuge } from '@/types/shelter';
-import { AnimalCard, Badge, Empty, Shell } from '@/Components/Shelter';
-import AnimalImage from '@/Components/AnimalImage';
+import { AnimalCard, Empty, Shell } from '@/Components/Shelter';
+import FloatingAnimalsHero from '@/Components/ui/FloatingAnimalsHero';
 import Icon from '@/Components/Icon';
 import ShelterImage from '@/Components/ShelterImage';
 
 export default function Home({ animals, refuges = [] }: { animals: Animal[]; refuges?: Refuge[] }) {
-    const featured = animals[0];
     return (
         <Shell>
-            <Head title="Un encuentro puede cambiarlo todo" />
-            <section
-                aria-labelledby="hero-title"
-                className="public-hero items-center overflow-hidden rounded-[1.75rem] sm:rounded-[2.5rem]"
-            >
-                <div className="hero-copy min-w-0 py-3 sm:py-6">
-                    <p className="eyebrow flex items-center gap-2">
-                        <Icon name="paw" className="h-4 w-4 shrink-0" />
-                        Segundas oportunidades, nuevas historias
-                    </p>
-                    <h1 id="hero-title" className="hero-heading mt-5">
-                        Un encuentro.
-                        <br />
-                        Un compañero.
-                        <br />
-                        <span className="font-serif italic font-normal text-huella-clay">
-                            Toda una vida.
-                        </span>
-                    </h1>
-                    <p className="reading-copy mt-6 text-base leading-relaxed text-stone-700 sm:text-lg">
-                        Hay una historia esperando cruzarse con la tuya. Conocé a los animales de
-                        nuestra red y encontrá a tu próximo compañero.
-                    </p>
-                    <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
-                        <Link href="/animales" className="btn">
-                            Encontrá tu compañero <Icon name="arrow" className="h-5 w-5" />
-                        </Link>
-                        <a href="#como-funciona" className="text-link">
-                            Cómo adoptar
-                        </a>
-                    </div>
-                    <p className="mt-7 flex items-start gap-2 text-sm leading-relaxed text-emerald-900">
-                        <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0" />
-                        Te acompañamos en cada paso de una adopción responsable.
-                    </p>
-                </div>
-                <div className="relative min-w-0">
-                    <div
-                        aria-hidden="true"
-                        className="absolute -right-4 -top-4 h-24 w-24 rounded-full border border-emerald-900/15 sm:h-36 sm:w-36"
-                    />
-                    <AnimalImage
-                        src={featured?.photo_url}
-                        alt={
-                            featured
-                                ? `${featured.name}, esperando una familia`
-                                : 'Una nueva historia en el refugio'
-                        }
-                        loading="eager"
-                        className="hero-photo relative rounded-[1.5rem] bg-[#e2e9db]"
-                    />
-                    <div className="relative mx-3 -mt-16 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm sm:mx-5 sm:p-5">
-                        <p className="eyebrow">
-                            {featured
-                                ? 'Podría ser el comienzo de algo lindo'
-                                : 'El amor también se adopta'}
-                        </p>
-                        <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-                            {featured ? (
-                                <Link
-                                    href={'/animales/' + featured.id}
-                                    className="inline-flex min-h-11 min-w-0 items-center gap-3 text-xl font-semibold text-emerald-950"
-                                >
-                                    <span className="break-words">Conocé a {featured.name}</span>
-                                    <Icon name="arrow" className="h-5 w-5 shrink-0" />
-                                </Link>
-                            ) : (
-                                <p className="text-lg font-semibold text-emerald-950">
-                                    Un hogar cambia todo.
-                                </p>
-                            )}
-                            {featured && <Badge>{featured.availability_status}</Badge>}
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <Head title="Encontrá a tu próximo compañero de huellas" />
+            <FloatingAnimalsHero />
             <section aria-labelledby="featured-title" className="py-14 sm:py-20">
                 <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
                     <div>
-                        <p className="eyebrow">Pequeñas huellas, grandes historias</p>
-                        <h2 id="featured-title" className="section-heading mt-3">
+                        <h2 id="featured-title" className="section-heading">
                             Buscan un lugar en tu vida.
                         </h2>
                         <p className="mt-4 max-w-xl leading-relaxed text-stone-600">
@@ -101,9 +25,9 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
                     </Link>
                 </div>
                 {animals.length ? (
-                    <div className="animal-grid">
+                    <div className="companions-grid">
                         {animals.map((a) => (
-                            <AnimalCard key={a.id} animal={a} />
+                            <AnimalCard key={a.id} animal={a} compact />
                         ))}
                     </div>
                 ) : (
@@ -135,8 +59,8 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
                                 kind={s.image_type}
                                 className="mb-4"
                             />
-                            <p className="eyebrow">{s.city || 'Red Huella'}</p>
-                            <h3 className="mt-3 text-xl font-semibold">{s.name}</h3>
+                            <h3 className="text-2xl font-semibold">{s.name}</h3>
+                            <p className="mt-2 text-sm text-stone-600">{s.city || 'Red Huella'}</p>
                             <p className="mt-4 text-sm text-emerald-800">
                                 Conocer su historia y sus animales →
                             </p>
@@ -151,16 +75,10 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
                 className="rounded-[1.75rem] bg-huella-forest px-6 py-10 text-white sm:rounded-[2.5rem] sm:p-12"
             >
                 <div className="max-w-2xl">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.17em] text-emerald-200">
-                        El camino hacia una nueva familia
-                    </p>
-                    <h2
-                        id="process-title"
-                        className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl"
-                    >
+                    <h2 id="process-title" className="section-heading text-white">
                         Adoptar es un compromiso.
                         <br />
-                        <span className="font-serif italic font-normal text-[#efdbc0]">
+                        <span className="font-medium text-[#efdbc0]">
                             Y no tenés que hacerlo solo.
                         </span>
                     </h2>
@@ -184,10 +102,10 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
                         },
                     ].map((step) => (
                         <li key={step.number} className="border-t border-white/25 pt-6">
-                            <span className="font-serif text-4xl text-[#efdbc0]">
+                            <span className="font-display text-4xl text-[#efdbc0]">
                                 {step.number}
                             </span>
-                            <h3 className="mt-5 text-xl font-semibold">{step.title}</h3>
+                            <h3 className="mt-5 text-2xl font-semibold">{step.title}</h3>
                             <p className="mt-3 leading-relaxed text-emerald-100">{step.text}</p>
                         </li>
                     ))}
@@ -202,13 +120,10 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
                     <span className="mb-5 inline-flex rounded-2xl bg-[#efe9dc] p-3 text-[#885039]">
                         <Icon name="leaf" className="h-7 w-7" />
                     </span>
-                    <p className="eyebrow">El refugio es solo el comienzo</p>
-                    <h2 id="about-title" className="section-heading mt-3">
+                    <h2 id="about-title" className="section-heading">
                         El destino es
                         <br />
-                        <span className="font-serif italic font-normal text-huella-clay">
-                            un hogar.
-                        </span>
+                        <span className="font-medium text-huella-clay">un hogar.</span>
                     </h2>
                 </div>
                 <div className="min-w-0">

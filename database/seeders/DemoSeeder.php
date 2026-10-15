@@ -38,6 +38,7 @@ class DemoSeeder extends Seeder
                 $users[$role] = $u;
             }
             $animals = [];
+            $images = ['gato', 'perro', 'companero', 'gato-2', 'perro-2', 'perro-3', 'gato-3', 'perro-4', 'perro-5', 'gato-4', 'perro-6', 'perro-7', 'gato-5', 'perro-8'];
             foreach (['Mora', 'Simón', 'Luna', 'Coco', 'Nina', 'Toto', 'Oliva', 'Félix', 'Alma', 'Rocco', 'Milo', 'Frida', 'Pipa', 'Bruno'] as $i => $name) {
                 $animals[] = Animal::create([
                     'shelter_id' => Shelter::where('slug', 'huella-inicial')->value('id'),
@@ -50,7 +51,7 @@ class DemoSeeder extends Seeder
                     'public_health_info' => 'Seguimiento sanitario al día. Consultá al refugio sobre sus cuidados específicos.',
                 ]);
                 $animal = end($animals);
-                $image = $animal->species === 'Gato' ? 'gato' : ($i % 2 ? 'perro' : 'companero');
+                $image = $images[$i];
                 $path = 'animals/demo-'.$animal->id.'.jpg';
                 Storage::disk('public')->put($path, file_get_contents(public_path('images/demo/'.$image.'.jpg')));
                 $animal->photos()->create(['file_path' => $path, 'is_primary' => true]);

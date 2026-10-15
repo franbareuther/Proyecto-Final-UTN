@@ -109,13 +109,10 @@ export default function Catalog({
                         {shelter.name} · Ver refugio
                     </Link>
                 )}
-                <p className="eyebrow">Cada historia merece una oportunidad</p>
-                <h1 className="public-heading mt-4">
+                <h1 className="public-heading">
                     Tu próximo compañero
                     <br />
-                    <span className="font-serif italic font-normal text-huella-clay">
-                        está por acá.
-                    </span>
+                    <span className="font-medium text-huella-clay">está por acá.</span>
                 </h1>
                 <p className="mt-5 max-w-xl text-base leading-relaxed text-stone-600 sm:text-lg">
                     {shelter
@@ -248,9 +245,9 @@ export default function Catalog({
                     </div>
                 )}
                 {animals.data.length ? (
-                    <div className="animal-grid">
+                    <div className="companions-grid">
                         {animals.data.map((animal) => (
-                            <AnimalCard key={animal.id} animal={animal} />
+                            <AnimalCard key={animal.id} animal={animal} compact />
                         ))}
                     </div>
                 ) : (

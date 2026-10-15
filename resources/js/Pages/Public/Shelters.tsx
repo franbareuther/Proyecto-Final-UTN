@@ -52,8 +52,10 @@ export default function Shelters({
                     {shelters.data.map((s) => (
                         <article key={s.id} className="card flex flex-col gap-4">
                             <ShelterImage src={s.image_url} name={s.name} kind={s.image_type} />
-                            <p className="eyebrow">{s.city || 'Refugio de la red Huella'}</p>
                             <h2 className="text-2xl font-semibold text-emerald-950">{s.name}</h2>
+                            <p className="text-sm text-stone-600">
+                                {s.city || 'Refugio de la red Huella'}
+                            </p>
                             <p className="line-clamp-3 text-stone-600">
                                 {s.description || 'Conocé al refugio y a sus animales en adopción.'}
                             </p>

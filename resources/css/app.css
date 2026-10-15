@@ -1,5 +1,20 @@
-﻿@import 'tailwindcss';
+@import 'tailwindcss';
 @config "../../tailwind.config.js";
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url('../fonts/plus-jakarta-sans-latin-variable.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Bricolage Grotesque';
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url('../fonts/bricolage-grotesque-latin-variable.woff2') format('woff2');
+}
 
 @theme {
     --color-huella-forest: #153e31;
@@ -10,6 +25,16 @@
 @layer base {
     body {
         @apply bg-[#f7f8f4] text-stone-800 antialiased;
+    }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-display;
+        font-optical-sizing: auto;
+        text-wrap: balance;
     }
     input:not([type='checkbox']):not([type='radio']):not([type='file']),
     select,
@@ -80,9 +105,6 @@
     .card {
         @apply min-w-0 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6;
     }
-    .eyebrow {
-        @apply text-[11px] font-bold uppercase leading-relaxed tracking-[0.17em] text-emerald-800;
-    }
     .text-link {
         @apply inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-emerald-900 underline decoration-emerald-900/30 underline-offset-4 hover:decoration-emerald-900;
     }
@@ -92,11 +114,168 @@
     .nav-link[aria-current] {
         @apply bg-emerald-50 font-semibold text-emerald-950;
     }
+    .site-header {
+        padding-top: env(safe-area-inset-top, 0px);
+        background-color: transparent;
+        color: var(--color-huella-forest);
+        transition:
+            background-color 180ms ease,
+            color 180ms ease,
+            box-shadow 180ms ease;
+    }
+    .site-header[data-scrolled='true'] {
+        background-color: var(--color-huella-forest);
+        color: white;
+        box-shadow: 0 2px 12px rgb(21 62 49 / 12%);
+    }
+    .site-brand {
+        color: inherit;
+    }
+    .site-header :is(.nav-link, .text-link) {
+        color: inherit;
+        text-decoration-color: currentColor;
+    }
+    .site-header .nav-link:hover,
+    .site-header .nav-link[aria-current] {
+        background-color: rgb(21 62 49 / 8%);
+    }
+    .site-header[data-scrolled='true'] .nav-link:hover,
+    .site-header[data-scrolled='true'] .nav-link[aria-current] {
+        background-color: rgb(255 255 255 / 12%);
+    }
+    .site-header[data-scrolled='true'] .btn {
+        background-color: white;
+        color: var(--color-huella-forest);
+    }
+    .site-header[data-scrolled='true'] .btn:hover {
+        background-color: #e7eddf;
+    }
+    .mobile-menu-masthead {
+        min-height: 5.5rem;
+    }
+    .mobile-menu-toggle {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        margin-left: auto;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+    }
+    .mobile-menu-icon {
+        position: relative;
+        display: block;
+        width: 1.75rem;
+        height: 1rem;
+    }
+    .mobile-menu-icon > span {
+        position: absolute;
+        inset-inline: 0;
+        top: calc(50% - 1px);
+        height: 2px;
+        border-radius: 2px;
+        background: currentColor;
+        transform: translateY(-5px);
+        transition: transform 180ms ease;
+    }
+    .mobile-menu-icon > span + span {
+        transform: translateY(5px);
+    }
+    .mobile-menu-icon[data-open='true'] > span {
+        transform: rotate(45deg);
+    }
+    .mobile-menu-icon[data-open='true'] > span + span {
+        transform: rotate(-45deg);
+    }
+    .mobile-menu-layer {
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+    }
+    .mobile-menu-panel {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        background: var(--color-huella-forest);
+        color: white;
+        opacity: 1;
+        transition: opacity 160ms ease;
+    }
+    .mobile-menu-panel[data-closed] {
+        opacity: 0;
+    }
+    .mobile-menu-navigation {
+        display: flex;
+        min-height: 0;
+        flex: 1;
+        flex-direction: column;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding-block: 1rem 2rem;
+    }
+    .mobile-menu-items {
+        display: flex;
+        flex: 0 0 auto;
+        flex-direction: column;
+        width: 100%;
+        max-width: 32rem;
+        margin: 0;
+    }
+    .mobile-menu-primary,
+    .mobile-menu-account {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    .mobile-menu-account {
+        margin-top: clamp(5rem, 12vh, 7rem);
+    }
+    .mobile-menu-navigation :is(.nav-link, .btn) {
+        @apply font-display;
+        justify-content: flex-start;
+        width: 100%;
+        border-radius: 0;
+        border: 0;
+        padding: 0.5rem 0;
+        background: transparent;
+        color: white;
+        box-shadow: none;
+        font-size: clamp(2rem, 8vw, 2.75rem);
+        font-weight: 500;
+        line-height: 1.2;
+        text-align: left;
+        overflow-wrap: anywhere;
+    }
+    .mobile-menu-account :is(.nav-link, .btn) {
+        font-size: clamp(1.125rem, 4.5vw, 1.5rem);
+    }
+    .mobile-menu-navigation :is(.nav-link, .btn):hover,
+    .mobile-menu-navigation .nav-link[aria-current] {
+        text-decoration: underline;
+        text-underline-offset: 0.3em;
+    }
+    .mobile-menu-panel :focus-visible {
+        outline-color: white;
+    }
+    .site-header :focus-visible {
+        outline-color: currentColor;
+    }
     .skip-link {
         @apply sr-only z-50 rounded-xl bg-emerald-950 px-5 py-3 text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4;
     }
     .public-shell {
         @apply bg-huella-paper;
+    }
+    .public-shell:has(.floating-animals-hero) {
+        background-color: #fff;
     }
     .public-shell main {
         @apply py-8 sm:py-12;
@@ -109,17 +288,18 @@
     .public-shell main :where(p, a, dd, dt) {
         overflow-wrap: anywhere;
     }
+    .page-heading,
     .public-heading {
-        font-size: clamp(2rem, 4.6vw, 4rem);
-        line-height: 1.12;
-        letter-spacing: -0.045em;
+        font-size: clamp(2.5rem, 5vw, 5rem);
+        line-height: 1.05;
+        letter-spacing: -0.04em;
         font-weight: 600;
         color: var(--color-huella-forest);
         text-wrap: balance;
     }
     .section-heading {
-        font-size: clamp(1.75rem, 3.3vw, 2.75rem);
-        line-height: 1.18;
+        font-size: clamp(2.125rem, 3.8vw, 3.75rem);
+        line-height: 1.1;
         letter-spacing: -0.035em;
         font-weight: 600;
         color: var(--color-huella-forest);
@@ -144,16 +324,207 @@
     .hero-copy {
         max-width: 44rem;
     }
+    .floating-animals-hero {
+        position: relative;
+        isolation: isolate;
+        width: calc(100% + 2 * clamp(1rem, 3vw, 6rem));
+        margin-inline: calc(-1 * clamp(1rem, 3vw, 6rem));
+        padding: 10rem 1rem 13rem;
+    }
+    .floating-animals-hero::before {
+        content: '';
+        position: absolute;
+        /* Include the masthead, safe area and space above the hero in one continuous grid. */
+        inset: calc(-5.5rem - 3rem - env(safe-area-inset-top, 0px)) 0 0;
+        z-index: -1;
+        pointer-events: none;
+        background-color: #eaf3e8;
+        background-image:
+            linear-gradient(
+                to bottom,
+                transparent calc(100% - clamp(8rem, 14vw, 14rem)),
+                #fff 100%
+            ),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M40 0H0V40' fill='none' stroke='%23153e31' stroke-opacity='.19' stroke-width='1'/%3E%3C/svg%3E");
+        background-size:
+            100% 100%,
+            40px 40px;
+        background-repeat: no-repeat, repeat;
+    }
+    .floating-hero-animals,
+    .floating-hero-copy {
+        transform: translateY(-40px);
+    }
+    .floating-hero-animals {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    .floating-hero-pet {
+        position: absolute;
+        width: 33.333%;
+        max-width: 8rem;
+        aspect-ratio: 1;
+    }
+    .floating-hero-pet img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+    .floating-hero-pet-golden {
+        top: 1rem;
+        left: 2%;
+        width: 27%;
+        rotate: -10deg;
+    }
+    .floating-hero-pet-tabby {
+        transform: translateY(-10px);
+        top: 0.5rem;
+        left: 48%;
+        translate: -50% 0;
+        width: 21%;
+        rotate: 8deg;
+    }
+    .floating-hero-pet-beagle {
+        top: 2rem;
+        right: 1%;
+        width: 25%;
+        rotate: 10deg;
+    }
+    .floating-hero-pet-collie {
+        bottom: 5rem;
+        left: 3%;
+        width: 26%;
+        rotate: -8deg;
+    }
+    .floating-hero-pet-tuxedo {
+        bottom: 6.5rem;
+        left: 50%;
+        translate: -50% 0;
+        width: 20%;
+        rotate: -12deg;
+    }
+    .floating-hero-pet-rabbit {
+        right: 1%;
+        bottom: 4.5rem;
+        width: 24%;
+        rotate: 12deg;
+    }
+    .floating-hero-copy {
+        position: relative;
+        z-index: 1;
+        margin-inline: auto;
+        max-width: 38rem;
+        text-align: center;
+    }
+    .floating-hero-heading {
+        font-size: clamp(2.25rem, 8vw, 4rem);
+        font-weight: 600;
+        line-height: 1.06;
+        letter-spacing: -0.045em;
+        color: var(--color-huella-forest);
+    }
+    .hero-title-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.12em;
+        white-space: nowrap;
+    }
+    .hero-marker-underline {
+        position: relative;
+        display: inline-block;
+    }
+    .hero-marker-underline::after {
+        content: '';
+        position: absolute;
+        right: -0.03em;
+        bottom: -0.13em;
+        left: -0.03em;
+        height: 0.18em;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 24' preserveAspectRatio='none'%3E%3Cpath d='M7 16C65 9 116 18 166 12S250 10 292 7' fill='none' stroke='%23a34f32' stroke-width='11' stroke-linecap='round' opacity='.85'/%3E%3Cpath d='M12 20C100 15 198 18 286 12' fill='none' stroke='%23a34f32' stroke-width='4' stroke-linecap='round' opacity='.35'/%3E%3C/svg%3E")
+            center / 100% 100% no-repeat;
+        pointer-events: none;
+    }
+    @media (min-width: 640px) and (max-width: 1023px) {
+        .floating-animals-hero {
+            padding-block: 14rem 17rem;
+        }
+        .floating-hero-pet {
+            max-width: 12rem;
+        }
+        .floating-hero-pet-golden,
+        .floating-hero-pet-collie {
+            left: 4%;
+        }
+        .floating-hero-pet-beagle,
+        .floating-hero-pet-rabbit {
+            right: 4%;
+        }
+    }
+    @media (min-width: 1024px) {
+        .floating-animals-hero {
+            display: flex;
+            align-items: center;
+            min-height: max(46rem, calc(100svh - 6rem));
+            padding: 7rem 1rem;
+        }
+        .floating-hero-copy {
+            width: 54%;
+            max-width: 46rem;
+        }
+        .floating-hero-heading {
+            font-size: clamp(3rem, 4.4vw, 5rem);
+        }
+        .floating-hero-pet {
+            max-width: 17rem;
+            translate: none;
+        }
+        .floating-hero-pet-golden {
+            top: 12%;
+            left: 3%;
+            width: 17%;
+        }
+        .floating-hero-pet-beagle {
+            top: 7%;
+            right: 6%;
+            width: 14%;
+        }
+        .floating-hero-pet-tabby {
+            top: 2%;
+            left: 36%;
+            width: 10%;
+        }
+        .floating-hero-pet-tuxedo {
+            top: auto;
+            bottom: 18%;
+            left: 5%;
+            width: 12%;
+        }
+        .floating-hero-pet-collie {
+            top: 44%;
+            right: 1%;
+            bottom: auto;
+            left: auto;
+            width: 17%;
+        }
+        .floating-hero-pet-rabbit {
+            right: auto;
+            bottom: 7%;
+            left: 65%;
+            width: 11%;
+        }
+    }
     .hero-photo {
         aspect-ratio: 4 / 3;
         width: 100%;
         object-fit: cover;
     }
     .hero-heading {
-        font-size: clamp(2.65rem, 5.8vw, 5.6rem);
+        font-size: clamp(2.85rem, 6.5vw, 6.5rem);
         line-height: 1.03;
         font-weight: 600;
-        letter-spacing: -0.055em;
+        letter-spacing: -0.045em;
         color: var(--color-huella-forest);
         text-wrap: balance;
     }
@@ -165,6 +536,19 @@
         grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
         gap: clamp(1rem, 1.5vw, 1.75rem);
         align-items: stretch;
+    }
+    .companions-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: clamp(0.75rem, 2vw, 1.75rem);
+        align-items: stretch;
+    }
+    .companions-grid .animal-card-body {
+        padding: clamp(0.75rem, 2.2vw, 1.5rem);
+        padding-inline: clamp(0.625rem, 1.8vw, 1.25rem);
+    }
+    .companions-grid .animal-card h3 {
+        font-size: clamp(1rem, 2vw, 1.375rem);
     }
     .profile-layout {
         display: grid;
