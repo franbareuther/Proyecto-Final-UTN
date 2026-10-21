@@ -74,6 +74,59 @@
     }
 }
 @layer components {
+    @media (max-width: 639px) {
+        .animal-editor input:not([type='checkbox']):not([type='file']),
+        .animal-editor select,
+        .animal-editor textarea {
+            min-height: 38px;
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 6px;
+            box-shadow: none;
+        }
+        .animal-editor-fields > div {
+            display: flex;
+            flex-direction: column;
+        }
+        .animal-editor-fields > div > label {
+            display: flex;
+            flex: 1;
+            align-items: end;
+            font-size: 12px;
+            line-height: 1.35;
+        }
+        .animal-editor input[type='date'] {
+            max-width: 100%;
+            min-width: 0;
+            font-size: 13px;
+        }
+    }
+    .compact-shelter-form input:not([type='checkbox']):not([type='file']),
+    .compact-shelter-form select,
+    .compact-shelter-form textarea {
+        min-height: 36px;
+        padding: 7px 10px;
+        font-size: 14px;
+        border-radius: 6px;
+        box-shadow: none;
+    }
+    .compact-shelter-form textarea {
+        min-height: 72px;
+    }
+    .compact-shelter-form .btn,
+    .compact-shelter-form .btn-secondary {
+        min-height: 36px;
+        padding: 7px 14px;
+        border-radius: 6px;
+        font-size: 13px;
+    }
+    .dashboard-layout {
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    .dashboard-layout :is(h1, h2, h3, h4, h5, h6, .font-display) {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        letter-spacing: normal;
+    }
     .site-gutter {
         padding-inline: clamp(1rem, 3vw, 6rem);
     }

@@ -51,11 +51,14 @@ export default function Dashboard({
                 title="Cada día, una nueva oportunidad."
                 text="La actividad del refugio, de un vistazo."
             />
-            <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="mb-6 grid grid-cols-2 gap-2.5 sm:mb-8 sm:gap-4 xl:grid-cols-3">
                 {Object.entries(stats).map(([k, v]) => (
-                    <div key={k} className="card">
-                        <p className="text-sm text-stone-500">{k}</p>
-                        <p className="mt-3 text-4xl font-semibold tracking-tight text-emerald-900">
+                    <div
+                        key={k}
+                        className="min-w-0 rounded-lg border border-stone-200 bg-white p-3 sm:rounded-xl sm:p-5"
+                    >
+                        <p className="text-xs leading-snug text-stone-500 sm:text-sm">{k}</p>
+                        <p className="mt-2 text-2xl font-semibold leading-none text-emerald-900 sm:mt-3 sm:text-4xl">
                             {v}
                         </p>
                     </div>

@@ -31,7 +31,7 @@ export default function AnimalForm({ animal: a }: { animal?: Animal }) {
                 text="La información de esta ficha será visible en el catálogo público."
             />
             <form
-                className="card max-w-4xl space-y-6"
+                className="animal-editor max-w-4xl space-y-4 rounded-xl border border-stone-200 bg-white p-3 sm:space-y-6 sm:p-6"
                 onSubmit={(e) => {
                     e.preventDefault();
                     f.post(a ? '/admin/animales/' + a.id : '/admin/animales', {
@@ -41,7 +41,7 @@ export default function AnimalForm({ animal: a }: { animal?: Animal }) {
                 }}
             >
                 <Errors errors={f.errors} />
-                <div className="grid gap-5 md:grid-cols-2">
+                <div className="animal-editor-fields grid grid-cols-2 gap-x-3 gap-y-3 sm:gap-5">
                     {(
                         [
                             ['name', 'Nombre'],
@@ -136,7 +136,7 @@ export default function AnimalForm({ animal: a }: { animal?: Animal }) {
             {a && (
                 <section className="mt-8">
                     <h2 className="mb-5 text-2xl font-semibold">Fotografías del perfil</h2>
-                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
                         {a.photos.map((p) => (
                             <div className="card space-y-3" key={p.id}>
                                 <img

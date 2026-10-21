@@ -4,6 +4,7 @@ import {
     cloneElement,
     isValidElement,
     PropsWithChildren,
+    ReactNode,
     useEffect,
     useId,
     useRef,
@@ -14,6 +15,7 @@ import { Animal, Application, Page, Shared } from '@/types/shelter';
 import Modal from '@/Components/Modal';
 import AnimalImage from '@/Components/AnimalImage';
 import Icon from '@/Components/Icon';
+import DashboardLayout from '@/Components/ui/dashboard-sidebar';
 
 export const date = (value: string) =>
     new Date(value.slice(0, 10) + 'T12:00:00').toLocaleDateString('es-AR');
@@ -367,7 +369,11 @@ function MenuGlyph({ expanded = false }: { expanded?: boolean }) {
     );
 }
 
-export function Shell({ children, internal = false }: PropsWithChildren<{ internal?: boolean }>) {
+export function Shell({
+    children,
+    internal = false,
+    sidebar,
+}: PropsWithChildren<{ internal?: boolean; sidebar?: ReactNode }>) {
     const { auth, flash, shelterName, currentShelter } = usePage<Shared>().props;
     const currentPath = usePage().url.split(/[?#]/)[0];
     const [open, setOpen] = useState(false);
@@ -492,6 +498,9 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
             </span>
         </Link>
     );
+    if (internal && (admin || superadmin)) {
+        return <DashboardLayout sidebarContent={sidebar}>{children}</DashboardLayout>;
+    }
     return (
         <div className={'min-h-screen ' + (internal ? 'internal-shell' : 'public-shell')}>
             <a className="skip-link" href="#main">

@@ -1,6 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { Errors, Field, Shell, Title } from '@/Components/Shelter';
+import { Errors, Field, Shell } from '@/Components/Shelter';
 import ShelterForm from '@/Components/ShelterForm';
 import { Refuge } from '@/types/shelter';
 
@@ -64,71 +64,132 @@ function StaffForm({ shelter }: { shelter: Refuge }) {
 
 export default function Shelters({ shelters }: { shelters: Refuge[] }) {
     const [selected, setSelected] = useState<number | null>(null);
+    const [tab, setTab] = useState<'profile' | 'staff'>('profile');
     const shelter = shelters.find((s) => s.id === selected);
+    const refugeNavigation = (
+        <section className="border-t border-stone-200/70 pt-5" aria-label="Refugios">
+            <div className="mb-3 px-3">
+                <h2 className="text-sm font-semibold">Refugios</h2>
+                <p className="mt-1 text-xs text-stone-500">
+                    {shelters.length}{' '}
+                    {shelters.length === 1 ? 'refugio registrado' : 'refugios registrados'}
+                </p>
+            </div>
+            <button
+                className={
+                    'mb-1 flex min-h-10 w-full items-center rounded-lg px-3 text-left text-[13px] ' +
+                    (selected === null
+                        ? 'bg-emerald-900/8 font-semibold text-emerald-950'
+                        : 'text-stone-600 hover:bg-stone-200/50')
+                }
+                onClick={() => {
+                    setSelected(null);
+                    setTab('profile');
+                }}
+                aria-current={selected === null ? 'page' : undefined}
+            >
+                + Nuevo refugio
+            </button>
+            {!shelters.length && (
+                <p className="px-3 py-3 text-xs text-stone-500">Todavía no hay refugios.</p>
+            )}
+            {shelters.map((s) => (
+                <button
+                    key={s.id}
+                    className={
+                        'flex min-h-10 w-full items-center justify-between gap-2 rounded-lg px-3 text-left text-[13px] ' +
+                        (selected === s.id
+                            ? 'bg-emerald-900/8 font-semibold text-emerald-950'
+                            : 'text-stone-600 hover:bg-stone-200/50')
+                    }
+                    onClick={() => {
+                        setSelected(s.id);
+                        setTab('profile');
+                    }}
+                    aria-current={selected === s.id ? 'page' : undefined}
+                >
+                    <span className="truncate">{s.name}</span>
+                    <span
+                        className={
+                            'h-1.5 w-1.5 shrink-0 rounded-full ' +
+                            (s.active ? 'bg-emerald-600' : 'bg-stone-300')
+                        }
+                        aria-label={s.active ? 'Activo' : 'Inactivo'}
+                    />
+                </button>
+            ))}
+        </section>
+    );
     return (
-        <Shell internal>
+        <Shell internal sidebar={refugeNavigation}>
             <Head title="Administrar refugios" />
-            <Title
-                title="Refugios de Huella"
-                text="Alta manual después de conversar con cada refugio. Administrá su perfil y las cuentas de su equipo."
-            />
-            <div className="grid gap-6 lg:grid-cols-[1fr_2fr]">
-                <aside className="card self-start space-y-3">
-                    <button
-                        className={selected === null ? 'btn w-full' : 'btn-secondary w-full'}
-                        onClick={() => setSelected(null)}
-                    >
-                        + Nuevo refugio
-                    </button>
-                    {shelters.map((s) => (
+            <div className="min-w-0 rounded-lg border border-stone-200 bg-white p-4 sm:p-5">
+                {shelter && (
+                    <div className="mb-4 flex gap-4 border-b border-stone-200 text-sm">
                         <button
-                            key={s.id}
-                            className={selected === s.id ? 'btn w-full' : 'btn-secondary w-full'}
-                            onClick={() => setSelected(s.id)}
+                            onClick={() => setTab('profile')}
+                            className={
+                                'pb-3 ' +
+                                (tab === 'profile'
+                                    ? 'border-b-2 border-emerald-900 font-medium'
+                                    : 'text-stone-500')
+                            }
                         >
-                            {s.name} · {s.active ? 'Activo' : 'Inactivo'}
+                            Datos del refugio
                         </button>
-                    ))}
-                </aside>
-                <div className="space-y-6">
-                    <section className="card">
-                        <h2 className="mb-6 text-2xl font-semibold">
+                        <button
+                            onClick={() => setTab('staff')}
+                            className={
+                                'pb-3 ' +
+                                (tab === 'staff'
+                                    ? 'border-b-2 border-emerald-900 font-medium'
+                                    : 'text-stone-500')
+                            }
+                        >
+                            Equipo
+                        </button>
+                    </div>
+                )}
+                {tab === 'profile' && (
+                    <section>
+                        <h2 className="mb-4 text-base font-semibold">
                             {shelter ? shelter.name : 'Nuevo refugio'}
                         </h2>
                         <ShelterForm
+                            compact
                             key={shelter ? JSON.stringify(shelter) : 'new'}
                             shelter={shelter}
                         />
                     </section>
-                    {shelter && (
-                        <>
-                            <section className="card">
-                                <h2 className="mb-4 text-xl font-semibold">Equipo del refugio</h2>
-                                {shelter.staff?.length ? (
-                                    <ul className="divide-y">
-                                        {shelter.staff.map((u) => (
-                                            <li className="break-words py-3" key={u.id}>
-                                                {u.name} {u.last_name} · Administrador del refugio
-                                                <br />
-                                                <span className="text-sm text-stone-600">
-                                                    {u.email}
-                                                </span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <p>Todavía no tiene personal asignado.</p>
-                                )}
-                            </section>
-                            <section className="card">
-                                <h2 className="mb-6 text-xl font-semibold">
-                                    Crear cuenta para {shelter.name}
-                                </h2>
-                                <StaffForm key={shelter.id} shelter={shelter} />
-                            </section>
-                        </>
-                    )}
-                </div>
+                )}
+                {shelter && tab === 'staff' && (
+                    <>
+                        <section className="mb-5">
+                            <h2 className="mb-4 text-xl font-semibold">Equipo del refugio</h2>
+                            {shelter.staff?.length ? (
+                                <ul className="divide-y">
+                                    {shelter.staff.map((u) => (
+                                        <li className="break-words py-3" key={u.id}>
+                                            {u.name} {u.last_name} · Administrador del refugio
+                                            <br />
+                                            <span className="text-sm text-stone-600">
+                                                {u.email}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p>Todavía no tiene personal asignado.</p>
+                            )}
+                        </section>
+                        <section className="border-t border-stone-200 pt-4">
+                            <h2 className="mb-6 text-xl font-semibold">
+                                Crear cuenta para {shelter.name}
+                            </h2>
+                            <StaffForm key={shelter.id} shelter={shelter} />
+                        </section>
+                    </>
+                )}
             </div>
         </Shell>
     );
