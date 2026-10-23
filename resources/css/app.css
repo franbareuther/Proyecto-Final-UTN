@@ -168,18 +168,27 @@
         @apply bg-emerald-50 font-semibold text-emerald-950;
     }
     .site-header {
+        --header-progress: 0;
+        --header-offset: -100%;
+        --header-text-color: var(--color-huella-forest);
+        --header-button-bg: var(--color-huella-forest);
+        --header-button-color: white;
+        --header-button-hover-bg: #166534;
+        --header-shadow-alpha: 0;
+        isolation: isolate;
         padding-top: env(safe-area-inset-top, 0px);
         background-color: transparent;
-        color: var(--color-huella-forest);
-        transition:
-            background-color 180ms ease,
-            color 180ms ease,
-            box-shadow 180ms ease;
+        color: var(--header-text-color);
+        box-shadow: 0 2px 12px rgb(21 62 49 / var(--header-shadow-alpha));
     }
-    .site-header[data-scrolled='true'] {
+    .site-header::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
         background-color: var(--color-huella-forest);
-        color: white;
-        box-shadow: 0 2px 12px rgb(21 62 49 / 12%);
+        opacity: var(--header-progress);
+        transform: translateY(var(--header-offset));
     }
     .site-brand {
         color: inherit;
@@ -196,12 +205,12 @@
     .site-header[data-scrolled='true'] .nav-link[aria-current] {
         background-color: rgb(255 255 255 / 12%);
     }
-    .site-header[data-scrolled='true'] .btn {
-        background-color: white;
-        color: var(--color-huella-forest);
+    .site-header .btn {
+        background-color: var(--header-button-bg);
+        color: var(--header-button-color);
     }
-    .site-header[data-scrolled='true'] .btn:hover {
-        background-color: #e7eddf;
+    .site-header .btn:hover {
+        background-color: var(--header-button-hover-bg);
     }
     .mobile-menu-masthead {
         min-height: 5.5rem;
@@ -382,7 +391,8 @@
         isolation: isolate;
         width: calc(100% + 2 * clamp(1rem, 3vw, 6rem));
         margin-inline: calc(-1 * clamp(1rem, 3vw, 6rem));
-        padding: 10rem 1rem 13rem;
+        min-height: calc(100svh - 7.5rem);
+        padding: clamp(6.5rem, 15svh, 10rem) 1rem clamp(7.5rem, 17svh, 13rem);
     }
     .floating-animals-hero::before {
         content: '';
@@ -501,7 +511,8 @@
     }
     @media (min-width: 640px) and (max-width: 1023px) {
         .floating-animals-hero {
-            padding-block: 14rem 17rem;
+            min-height: calc(100svh - 8.5rem);
+            padding-block: clamp(8rem, 18svh, 14rem) clamp(9rem, 20svh, 17rem);
         }
         .floating-hero-pet {
             max-width: 12rem;
@@ -519,18 +530,18 @@
         .floating-animals-hero {
             display: flex;
             align-items: center;
-            min-height: max(46rem, calc(100svh - 6rem));
-            padding: 7rem 1rem;
+            min-height: calc(100svh - 8.5rem);
+            padding: clamp(2.5rem, 7svh, 7rem) 1rem;
         }
         .floating-hero-copy {
             width: 54%;
             max-width: 46rem;
         }
         .floating-hero-heading {
-            font-size: clamp(3rem, 4.4vw, 5rem);
+            font-size: clamp(2.75rem, min(4.4vw, 9svh), 5rem);
         }
         .floating-hero-pet {
-            max-width: 17rem;
+            max-width: min(17rem, 28svh);
             translate: none;
         }
         .floating-hero-pet-golden {
@@ -568,6 +579,17 @@
             width: 11%;
         }
     }
+    @media (min-width: 640px) and (max-width: 1023px) and (max-height: 700px) {
+        .floating-animals-hero {
+            padding-block: 4.5rem 5.5rem;
+        }
+        .floating-hero-pet {
+            max-width: min(9rem, 22svh);
+        }
+        .floating-hero-heading {
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+        }
+    }
     .hero-photo {
         aspect-ratio: 4 / 3;
         width: 100%;
@@ -595,6 +617,12 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: clamp(0.75rem, 2vw, 1.75rem);
         align-items: stretch;
+    }
+    .companions-grid .animal-card-photo {
+        aspect-ratio: 16 / 10;
+    }
+    .companions-grid .animal-card {
+        border-radius: 0.75rem;
     }
     .companions-grid .animal-card-body {
         padding: clamp(0.75rem, 2.2vw, 1.5rem);
@@ -624,6 +652,9 @@
     @media (min-width: 640px) {
         .hero-photo {
             aspect-ratio: 16 / 10;
+        }
+        .companions-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
         }
     }
     @media (min-width: 1024px) {
