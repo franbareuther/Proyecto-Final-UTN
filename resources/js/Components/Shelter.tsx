@@ -52,7 +52,7 @@ export function Title({
     children,
 }: PropsWithChildren<{ title: string; text?: string }>) {
     return (
-        <div className="mb-8 flex min-w-0 flex-wrap items-end justify-between gap-5 sm:mb-10">
+        <div className="page-title-block mb-8 flex min-w-0 flex-wrap items-end justify-between gap-5 sm:mb-10">
             <div className="min-w-0 max-w-3xl">
                 <h1 className="page-heading break-words">{title}</h1>
                 {text && (
@@ -154,7 +154,7 @@ export function Field({
     const id = isValidElement<Control>(control) ? control.props.id || generatedId : generatedId;
     return (
         <div className="min-w-0 text-sm font-medium text-stone-700">
-            <label htmlFor={id} className="mb-2 block">
+            <label htmlFor={id} className="field-label mb-2 block">
                 {label}
             </label>
             {Children.map(children, (child) =>
@@ -701,7 +701,11 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                         internal ? 'internal-content flex min-h-screen min-w-0 flex-1 flex-col' : ''
                     }
                 >
-                    <main id="main" tabIndex={-1} className="app-main site-gutter flex-1 py-10">
+                    <main
+                        id="main"
+                        tabIndex={-1}
+                        className={`app-main site-gutter flex-1 ${internal ? 'py-5' : 'py-10'}`}
+                    >
                         {flash.error && (
                             <div
                                 role="alert"

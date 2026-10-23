@@ -89,6 +89,52 @@
         flex: 1 1 0%;
         width: auto;
     }
+    .internal-shell .site-gutter {
+        padding-inline: clamp(0.75rem, 1.75vw, 2rem);
+    }
+    .internal-shell .page-title-block {
+        margin-bottom: 1.25rem;
+        gap: 1rem;
+    }
+    .internal-shell .page-title-block p {
+        margin-top: 0.375rem;
+        font-size: 0.875rem;
+        line-height: 1.35;
+    }
+    .internal-shell .card {
+        border-radius: 0.75rem;
+        padding: 1rem;
+    }
+    .internal-shell .max-w-4xl {
+        max-width: none;
+    }
+    .internal-shell :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+        min-height: 2.25rem;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    .internal-shell .field-label {
+        margin-bottom: 0.375rem;
+        color: #166534;
+        font-size: 0.9375rem;
+        font-weight: 700;
+        line-height: 1.25rem;
+    }
+    .internal-shell textarea {
+        min-height: 5rem;
+    }
+    .internal-shell :is(table th, table td) {
+        padding: 0.75rem;
+    }
+    .internal-shell :is(.gap-5, .gap-6) {
+        gap: 1rem;
+    }
+    .internal-shell :is(.mb-8, .sm\:mb-10) {
+        margin-bottom: 1.25rem;
+    }
+    .internal-shell :is(.space-y-5, .space-y-6) > :not(:last-child) {
+        margin-block-end: 0.875rem;
+    }
     .internal-sidebar {
         width: 17rem;
         transition: width 180ms ease;
@@ -100,6 +146,7 @@
         min-width: 0;
         overflow: hidden;
         white-space: nowrap;
+        color: #166534;
     }
     .internal-sidebar .site-brand span,
     .internal-sidebar .nav-link-label {
@@ -120,13 +167,16 @@
         padding-inline: 0.75rem;
     }
     .sidebar-toggle {
-        @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-stone-500 transition hover:bg-emerald-50 hover:text-emerald-950;
+        @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-green-700 transition hover:bg-emerald-50 hover:text-green-800;
     }
     .internal-sidebar.is-collapsed .sidebar-toggle svg {
         transform: scaleX(-1);
     }
     .nav-link-icon {
         color: currentColor;
+    }
+    .internal-sidebar .nav-link-icon {
+        color: #15803d;
     }
     .app-main :where(.grid) > * {
         min-width: 0;

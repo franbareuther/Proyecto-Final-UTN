@@ -50,7 +50,7 @@ export default function ShelterForm({
     ];
     return (
         <form
-            className="space-y-5"
+            className="space-y-4"
             onSubmit={(e) => {
                 e.preventDefault();
                 const options = {
@@ -68,7 +68,7 @@ export default function ShelterForm({
             }}
         >
             <Errors errors={f.errors} />
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {fields.map(([key, label]) => (
                     <Field key={key} label={label} error={f.errors[key]}>
                         <input
@@ -95,101 +95,105 @@ export default function ShelterForm({
             )}
             <Field label="Historia y descripción" error={f.errors.description}>
                 <textarea
-                    className="input min-h-32"
+                    className="input min-h-24"
                     value={f.data.description}
                     onChange={(e) => f.setData('description', e.target.value)}
                 />
             </Field>
             <fieldset
-                className="min-w-0 space-y-4 rounded-xl border border-stone-200 p-4"
+                className="grid min-w-0 items-start gap-4 rounded-xl border border-stone-200 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(15rem,0.7fr)]"
                 disabled={f.processing}
             >
                 <legend className="px-2 font-semibold text-emerald-950">
                     Imagen del refugio (opcional)
                 </legend>
-                <p id="shelter-image-help" className="text-sm text-stone-600">
+                <p id="shelter-image-help" className="text-sm text-stone-600 lg:col-span-2">
                     JPEG, PNG o WebP, hasta 5 MB. Para logos con transparencia, usá PNG. No se
                     admite SVG.
                 </p>
-                <Field label="Elegir imagen" error={f.errors.image}>
-                    <input
-                        ref={fileInput}
-                        className="block w-full min-w-0 max-w-full text-sm"
-                        type="file"
-                        name="image"
-                        accept="image/jpeg,image/png,image/webp"
-                        aria-describedby="shelter-image-help"
-                        onChange={(event) => {
-                            f.clearErrors('image');
-                            const image = event.target.files?.[0] || null;
-                            f.setData((data) => ({
-                                ...data,
-                                image,
-                                remove_image: image ? false : data.remove_image,
-                            }));
-                        }}
-                    />
-                </Field>
-                <Field label="Presentación" error={f.errors.image_type}>
-                    <select
-                        name="image_type"
-                        value={f.data.image_type}
-                        onChange={(event) =>
-                            f.setData('image_type', event.target.value as 'photo' | 'logo')
-                        }
-                    >
-                        <option value="photo">Fotografía · llenar el marco</option>
-                        <option value="logo">Logo · mostrar completo</option>
-                    </select>
-                </Field>
-                <div className="max-w-md">
+                <div className="min-w-0 space-y-3">
+                    <Field label="Elegir imagen" error={f.errors.image}>
+                        <input
+                            ref={fileInput}
+                            className="block w-full min-w-0 max-w-full text-sm"
+                            type="file"
+                            name="image"
+                            accept="image/jpeg,image/png,image/webp"
+                            aria-describedby="shelter-image-help"
+                            onChange={(event) => {
+                                f.clearErrors('image');
+                                const image = event.target.files?.[0] || null;
+                                f.setData((data) => ({
+                                    ...data,
+                                    image,
+                                    remove_image: image ? false : data.remove_image,
+                                }));
+                            }}
+                        />
+                    </Field>
+                    <Field label="Presentación" error={f.errors.image_type}>
+                        <select
+                            name="image_type"
+                            value={f.data.image_type}
+                            onChange={(event) =>
+                                f.setData('image_type', event.target.value as 'photo' | 'logo')
+                            }
+                        >
+                            <option value="photo">Fotografía · llenar el marco</option>
+                            <option value="logo">Logo · mostrar completo</option>
+                        </select>
+                    </Field>
+                    <div className="flex flex-wrap gap-2">
+                        {f.data.image && (
+                            <button
+                                type="button"
+                                className="btn-secondary"
+                                onClick={() => {
+                                    f.setData('image', null);
+                                    f.clearErrors('image');
+                                    if (fileInput.current) fileInput.current.value = '';
+                                }}
+                            >
+                                Descartar archivo seleccionado
+                            </button>
+                        )}
+                        {shelter?.image_url && (
+                            <button
+                                type="button"
+                                className="btn-secondary"
+                                onClick={() => {
+                                    f.setData((data) => ({
+                                        ...data,
+                                        image: null,
+                                        remove_image: !data.remove_image,
+                                    }));
+                                    f.clearErrors('image');
+                                    if (fileInput.current) fileInput.current.value = '';
+                                }}
+                            >
+                                {f.data.remove_image
+                                    ? 'Conservar imagen actual'
+                                    : 'Quitar imagen al guardar'}
+                            </button>
+                        )}
+                    </div>
+                </div>
+                <div className="min-w-0 space-y-2">
                     <ShelterImage
                         src={f.data.remove_image ? null : preview || shelter?.image_url}
                         name={f.data.name || 'tu refugio'}
                         kind={f.data.image_type as 'photo' | 'logo'}
                     />
-                </div>
-                <p className="break-words text-sm text-stone-600" role="status">
-                    {f.data.remove_image
-                        ? 'La imagen se quitará al guardar.'
-                        : f.data.image
-                          ? `Archivo seleccionado: ${f.data.image.name}. Los cambios se publican al guardar.`
-                          : shelter?.image_url
-                            ? 'Imagen actual. Podés reemplazarla o quitarla.'
-                            : 'Sin imagen. El nombre y los datos del refugio seguirán visibles.'}
-                </p>
-                {f.data.image && (
-                    <button
-                        type="button"
-                        className="btn-secondary"
-                        onClick={() => {
-                            f.setData('image', null);
-                            f.clearErrors('image');
-                            if (fileInput.current) fileInput.current.value = '';
-                        }}
-                    >
-                        Descartar archivo seleccionado
-                    </button>
-                )}
-                {shelter?.image_url && (
-                    <button
-                        type="button"
-                        className="btn-secondary"
-                        onClick={() => {
-                            f.setData((data) => ({
-                                ...data,
-                                image: null,
-                                remove_image: !data.remove_image,
-                            }));
-                            f.clearErrors('image');
-                            if (fileInput.current) fileInput.current.value = '';
-                        }}
-                    >
+                    <p className="break-words text-xs text-stone-600" role="status">
                         {f.data.remove_image
-                            ? 'Conservar imagen actual'
-                            : 'Quitar imagen al guardar'}
-                    </button>
-                )}
+                            ? 'La imagen se quitará al guardar.'
+                            : f.data.image
+                              ? `Archivo seleccionado: ${f.data.image.name}. Los cambios se publican al guardar.`
+                              : shelter?.image_url
+                                ? 'Imagen actual. Podés reemplazarla o quitarla.'
+                                : 'Sin imagen. El nombre y los datos del refugio seguirán visibles.'}
+                    </p>
+                </div>
             </fieldset>
             {!admin && (
                 <label className="flex items-center gap-3">
