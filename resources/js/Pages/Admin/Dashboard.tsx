@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { Adoption, Application, MedicalRecord } from '@/types/shelter';
-import { date, Empty, RequestList, Shell, Title } from '@/Components/Shelter';
+import { date, Empty, RequestList, Shell } from '@/Components/Shelter';
 function Chart({ title, items }: { title: string; items: { label: string; total: number }[] }) {
     const max = Math.max(1, ...items.map((i) => i.total));
     return (
@@ -46,16 +46,18 @@ export default function Dashboard({
 }) {
     return (
         <Shell internal>
-            <Head title="Resumen del refugio" />
-            <Title
-                title="Cada día, una nueva oportunidad."
-                text="La actividad del refugio, de un vistazo."
-            />
-            <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <Head title="Resumen de estadísticas" />
+            <h1 className="mb-5 text-2xl font-semibold tracking-tight text-emerald-950">
+                Resumen de estadísticas
+            </h1>
+            <div className="mb-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {Object.entries(stats).map(([k, v]) => (
-                    <div key={k} className="card">
-                        <p className="text-sm text-stone-500">{k}</p>
-                        <p className="mt-3 text-4xl font-semibold tracking-tight text-emerald-900">
+                    <div
+                        key={k}
+                        className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm"
+                    >
+                        <p className="text-xs text-stone-500">{k}</p>
+                        <p className="mt-2 text-3xl font-semibold tracking-tight text-emerald-900">
                             {v}
                         </p>
                     </div>

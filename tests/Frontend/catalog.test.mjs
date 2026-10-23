@@ -103,7 +103,9 @@ test('los badges mantienen texto y distinguen disponible, en proceso y adoptado'
         createElement(components.Badge, null, 'En proceso de adopción'),
     );
     const adopted = renderToStaticMarkup(createElement(components.Badge, null, 'Adoptado'));
-    assert.match(available, /bg-emerald-50/);
+    const availableClass = available.match(/^<span class="([^"]+)"/)[1];
+    assert.doesNotMatch(availableClass, /bg-|border|rounded|px-|py-/);
+    assert.match(availableClass, /text-emerald-800/);
     assert.match(processing, /bg-amber-50/);
     assert.match(adopted, /bg-sky-50/);
     assert.match(processing, /En proceso de adopción/);

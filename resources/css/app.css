@@ -89,6 +89,45 @@
         flex: 1 1 0%;
         width: auto;
     }
+    .internal-sidebar {
+        width: 17rem;
+        transition: width 180ms ease;
+    }
+    .internal-sidebar.is-collapsed {
+        width: 5.25rem;
+    }
+    .internal-sidebar .site-brand {
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    .internal-sidebar .site-brand span,
+    .internal-sidebar .nav-link-label {
+        opacity: 1;
+        transition: opacity 120ms ease;
+    }
+    .internal-sidebar.is-collapsed .site-brand span,
+    .internal-sidebar.is-collapsed .nav-link-label {
+        width: 0;
+        opacity: 0;
+        overflow: hidden;
+    }
+    .internal-sidebar.is-collapsed .internal-sidebar-header {
+        flex-direction: column;
+    }
+    .internal-sidebar.is-collapsed .nav-link {
+        justify-content: center;
+        padding-inline: 0.75rem;
+    }
+    .sidebar-toggle {
+        @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-stone-500 transition hover:bg-emerald-50 hover:text-emerald-950;
+    }
+    .internal-sidebar.is-collapsed .sidebar-toggle svg {
+        transform: scaleX(-1);
+    }
+    .nav-link-icon {
+        color: currentColor;
+    }
     .app-main :where(.grid) > * {
         min-width: 0;
     }
@@ -109,7 +148,10 @@
         @apply inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-emerald-900 underline decoration-emerald-900/30 underline-offset-4 hover:decoration-emerald-900;
     }
     .nav-link {
-        @apply flex min-h-11 items-center rounded-xl px-3 py-2 text-sm font-medium text-stone-600 transition hover:bg-emerald-50 hover:text-emerald-950;
+        @apply flex min-h-11 items-center gap-3.5 rounded-xl px-3 py-2 text-sm font-medium text-stone-600 transition hover:bg-emerald-50 hover:text-emerald-950;
+    }
+    .nav-link-danger {
+        @apply text-red-700 hover:bg-red-50 hover:text-red-800;
     }
     .nav-link[aria-current] {
         @apply bg-emerald-50 font-semibold text-emerald-950;
@@ -305,6 +347,13 @@
         font-weight: 600;
         color: var(--color-huella-forest);
         text-wrap: balance;
+    }
+    .internal-shell .page-heading {
+        font-size: 1.5rem;
+        line-height: 2rem;
+        letter-spacing: -0.025em;
+        font-weight: 600;
+        color: #022c22;
     }
     .section-heading {
         font-size: clamp(2.125rem, 3.8vw, 3.75rem);
