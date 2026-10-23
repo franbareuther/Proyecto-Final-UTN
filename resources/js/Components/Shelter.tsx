@@ -373,6 +373,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [menuScrollbarGap, setMenuScrollbarGap] = useState(0);
+    const header = useRef<HTMLElement>(null);
     const closeMenuButton = useRef<HTMLButtonElement>(null);
     const menuId = useId();
     const admin = auth.user?.role === 'admin';
@@ -380,10 +381,52 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
     const staff = admin;
     const catalogUrl = currentShelter ? `/refugios/${currentShelter.slug}/animales` : '/animales';
     useEffect(() => {
-        const updateScroll = () => setScrolled(window.scrollY > 0);
-        updateScroll();
+        const element = header.current;
+        if (!element) return;
+
+        const scrollRange = 96;
+        let current = Math.min(window.scrollY / scrollRange, 1);
+        let target = current;
+        let frame = 0;
+
+        const mix = (from: number, to: number, progress: number) =>
+            Math.round(from + (to - from) * progress);
+        const paint = (progress: number) => {
+            const textColor = `rgb(${mix(21, 255, progress)} ${mix(62, 255, progress)} ${mix(49, 255, progress)})`;
+            const buttonColor = `rgb(${mix(21, 255, progress)} ${mix(62, 255, progress)} ${mix(49, 255, progress)})`;
+            const buttonText = `rgb(${mix(255, 21, progress)} ${mix(255, 62, progress)} ${mix(255, 49, progress)})`;
+            const buttonHover = `rgb(${mix(22, 231, progress)} ${mix(101, 237, progress)} ${mix(52, 223, progress)})`;
+
+            element.style.setProperty('--header-progress', progress.toFixed(3));
+            element.style.setProperty('--header-offset', `${(progress - 1) * 100}%`);
+            element.style.setProperty('--header-text-color', textColor);
+            element.style.setProperty('--header-button-bg', buttonColor);
+            element.style.setProperty('--header-button-color', buttonText);
+            element.style.setProperty('--header-button-hover-bg', buttonHover);
+            element.style.setProperty('--header-shadow-alpha', (progress * 0.12).toFixed(3));
+        };
+        const animate = () => {
+            const distance = target - current;
+            current = Math.abs(distance) < 0.002 ? target : current + distance * 0.18;
+            paint(current);
+
+            if (current !== target) frame = window.requestAnimationFrame(animate);
+            else frame = 0;
+        };
+        const updateScroll = () => {
+            target = Math.min(Math.max(window.scrollY / scrollRange, 0), 1);
+            setScrolled(target >= 0.5);
+
+            if (!frame) frame = window.requestAnimationFrame(animate);
+        };
+
+        paint(current);
+        setScrolled(current >= 0.5);
         window.addEventListener('scroll', updateScroll, { passive: true });
-        return () => window.removeEventListener('scroll', updateScroll);
+        return () => {
+            window.removeEventListener('scroll', updateScroll);
+            if (frame) window.cancelAnimationFrame(frame);
+        };
     }, []);
     useEffect(() => router.on('navigate', () => setOpen(false)), []);
     useEffect(() => {
@@ -497,7 +540,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
             <a className="skip-link" href="#main">
                 Saltar al contenido
             </a>
-            <header className="site-header sticky top-0 z-40" data-scrolled={scrolled}>
+            <header ref={header} className="site-header sticky top-0 z-40" data-scrolled={scrolled}>
                 <div className="mobile-menu-masthead site-gutter flex w-full min-w-0 items-center justify-between gap-4">
                     {brand}
                     <nav
