@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './about.css';
 @config "../../tailwind.config.js";
 
 @font-face {

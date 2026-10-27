@@ -15,7 +15,7 @@ Son observaciones del código; no se presentan como defectos vistos en capturas.
 
 ## Dirección visual propuesta
 
-Conservar Huella y el verde del refugio. Usar fondo marfil, verde bosque y pequeños acentos terracota; títulos editoriales con serif en fragmentos, texto principal sans y espacios generosos. Fotografías existentes como protagonistas, sin generar imágenes ni agregar servicios externos. No inventar estadísticas, testimonios o animales.
+Conservar Huellitas y el verde del refugio. Usar fondo marfil, verde bosque y pequeños acentos terracota; títulos editoriales con serif en fragmentos, texto principal sans y espacios generosos. Fotografías existentes como protagonistas, sin generar imágenes ni agregar servicios externos. No inventar estadísticas, testimonios o animales.
 
 Home: hero dividido con título fluido, foto vinculada al animal real destacado, pasos de adopción y sección del refugio. Catálogo: cabecera clara, filtros adaptables, resumen de filtros aplicados y resultados, tarjetas con proporciones consistentes y disponibilidad diferenciada. Perfil: galería adaptable, datos legibles, selección accesible y bloque de acción con la condición de adopción existente.
 

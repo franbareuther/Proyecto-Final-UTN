@@ -8,7 +8,7 @@ Sos responsable del sitio público y de los componentes visuales compartidos. Tu
 
 ## Tareas concretas, en orden
 
-1. Revisá inicio, menú, footer, catálogo general, directorio y perfil de refugio, catálogo de un refugio y perfil de animal. Mantené las dos entradas «Animales en adopción» y «Refugios», y la sección de cada una en el inicio. Revisá que los textos representen a Huella como plataforma y al refugio como responsable del animal.
+1. Revisá inicio, menú, footer, catálogo general, directorio y perfil de refugio, catálogo de un refugio y perfil de animal. Mantené las dos entradas «Animales en adopción» y «Refugios», y la sección de cada una en el inicio. Revisá que los textos representen a Huellitas como plataforma y al refugio como responsable del animal.
 2. Verificá búsqueda, especie, raza, tamaño, edad, disponibilidad, ciudad y refugio; combinaciones, chips para quitar un filtro, limpiar y paginar. La URL, los controles y los resultados deben coincidir. En el catálogo de una institución, ninguna combinación de URL debe cambiarla ni mostrar filtros como aplicados si no afectan la consulta.
 3. Comprobá foto principal, galería y miniaturas, nombres largos, imágenes faltantes o inaccesibles, listas vacías y refugios sin contacto. Mantené el nombre del refugio en tarjetas y perfiles. Usá fotos autorizadas o las demo existentes; no inventes testimonios, estadísticas o animales reales.
 4. Probá las pantallas públicas a 1440×900, 768×1024 y 390×844; agregá 320 px y zoom 200% como casos de estrés. Comprobá teclado, foco, menú con Escape, etiquetas, errores y contraste de los elementos modificados. Adjuntá capturas y pasos, sin confundir renderizado SSR con navegador.
@@ -28,7 +28,7 @@ Revisor principal: integrante 3; integrante 4 apoya accesibilidad. Solicitá rev
 
 ## Base y reglas comunes
 
-Repositorio: franbareuther/Proyecto-Final-UTN. Continuá la aplicación Laravel 12 + React/Inertia + TypeScript existente. Huella ya tiene catálogo general, catálogo por refugio, tres roles, solicitudes y adopciones, administración y salud. No reconstruyas el proyecto ni repitas tareas ya resueltas.
+Repositorio: franbareuther/Proyecto-Final-UTN. Continuá la aplicación Laravel 12 + React/Inertia + TypeScript existente. Huellitas ya tiene catálogo general, catálogo por refugio, tres roles, solicitudes y adopciones, administración y salud. No reconstruyas el proyecto ni repitas tareas ya resueltas.
 
 Los únicos roles son superadmin, admin del refugio y adoptante. El superadministrador crea refugios manualmente y su personal; no opera adopciones ni clínica. El administrador gestiona los datos de su propio refugio, incluida salud. El adoptante usa una cuenta global y ve solo sus solicitudes. La información pública de animales de toda la red puede ser explorada también por personal autenticado; los paneles y escrituras internas permanecen separados por refugio.
 

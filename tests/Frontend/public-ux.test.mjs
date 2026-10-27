@@ -11,6 +11,7 @@ let server;
 before(async () => {
     server = await createServer({
         configFile: false,
+        cacheDir: `.local/public-ux-vite-${process.pid}`,
         publicDir: false,
         appType: 'custom',
         resolve: { alias: { '@': resolve('resources/js') } },
@@ -33,7 +34,7 @@ async function render(component, props) {
                     auth: { user: null },
                     errors: {},
                     flash: {},
-                    shelterName: 'Huella',
+                    shelterName: 'Huellitas',
                     ...props,
                 },
                 url: '/animales',

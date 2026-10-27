@@ -44,6 +44,7 @@ const page = (data, total = data.length) => ({
 before(async () => {
     server = await createServer({
         configFile: false,
+        cacheDir: `.local/catalog-vite-${process.pid}`,
         publicDir: false,
         appType: 'custom',
         resolve: { alias: { '@': resolve('resources/js') } },
@@ -61,7 +62,7 @@ async function renderPage(component, props, user = null, url = '/animales') {
     const result = await createInertiaApp({
         page: {
             component,
-            props: { auth: { user }, flash: {}, errors: {}, shelterName: 'Huella', ...props },
+            props: { auth: { user }, flash: {}, errors: {}, shelterName: 'Huellitas', ...props },
             url,
             version: 'test',
             clearHistory: false,
@@ -221,7 +222,7 @@ test('el hero explica la plataforma y conserva seis caras decorativas sin contro
         assert.equal(image.toString('ascii', 8, 12), 'WEBP');
     }
     assert.match(home, /Encontrá a tu próximo compañero de/);
-    assert.match(home, /class="hero-marker-underline">huellas<\/span>\./);
+    assert.match(home, /class="hero-marker-underline">huellitas<\/span>\./);
     assert.match(home, /Conectamos a familias con refugios/);
     assert.match(home, /gato-gris-cara.webp/);
     assert.doesNotMatch(home, /Pausar animación|Reanudar animación|Imágenes ilustrativas/);

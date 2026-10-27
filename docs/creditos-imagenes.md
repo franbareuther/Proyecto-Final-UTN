@@ -30,4 +30,4 @@ Los seis recortes de `public/images/hero/` fueron generados con IA para la compo
 
 Los seis animales usan las variantes `*-cara.webp`: caras ilustradas recortadas por la silueta de sus orejas y mentón, sin cuerpo ni fondo. Se distribuyen en posiciones y tamaños distintos alrededor del texto. El hero ocupa todo el ancho disponible, con fondo verde claro y cuadrícula verde fina que se desvanecen hacia blanco en el borde inferior. El mismo fondo se extiende detrás de la navbar transparente.
 
-El hero adapta la referencia con texto centrado y caras estáticas. El título presenta la búsqueda de un compañero de huellas, con esa última palabra subrayada, y la descripción explica la conexión entre familias y refugios. La implementación usa React y CSS existentes, sin instalar otra biblioteca de componentes.
+El hero adapta la referencia con texto centrado y caras estáticas. El título presenta la búsqueda de un compañero de huellitas, con esa última palabra subrayada, y la descripción explica la conexión entre familias y refugios. La implementación usa React y CSS existentes, sin instalar otra biblioteca de componentes.

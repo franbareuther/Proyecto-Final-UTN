@@ -69,7 +69,7 @@ export default function Shelters({ shelters }: { shelters: Refuge[] }) {
         <Shell internal>
             <Head title="Administrar refugios" />
             <Title
-                title="Refugios de Huella"
+                title="Refugios de Huellitas"
                 text="Alta manual después de conversar con cada refugio. Administrá su perfil y las cuentas de su equipo."
             />
             <div className="grid gap-6 lg:grid-cols-[1fr_2fr]">

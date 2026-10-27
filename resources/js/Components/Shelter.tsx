@@ -501,7 +501,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                     {currentShelter &&
                         navLink(catalogUrl, 'Adoptar', currentPath.startsWith(catalogUrl))}
                     {navLink('/#como-funciona', 'Cómo funciona', false)}
-                    {navLink('/#nosotros', 'Huella', false)}
+                    {navLink('/#nosotros', 'Huellitas', false)}
                 </>
             )}
         </>
@@ -553,7 +553,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
         >
             <Icon name="paw" className="h-9 w-9 shrink-0" />
             <span className="font-display text-3xl font-bold leading-none tracking-tight">
-                huella
+                huellitas
             </span>
         </Link>
     );
@@ -737,7 +737,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                         <div>
                             <div className="flex items-center gap-3 text-2xl font-semibold">
                                 <Icon name="paw" className="h-7 w-7" />
-                                huella.
+                                huellitas.
                             </div>
                             <p className="mt-4 max-w-sm text-sm leading-relaxed text-emerald-100">
                                 Un encuentro puede cambiar dos vidas. Acompañamos el camino hacia
@@ -775,7 +775,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                                 href="/#nosotros"
                                 className="block py-2 text-sm underline-offset-4 hover:underline"
                             >
-                                Sobre Huella
+                                Sobre Huellitas
                             </Link>
                             <Link
                                 href={auth.user ? '/dashboard' : '/login'}
@@ -786,7 +786,7 @@ export function Shell({ children, internal = false }: PropsWithChildren<{ intern
                         </nav>
                     </div>
                     <div className="site-gutter flex min-w-0 flex-wrap justify-between gap-3 border-t border-white/20 py-6 text-xs leading-relaxed text-emerald-100">
-                        <p>{shelterName} · Cada adopción deja una huella.</p>
+                        <p>{shelterName} · Adopciones y refugios.</p>
                         <p>Proyecto final · UTN</p>
                     </div>
                 </footer>

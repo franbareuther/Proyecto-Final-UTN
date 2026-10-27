@@ -6,7 +6,7 @@ La [propuesta](01-propuesta-catalogo.md) se documentó antes de aplicar el cambi
 
 ## Cambios implementados
 
-- Identidad Huella con marfil, verde bosque y terracota, tokens de marca en Tailwind y tipografía fluida. Hero dividido, fotografía real destacada vinculada al perfil, pasos de adopción y secciones con títulos jerarquizados. No se inventaron cifras, testimonios ni datos de animales.
+- Identidad Huellitas con marfil, verde bosque y terracota, tokens de marca en Tailwind y tipografía fluida. Hero dividido, fotografía real destacada vinculada al perfil, pasos de adopción y secciones con títulos jerarquizados. No se inventaron cifras, testimonios ni datos de animales.
 - Navbar con enlace activo, marca e iconografía SVG propia; menú móvil con aria-controls, cierre al navegar y Escape; enlace para saltar al contenido. Footer público con enlaces reales y foco claro sobre fondo oscuro. Se mantienen las condiciones de navegación según rol.
 - Catálogo con filtros distribuidos en una, dos o tres columnas; búsquedas de nombre con límite compatible con servidor; chips de filtros aplicados que permiten quitar uno conservando el resto; conteo y rango recibidos de Laravel; estado de búsqueda y salida del vacío; paginación con etiquetas y página actual.
 - Tarjetas con fotos de proporción 4:3, etiquetas de sexo/tamaño, disponibilidad en texto/color, nombre con corte de palabras y enlace al perfil. Se conserva la prioridad de fecha de nacimiento sobre edad estimada.
