@@ -11,6 +11,7 @@ let server;
 before(async () => {
     server = await createServer({
         configFile: false,
+        cacheDir: `.local/shelter-image-vite-${process.pid}`,
         publicDir: false,
         appType: 'custom',
         resolve: { alias: { '@': resolve('resources/js') } },
@@ -41,7 +42,7 @@ async function render(component, props) {
                     auth: { user: null },
                     flash: {},
                     errors: {},
-                    shelterName: 'Huella',
+                    shelterName: 'Huellitas',
                     ...props,
                 },
                 url: '/',
@@ -80,7 +81,7 @@ test('the image component has an accessible photo label and preserves an empty p
     assert.match(photo, /alt="Fotografía de Sur"/);
     const empty = renderToStaticMarkup(createElement(Image, { name: 'Sur' }));
     assert.doesNotMatch(empty, /<img/);
-    assert.match(empty, /Refugio de la red Huella/);
+    assert.match(empty, /Refugio de la red Huellitas/);
 });
 
 test('both management consumers expose upload, presentation and reversible removal', async () => {

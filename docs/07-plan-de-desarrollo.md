@@ -20,7 +20,7 @@
 - Revisión con responsables del refugio de formularios, vocabulario y política de solicitudes.
 - Afinar filtros de tablas internas, búsqueda de adopciones históricas y acciones masivas si el equipo las requiere.
 - Gestión de fotos con reordenamiento por arrastre, opcional: actualmente se selecciona la principal y se pueden eliminar.
-- La identidad Huella y fotos de muestra son provisionales y deben reemplazarse antes de producción.
+- La identidad Huellitas y fotos de muestra son provisionales y deben reemplazarse antes de producción.
 - Traducción de pantallas auxiliares de Breeze y todos los mensajes de validación nativos; el flujo principal está en español.
 - Revisión de privacidad, respaldos, configuración SMTP/HTTPS y despliegue manual antes de producción.
 - No hay restauración de animales archivados desde interfaz, ni cancelación o readopción. El historial se conserva.

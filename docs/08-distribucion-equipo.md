@@ -1,6 +1,6 @@
 # Distribución actual del equipo
 
-La base de Huella ya está implementada: catálogo general y por refugio; tres roles; alta manual de instituciones; solicitudes/adopciones; administración; salud del refugio. Las tareas siguientes completan su uso, calidad y entrega. Los issues #2–#5 se actualizan para esta etapa.
+La base de Huellitas ya está implementada: catálogo general y por refugio; tres roles; alta manual de instituciones; solicitudes/adopciones; administración; salud del refugio. Las tareas siguientes completan su uso, calidad y entrega. Los issues #2–#5 se actualizan para esta etapa.
 
 | Integrante | Responsabilidad | Entrega principal |
 |---|---|---|

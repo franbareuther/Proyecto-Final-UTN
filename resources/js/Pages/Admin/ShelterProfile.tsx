@@ -15,7 +15,7 @@ export default function ShelterProfile({ shelter }: { shelter: Refuge }) {
                     Ver perfil público
                 </Link>
             </Title>
-            <section className="card max-w-4xl">
+            <section className="card w-full">
                 <ShelterForm shelter={shelter} admin />
             </section>
         </Shell>

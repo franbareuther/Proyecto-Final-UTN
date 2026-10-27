@@ -44,6 +44,7 @@ const page = (data, total = data.length) => ({
 before(async () => {
     server = await createServer({
         configFile: false,
+        cacheDir: `.local/catalog-vite-${process.pid}`,
         publicDir: false,
         appType: 'custom',
         resolve: { alias: { '@': resolve('resources/js') } },
@@ -61,7 +62,7 @@ async function renderPage(component, props, user = null, url = '/animales') {
     const result = await createInertiaApp({
         page: {
             component,
-            props: { auth: { user }, flash: {}, errors: {}, shelterName: 'Huella', ...props },
+            props: { auth: { user }, flash: {}, errors: {}, shelterName: 'Huellitas', ...props },
             url,
             version: 'test',
             clearHistory: false,
@@ -103,7 +104,9 @@ test('los badges mantienen texto y distinguen disponible, en proceso y adoptado'
         createElement(components.Badge, null, 'En proceso de adopción'),
     );
     const adopted = renderToStaticMarkup(createElement(components.Badge, null, 'Adoptado'));
-    assert.match(available, /bg-emerald-50/);
+    const availableClass = available.match(/^<span class="([^"]+)"/)[1];
+    assert.doesNotMatch(availableClass, /bg-|border|rounded|px-|py-/);
+    assert.match(availableClass, /text-emerald-800/);
     assert.match(processing, /bg-amber-50/);
     assert.match(adopted, /bg-sky-50/);
     assert.match(processing, /En proceso de adopción/);
@@ -219,7 +222,7 @@ test('el hero explica la plataforma y conserva seis caras decorativas sin contro
         assert.equal(image.toString('ascii', 8, 12), 'WEBP');
     }
     assert.match(home, /Encontrá a tu próximo compañero de/);
-    assert.match(home, /class="hero-marker-underline">huellas<\/span>\./);
+    assert.match(home, /class="hero-marker-underline">huellitas<\/span>\./);
     assert.match(home, /Conectamos a familias con refugios/);
     assert.match(home, /gato-gris-cara.webp/);
     assert.doesNotMatch(home, /Pausar animación|Reanudar animación|Imágenes ilustrativas/);

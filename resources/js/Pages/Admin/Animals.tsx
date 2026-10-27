@@ -50,11 +50,12 @@ export default function Animals({
                     <table className="w-full text-left text-sm">
                         <thead className="bg-stone-50 text-stone-500">
                             <tr>
-                                {['Animal', 'Características', 'Estado', 'Acciones'].map((h) => (
-                                    <th className="p-5 font-medium" key={h}>
-                                        {h}
-                                    </th>
-                                ))}
+                                <th className="p-5 font-medium">Animal</th>
+                                <th className="p-5 font-medium">Características</th>
+                                <th className="p-5 font-medium">Estado</th>
+                                <th className="w-px whitespace-nowrap p-5 text-right font-medium">
+                                    Acciones
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-stone-100">
@@ -77,8 +78,8 @@ export default function Animals({
                                     <td className="p-5">
                                         <Badge>{a.availability_status}</Badge>
                                     </td>
-                                    <td className="p-5">
-                                        <div className="flex flex-wrap gap-2">
+                                    <td className="w-px whitespace-nowrap p-5">
+                                        <div className="flex flex-nowrap justify-end gap-2">
                                             <Link
                                                 className="btn-secondary"
                                                 href={'/admin/animales/' + a.id + '/edit'}

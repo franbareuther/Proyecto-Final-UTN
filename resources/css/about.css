@@ -1,0 +1,402 @@
+@layer components {
+    .about-section {
+        width: 100%;
+        --about-pin-top: 5.25rem;
+        padding-bottom: 3.5rem;
+        color: #153e31;
+        border-bottom: 1px solid #dce3d9;
+    }
+    .about-header {
+        padding-bottom: 1rem;
+        flex-shrink: 0;
+        text-align: left;
+    }
+    .about-header h2 {
+        font-size: clamp(1.75rem, 6vw, 4.5rem);
+        line-height: 1.1;
+        font-weight: 600;
+        letter-spacing: -0.04em;
+        color: #153e31;
+        white-space: nowrap;
+    }
+    .about-choose {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        padding-bottom: 1rem;
+        background: #fff;
+        scroll-margin-top: 10rem;
+    }
+    .about-tabs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+        max-width: 27rem;
+        gap: 0.25rem;
+        padding: 0.25rem;
+        border: 1px solid #dde4d9;
+        border-radius: 999px;
+        background: #f1f4ed;
+    }
+    .about-tab {
+        display: flex;
+        min-height: 2.75rem;
+        align-items: center;
+        justify-content: center;
+        gap: 0.375rem;
+        padding: 0.5rem 0.25rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+            background-color 180ms ease,
+            color 180ms ease;
+    }
+    .about-tab:hover {
+        background: #e1e8db;
+    }
+    .about-tab[data-selected] {
+        background: #153e31;
+        color: #fff;
+    }
+    .about-scroll-track {
+        height: calc(var(--about-panel-height, 38rem) + 140svh);
+        position: relative;
+        scroll-margin-top: var(--about-pin-top);
+    }
+    .about-sticky-panel {
+        position: sticky;
+        top: var(--about-pin-top);
+        height: calc(100svh - var(--about-pin-top));
+        display: flex;
+        flex-direction: column;
+        padding-block: 1rem;
+        background: white;
+    }
+    .about-interactive {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        min-height: 0;
+    }
+    .about-panels {
+        flex: 1;
+        min-height: 0;
+    }
+    .about-journey {
+        height: 100%;
+    }
+    .about-journey-layout {
+        min-width: 0;
+        height: 100%;
+    }
+    .about-guide-heading h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        line-height: 1.15;
+        letter-spacing: -0.025em;
+    }
+    .about-guide-heading > p {
+        margin-top: 0.5rem;
+        font-size: 0.8125rem;
+        line-height: 1.6;
+        color: #586159;
+    }
+    .about-steps {
+        margin-top: 1rem;
+        border-top: 1px solid #dce3d9;
+    }
+    .about-step {
+        border-bottom: 1px solid #dce3d9;
+    }
+    .about-step h4 {
+        font-family: inherit;
+    }
+    .about-step button {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        width: 100%;
+        min-height: 3.25rem;
+        padding-block: 0.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.4;
+        text-align: left;
+        cursor: pointer;
+    }
+    .about-step button:hover {
+        color: #8c513b;
+    }
+    .about-toggle {
+        display: grid;
+        flex-shrink: 0;
+        place-items: center;
+        width: 1.75rem;
+        height: 1.75rem;
+        border-radius: 50%;
+        background: #eff3eb;
+        font-size: 1.25rem;
+        font-weight: 400;
+    }
+    .about-step button[aria-expanded='true'] .about-toggle {
+        background: #153e31;
+        color: white;
+    }
+    .about-disclosure {
+        display: grid;
+        grid-template-rows: 0fr;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+            grid-template-rows 350ms ease,
+            opacity 250ms ease,
+            visibility 350ms;
+    }
+    .about-disclosure[data-open='true'] {
+        grid-template-rows: 1fr;
+        opacity: 1;
+        visibility: visible;
+    }
+    .about-disclosure > div {
+        overflow: hidden;
+    }
+    .about-disclosure p {
+        max-width: 52ch;
+        padding-bottom: 0.75rem;
+        font-size: 0.8125rem;
+        line-height: 1.65;
+        color: #586159;
+    }
+    .about-photo {
+        overflow: hidden;
+        min-width: 0;
+        border-radius: 0.875rem;
+        background: #153e31;
+    }
+    .about-photo-frame {
+        position: relative;
+        overflow: hidden;
+        height: clamp(4rem, calc(100svh - 39rem), 9rem);
+        background: #e0e5d9;
+    }
+    .about-photo-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        animation: about-photo-in 300ms ease;
+    }
+    .about-photo-note {
+        position: absolute;
+        right: 0.5rem;
+        bottom: 0.5rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        background: #153e31e6;
+        color: white;
+        font-size: 0.625rem;
+    }
+    .about-mobile-photo {
+        margin-bottom: 0.75rem;
+    }
+    .about-mobile-photo figcaption,
+    .about-desktop-photo {
+        display: none;
+    }
+    .about-photo figcaption {
+        padding: 1.25rem;
+    }
+    .about-caption-title {
+        font-family: 'Bricolage Grotesque', sans-serif;
+        font-size: 1.375rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+    }
+    .about-caption-copy {
+        margin-top: 0.5rem;
+        color: #586159;
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
+    .about-photo-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.375rem 1rem;
+        margin-top: 1rem;
+        color: #78513e;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .about-action {
+        padding-top: 1.5rem;
+    }
+    .about-action .btn {
+        width: 100%;
+    }
+    .about-action > p {
+        margin-top: 0.875rem;
+        color: #586159;
+        font-size: 0.75rem;
+        line-height: 1.7;
+    }
+    @keyframes about-photo-in {
+        from {
+            opacity: 0.4;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    @media (min-width: 640px) {
+        .about-section {
+            --about-pin-top: 5.5rem;
+        }
+        .about-header {
+            padding-bottom: 2rem;
+        }
+        .about-tab {
+            font-size: 0.9375rem;
+        }
+        .about-action .btn {
+            width: auto;
+        }
+    }
+    @media (min-width: 1024px) {
+        .about-sticky-panel {
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+            grid-template-rows: max-content max-content;
+            align-content: start;
+            column-gap: clamp(3rem, 6vw, 7rem);
+            padding-top: clamp(1.5rem, 6svh, 3.5rem);
+            padding-bottom: 2rem;
+        }
+        .about-header {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        .about-interactive {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        .about-choose {
+            padding-bottom: 1.5rem;
+        }
+        .about-guide-heading h3 {
+            font-size: clamp(1.625rem, 2.5vw, 2.5rem);
+        }
+        .about-guide-heading > p {
+            font-size: 0.9375rem;
+        }
+        .about-steps {
+            margin-top: 1.5rem;
+        }
+        .about-step button {
+            min-height: 4.25rem;
+            padding-block: 1rem;
+            font-size: clamp(1.25rem, 1.5vw, 1.75rem);
+            letter-spacing: -0.025em;
+        }
+        .about-disclosure p {
+            font-size: 0.9375rem;
+            line-height: 1.8;
+            padding-right: 1rem;
+            padding-bottom: 1.25rem;
+        }
+        .about-mobile-photo {
+            display: none;
+        }
+        .about-desktop-photo {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            grid-column: 2;
+            grid-row: 1 / span 2;
+            inset: 0;
+            height: auto;
+        }
+        .about-desktop-photo .about-photo-frame {
+            position: absolute;
+            inset: 0;
+            height: 100%;
+        }
+        .about-desktop-photo figcaption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            z-index: 1;
+            isolation: isolate;
+            width: min(100%, 34rem);
+            padding: 1.5rem 2rem;
+            color: white;
+        }
+        .about-desktop-photo figcaption::before {
+            content: '';
+            position: absolute;
+            inset: -1.5rem -3rem 0 0;
+            z-index: -1;
+            background: rgb(10 30 23 / 74%);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            mask-image:
+                linear-gradient(to right, #000 calc(100% - 3rem), transparent),
+                linear-gradient(to top, #000 calc(100% - 1.5rem), transparent);
+            mask-composite: intersect;
+        }
+        .about-desktop-photo .about-caption-copy,
+        .about-desktop-photo .about-photo-tags {
+            color: #f0f5ed;
+        }
+        .about-desktop-photo .about-photo-note {
+            top: 1rem;
+            right: 1rem;
+            bottom: auto;
+        }
+        .about-action {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .about-action > p {
+            margin: 0;
+        }
+    }
+    @media (max-height: 740px) {
+        .about-guide-heading > p {
+            display: none;
+        }
+        .about-sticky-panel {
+            padding-block: 0.5rem;
+        }
+        .about-header {
+            padding-bottom: 0.75rem;
+        }
+        .about-choose {
+            padding-bottom: 0.75rem;
+        }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .about-disclosure {
+            transition: none;
+        }
+    }
+    @media print {
+        .about-scroll-track {
+            height: auto;
+        }
+        .about-choose,
+        .about-sticky-panel {
+            position: static;
+        }
+        .about-sticky-panel {
+            height: auto;
+        }
+        .about-disclosure {
+            opacity: 1;
+            visibility: visible;
+            grid-template-rows: 1fr;
+        }
+    }
+}

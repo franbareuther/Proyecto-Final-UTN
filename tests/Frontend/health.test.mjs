@@ -32,7 +32,7 @@ async function render(component, props) {
                     auth: { user: { id: 1, name: 'Ana', role: 'admin' } },
                     flash: {},
                     errors: {},
-                    shelterName: 'Huella',
+                    shelterName: 'Huellitas',
                     ...props,
                 },
                 url: '/',

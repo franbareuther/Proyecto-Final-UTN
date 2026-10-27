@@ -14,14 +14,14 @@ import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { Animal, Application, Page, Shared } from '@/types/shelter';
 import Modal from '@/Components/Modal';
 import AnimalImage from '@/Components/AnimalImage';
-import Icon from '@/Components/Icon';
+import Icon, { IconName } from '@/Components/Icon';
 import DashboardLayout from '@/Components/ui/dashboard-sidebar';
 
 export const date = (value: string) =>
     new Date(value.slice(0, 10) + 'T12:00:00').toLocaleDateString('es-AR');
 
 const badgeStyles: Record<string, string> = {
-    Disponible: 'border-emerald-200 bg-emerald-50 text-emerald-900',
+    Disponible: 'text-emerald-800',
     'En proceso de adopción': 'border-amber-200 bg-amber-50 text-amber-950',
     Adoptado: 'border-sky-200 bg-sky-50 text-sky-950',
     'No disponible temporalmente': 'border-stone-300 bg-stone-100 text-stone-700',
@@ -34,10 +34,12 @@ const badgeStyles: Record<string, string> = {
 };
 export function Badge({ children }: PropsWithChildren) {
     const style = typeof children === 'string' ? badgeStyles[children] : undefined;
+    const plain = children === 'Disponible';
     return (
         <span
             className={
-                'inline-flex max-w-full items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold leading-relaxed ' +
+                'inline-flex max-w-full items-center gap-2 text-xs font-semibold leading-relaxed ' +
+                (plain ? '' : 'rounded-full border px-3 py-1.5 ') +
                 (style || 'border-stone-200 bg-stone-50 text-stone-700')
             }
         >
@@ -52,7 +54,7 @@ export function Title({
     children,
 }: PropsWithChildren<{ title: string; text?: string }>) {
     return (
-        <div className="mb-8 flex min-w-0 flex-wrap items-end justify-between gap-5 sm:mb-10">
+        <div className="page-title-block mb-8 flex min-w-0 flex-wrap items-end justify-between gap-5 sm:mb-10">
             <div className="min-w-0 max-w-3xl">
                 <h1 className="page-heading break-words">{title}</h1>
                 {text && (
@@ -154,7 +156,7 @@ export function Field({
     const id = isValidElement<Control>(control) ? control.props.id || generatedId : generatedId;
     return (
         <div className="min-w-0 text-sm font-medium text-stone-700">
-            <label htmlFor={id} className="mb-2 block">
+            <label htmlFor={id} className="field-label mb-2 block">
                 {label}
             </label>
             {Children.map(children, (child) =>
@@ -378,6 +380,7 @@ export function Shell({
     const currentPath = usePage().url.split(/[?#]/)[0];
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [menuScrollbarGap, setMenuScrollbarGap] = useState(0);
     const header = useRef<HTMLElement>(null);
     const closeMenuButton = useRef<HTMLButtonElement>(null);
@@ -386,6 +389,9 @@ export function Shell({
     const superadmin = auth.user?.role === 'superadmin';
     const staff = admin;
     const catalogUrl = currentShelter ? `/refugios/${currentShelter.slug}/animales` : '/animales';
+    useEffect(() => {
+        setSidebarCollapsed(window.localStorage.getItem('huella-sidebar-collapsed') === 'true');
+    }, []);
     useEffect(() => {
         const element = header.current;
         if (!element) return;
@@ -445,31 +451,41 @@ export function Shell({
         desktop.addEventListener('change', closeOnDesktop);
         return () => desktop.removeEventListener('change', closeOnDesktop);
     }, [open]);
-    const navLink = (href: string, label: string, active = currentPath === href) => (
+    const navLink = (
+        href: string,
+        label: string,
+        active = currentPath === href,
+        icon?: IconName,
+    ) => (
         <Link
             key={href}
             className="nav-link"
             href={href}
             aria-current={active ? 'page' : undefined}
             onClick={() => setOpen(false)}
+            title={internal && sidebarCollapsed ? label : undefined}
         >
-            {label}
+            {icon && <Icon name={icon} className="nav-link-icon h-5 w-5 shrink-0" />}
+            <span className="nav-link-label">{label}</span>
         </Link>
     );
     const primaryNavigation = (
         <>
-            {internal && superadmin && navLink('/superadmin/refugios', 'Gestionar refugios')}
+            {internal &&
+                superadmin &&
+                navLink('/superadmin/refugios', 'Gestionar refugios', undefined, 'building')}
             {internal && admin && (
                 <>
-                    {navLink('/admin', 'Resumen')}
-                    {navLink('/admin/refugio', 'Mi refugio')}
+                    {navLink('/admin', 'Resumen', undefined, 'dashboard')}
+                    {navLink('/admin/refugio', 'Mi refugio', undefined, 'building')}
                     {navLink(
                         '/admin/animales',
                         'Animales',
                         currentPath.startsWith('/admin/animales'),
+                        'paw',
                     )}
-                    {navLink('/admin/solicitudes', 'Solicitudes')}
-                    {navLink('/admin/adopciones', 'Adopciones')}
+                    {navLink('/admin/solicitudes', 'Solicitudes', undefined, 'clipboard')}
+                    {navLink('/admin/adopciones', 'Adopciones', undefined, 'heart')}
                 </>
             )}
             {internal && staff && (
@@ -479,8 +495,9 @@ export function Shell({
                         'Salud y cuidados',
                         currentPath.startsWith('/veterinaria') &&
                             currentPath !== '/veterinaria/controles',
+                        'medical',
                     )}
-                    {navLink('/veterinaria/controles', 'Próximos controles')}
+                    {navLink('/veterinaria/controles', 'Próximos controles', undefined, 'calendar')}
                 </>
             )}
             {!internal && (
@@ -490,11 +507,24 @@ export function Shell({
                     {currentShelter &&
                         navLink(catalogUrl, 'Adoptar', currentPath.startsWith(catalogUrl))}
                     {navLink('/#como-funciona', 'Cómo funciona', false)}
-                    {navLink('/#nosotros', 'Huella', false)}
+                    {navLink('/#nosotros', 'Huellitas', false)}
                 </>
             )}
         </>
     );
+    const logoutLink = auth.user ? (
+        <Link
+            as="button"
+            href="/logout"
+            method="post"
+            className="nav-link nav-link-danger text-left"
+            onClick={() => setOpen(false)}
+            title={internal && sidebarCollapsed ? 'Salir' : undefined}
+        >
+            <Icon name="logout" className="nav-link-icon h-5 w-5 shrink-0" />
+            <span className="nav-link-label">Salir</span>
+        </Link>
+    ) : null;
     const accountNavigation = auth.user ? (
         <>
             {!internal &&
@@ -503,16 +533,8 @@ export function Shell({
                     staff || superadmin ? 'Mi panel' : 'Mis solicitudes',
                     currentPath === '/mis-solicitudes',
                 )}
-            {navLink('/profile', 'Mi perfil')}
-            <Link
-                as="button"
-                href="/logout"
-                method="post"
-                className="nav-link text-left"
-                onClick={() => setOpen(false)}
-            >
-                Salir
-            </Link>
+            {navLink('/profile', 'Mi perfil', undefined, 'user')}
+            {!internal && logoutLink}
         </>
     ) : (
         <>
@@ -537,7 +559,7 @@ export function Shell({
         >
             <Icon name="paw" className="h-9 w-9 shrink-0" />
             <span className="font-display text-3xl font-bold leading-none tracking-tight">
-                huella
+                huellitas
             </span>
         </Link>
     );
@@ -549,7 +571,11 @@ export function Shell({
             <a className="skip-link" href="#main">
                 Saltar al contenido
             </a>
-            <header ref={header} className="site-header sticky top-0 z-40" data-scrolled={scrolled}>
+            <header
+                ref={header}
+                className={`site-header sticky top-0 z-40 ${internal ? 'lg:hidden' : ''}`}
+                data-scrolled={scrolled}
+            >
                 <div className="mobile-menu-masthead site-gutter flex w-full min-w-0 items-center justify-between gap-4">
                     {brand}
                     <nav
@@ -621,6 +647,7 @@ export function Shell({
                                 {primaryNavigation}
                                 {auth.user && accountNavigation}
                                 {internal && navLink(catalogUrl, 'Ver sitio público')}
+                                {internal && logoutLink}
                             </div>
                             {!auth.user && (
                                 <div
@@ -635,50 +662,91 @@ export function Shell({
                     </nav>
                 </DialogPanel>
             </Dialog>
-            <div className={'app-frame ' + (internal ? 'flex' : '')}>
+            <div className={'app-frame ' + (internal ? 'flex min-h-screen items-start' : '')}>
                 {internal && (
-                    <aside className="hidden min-h-[85vh] w-60 shrink-0 border-r border-stone-200 bg-white p-5 lg:block">
-                        <nav aria-label="Panel del refugio" className="flex flex-col gap-1">
+                    <aside
+                        className={`internal-sidebar sticky top-0 hidden h-screen shrink-0 flex-col border-r border-stone-200 bg-white p-4 lg:flex ${sidebarCollapsed ? 'is-collapsed' : ''}`}
+                    >
+                        <div className="internal-sidebar-header flex items-center justify-between gap-2 border-b border-stone-100 pb-4">
+                            {brand}
+                            <button
+                                type="button"
+                                className="sidebar-toggle"
+                                aria-label={
+                                    sidebarCollapsed
+                                        ? 'Expandir barra lateral'
+                                        : 'Contraer barra lateral'
+                                }
+                                aria-expanded={!sidebarCollapsed}
+                                onClick={() => {
+                                    const next = !sidebarCollapsed;
+                                    setSidebarCollapsed(next);
+                                    window.localStorage.setItem(
+                                        'huella-sidebar-collapsed',
+                                        String(next),
+                                    );
+                                }}
+                            >
+                                <Icon name="sidebar" className="h-5 w-5" />
+                            </button>
+                        </div>
+                        <nav
+                            aria-label="Panel del refugio"
+                            className="mt-5 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto"
+                        >
                             {navigation}
                         </nav>
+                        <div className="sidebar-footer mt-3 flex flex-col gap-1 border-t border-stone-100 pt-3">
+                            <Link href={catalogUrl} className="nav-link">
+                                <Icon name="arrow" className="nav-link-icon h-5 w-5 shrink-0" />
+                                <span className="nav-link-label">Ver sitio público</span>
+                            </Link>
+                            {logoutLink}
+                        </div>
                     </aside>
                 )}
-                <main id="main" tabIndex={-1} className="app-main site-gutter py-10">
-                    {internal && currentShelter && (
-                        <p className="mb-6 rounded-xl bg-emerald-50 p-4 font-semibold text-emerald-950">
-                            {currentShelter.name}
-                        </p>
+                <div
+                    className={
+                        internal ? 'internal-content flex min-h-screen min-w-0 flex-1 flex-col' : ''
+                    }
+                >
+                    <main
+                        id="main"
+                        tabIndex={-1}
+                        className={`app-main site-gutter flex-1 ${internal ? 'py-5' : 'py-10'}`}
+                    >
+                        {flash.error && (
+                            <div
+                                role="alert"
+                                className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-950"
+                            >
+                                {flash.error}
+                            </div>
+                        )}
+                        {flash.success && (
+                            <div
+                                role="status"
+                                className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-relaxed text-emerald-950"
+                            >
+                                {flash.success}
+                            </div>
+                        )}
+                        {children}
+                    </main>
+                    {internal && (
+                        <footer className="site-gutter border-t border-stone-200 py-6 text-center text-sm text-stone-600">
+                            {shelterName} · Proyecto académico UTN
+                        </footer>
                     )}
-                    {flash.error && (
-                        <div
-                            role="alert"
-                            className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-950"
-                        >
-                            {flash.error}
-                        </div>
-                    )}
-                    {flash.success && (
-                        <div
-                            role="status"
-                            className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-relaxed text-emerald-950"
-                        >
-                            {flash.success}
-                        </div>
-                    )}
-                    {children}
-                </main>
+                </div>
             </div>
-            {internal ? (
-                <footer className="site-gutter border-t border-stone-200 py-6 text-center text-sm text-stone-600">
-                    {shelterName} · Proyecto académico UTN
-                </footer>
-            ) : (
+            {!internal && (
                 <footer className="bg-huella-forest text-white">
                     <div className="site-gutter grid min-w-0 gap-10 py-12 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)] md:py-16">
                         <div>
                             <div className="flex items-center gap-3 text-2xl font-semibold">
                                 <Icon name="paw" className="h-7 w-7" />
-                                huella.
+                                huellitas.
                             </div>
                             <p className="mt-4 max-w-sm text-sm leading-relaxed text-emerald-100">
                                 Un encuentro puede cambiar dos vidas. Acompañamos el camino hacia
@@ -716,7 +784,7 @@ export function Shell({
                                 href="/#nosotros"
                                 className="block py-2 text-sm underline-offset-4 hover:underline"
                             >
-                                Sobre Huella
+                                Sobre Huellitas
                             </Link>
                             <Link
                                 href={auth.user ? '/dashboard' : '/login'}
@@ -727,7 +795,7 @@ export function Shell({
                         </nav>
                     </div>
                     <div className="site-gutter flex min-w-0 flex-wrap justify-between gap-3 border-t border-white/20 py-6 text-xs leading-relaxed text-emerald-100">
-                        <p>{shelterName} · Cada adopción deja una huella.</p>
+                        <p>{shelterName} · Adopciones y refugios.</p>
                         <p>Proyecto final · UTN</p>
                     </div>
                 </footer>

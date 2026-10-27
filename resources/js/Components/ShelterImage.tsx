@@ -31,7 +31,7 @@ export default function ShelterImage({
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 text-center text-stone-600">
                     <Icon name="home" className="h-8 w-8 text-emerald-800" />
                     <span className="text-sm">
-                        {src ? 'Imagen no disponible' : 'Refugio de la red Huella'}
+                        {src ? 'Imagen no disponible' : 'Refugio de la red Huellitas'}
                     </span>
                 </div>
             )}

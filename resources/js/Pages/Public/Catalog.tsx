@@ -117,7 +117,7 @@ export default function Catalog({
                 <p className="mt-5 max-w-xl text-base leading-relaxed text-stone-600 sm:text-lg">
                     {shelter
                         ? 'Conocé a los animales de este refugio.'
-                        : 'Conocé a los animales de toda la red Huella.'}{' '}
+                        : 'Conocé a los animales de toda la red Huellitas.'}{' '}
                     Más allá de su tamaño o edad, cada uno tiene algo único para compartir.
                 </p>
             </header>

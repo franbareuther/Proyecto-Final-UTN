@@ -1,8 +1,8 @@
-# Huella multirrefugio
+# Huellitas multirrefugio
 
 ## Alcance
 
-Huella es la plataforma común; cada refugio tiene nombre, identificador web, ciudad, descripción y contacto públicos. La portada dirige al directorio de refugios activos. La entrada «Animales en adopción» abre el catálogo general, filtrable por especie, ciudad y refugio; «Refugios» conserva el recorrido por institución. Cada perfil enlaza a su catálogo; filtros, razas y paginación pertenecen al refugio seleccionado. Los enlaces antiguos `/animales/{id}` siguen funcionando para animales de refugios activos.
+Huellitas es la plataforma común; cada refugio tiene nombre, identificador web, ciudad, descripción y contacto públicos. La portada dirige al directorio de refugios activos. La entrada «Animales en adopción» abre el catálogo general, filtrable por especie, ciudad y refugio; «Refugios» conserva el recorrido por institución. Cada perfil enlaza a su catálogo; filtros, razas y paginación pertenecen al refugio seleccionado. Los enlaces antiguos `/animales/{id}` siguen funcionando para animales de refugios activos.
 
 Alta manual: conversación fuera de la plataforma, verificación y creación por superadministrador. No hay autorregistro de refugios, chat ni aprobación automática. El superadministrador crea cuentas de administrador en el refugio elegido. El administrador edita el perfil público de su refugio, sin cambiar su identificador ni su habilitación.
 
