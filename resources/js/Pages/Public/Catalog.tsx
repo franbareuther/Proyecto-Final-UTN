@@ -2,7 +2,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { Animal, Page, Refuge } from '@/types/shelter';
 import { AnimalCard, Empty, Errors, Field, Pagination, Shell } from '@/Components/Shelter';
 import Icon from '@/Components/Icon';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 type Filters = {
     q: string;
@@ -31,6 +31,7 @@ export default function Catalog({
     filters: Record<string, string>;
     breeds: string[];
 }) {
+    const filterPanel = useRef<HTMLDetailsElement>(null);
     const f = useForm<Filters>({
         q: filters.q || '',
         species: filters.species || '',
@@ -100,38 +101,26 @@ export default function Catalog({
         const query = new URLSearchParams(applied.filter(([k]) => k !== key));
         return catalogUrl + (query.size ? '?' + query.toString() : '');
     };
+    useEffect(() => {
+        if (Object.keys(f.errors).some((key) => key !== 'q') && filterPanel.current) {
+            filterPanel.current.open = true;
+        }
+    }, [f.errors]);
     return (
         <Shell>
             <Head title="Encontrá tu compañero" />
-            <header className="mb-8 max-w-3xl sm:mb-10">
+            <header className="catalog-heading">
                 {shelter && (
                     <Link className="text-link mb-4 inline-flex" href={`/refugios/${shelter.slug}`}>
                         {shelter.name} · Ver refugio
                     </Link>
                 )}
-                <h1 className="public-heading">
-                    Tu próximo compañero
-                    <br />
+                <h1>
+                    Tu próximo compañero{' '}
                     <span className="font-medium text-huella-clay">está por acá.</span>
                 </h1>
-                <p className="mt-5 max-w-xl text-base leading-relaxed text-stone-600 sm:text-lg">
-                    {shelter
-                        ? 'Conocé a los animales de este refugio.'
-                        : 'Conocé a los animales de toda la red Huellitas.'}{' '}
-                    Más allá de su tamaño o edad, cada uno tiene algo único para compartir.
-                </p>
             </header>
-            <section aria-labelledby="filters-title" className="card mb-8">
-                <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-stone-100 pb-5">
-                    <h2
-                        id="filters-title"
-                        className="flex items-center gap-2 font-semibold text-emerald-950"
-                    >
-                        <Icon name="filter" className="h-5 w-5" />
-                        Encontrá una buena compañía
-                    </h2>
-                    <p className="text-sm text-stone-600">Podés combinar los filtros.</p>
-                </div>
+            <section aria-label="Búsqueda y filtros" className="catalog-tools">
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
@@ -143,63 +132,124 @@ export default function Catalog({
                                 ),
                             ),
                         );
-                        f.get(catalogUrl, { preserveState: true, preserveScroll: true });
+                        f.get(catalogUrl, {
+                            preserveState: true,
+                            preserveScroll: true,
+                            onSuccess: () => {
+                                if (filterPanel.current) filterPanel.current.open = false;
+                            },
+                        });
                     }}
                     aria-label="Buscar y filtrar animales"
                 >
                     <Errors errors={f.errors} />
-                    <div className="filter-grid">
-                        <Field label="Buscar por nombre" error={f.errors.q}>
+                    <div className="catalog-toolbar">
+                        <div className="catalog-search">
+                            <label className="sr-only" htmlFor="catalog-search">
+                                Buscar por nombre
+                            </label>
                             <input
+                                id="catalog-search"
                                 type="search"
                                 name="q"
                                 maxLength={100}
                                 value={f.data.q}
                                 onChange={(e) => f.setData('q', e.target.value)}
-                                placeholder="Por ejemplo, Mora"
+                                placeholder="Buscar por nombre…"
                                 autoComplete="off"
                             />
-                        </Field>
-                        {options.map(([key, label, values]) => (
-                            <Field key={key} label={label} error={f.errors[key]}>
-                                <select
-                                    name={key}
-                                    value={f.data[key]}
-                                    onChange={(e) => f.setData(key, e.target.value)}
-                                >
-                                    <option value="">
-                                        {key === 'breed' ? 'Todas las razas' : 'Todas las opciones'}
-                                    </option>
-                                    {f.data[key] &&
-                                        !values.some(
-                                            (value) =>
-                                                (typeof value === 'string' ? value : value[0]) ===
-                                                f.data[key],
-                                        ) && (
-                                            <option value={f.data[key]}>
-                                                {f.data[key]} (sin coincidencias)
-                                            </option>
-                                        )}
-                                    {values.map((value) => (
-                                        <option
-                                            key={typeof value === 'string' ? value : value[0]}
-                                            value={typeof value === 'string' ? value : value[0]}
-                                        >
-                                            {typeof value === 'string' ? value : value[1]}
-                                        </option>
+                            <button
+                                type="submit"
+                                aria-label="Buscar animales"
+                                disabled={f.processing}
+                            >
+                                <Icon name="search" className="h-4 w-4" />
+                            </button>
+                        </div>
+                        <details
+                            className="catalog-filter-dropdown"
+                            ref={filterPanel}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Escape') {
+                                    event.currentTarget.open = false;
+                                    event.currentTarget.querySelector('summary')?.focus();
+                                }
+                            }}
+                        >
+                            <summary>
+                                <Icon name="filter" className="h-4 w-4" />
+                                <span>Filtros</span>
+                                {applied.filter(([key]) => key !== 'q').length > 0 && (
+                                    <span className="catalog-filter-count">
+                                        {applied.filter(([key]) => key !== 'q').length}
+                                    </span>
+                                )}
+                                <Icon name="chevron" className="catalog-filter-chevron h-3 w-3" />
+                            </summary>
+                            <div className="catalog-filter-panel">
+                                <div className="filter-grid">
+                                    {options.map(([key, label, values]) => (
+                                        <Field key={key} label={label} error={f.errors[key]}>
+                                            <select
+                                                name={key}
+                                                value={f.data[key]}
+                                                onChange={(e) => f.setData(key, e.target.value)}
+                                            >
+                                                <option value="">
+                                                    {key === 'breed'
+                                                        ? 'Todas las razas'
+                                                        : 'Todas las opciones'}
+                                                </option>
+                                                {f.data[key] &&
+                                                    !values.some(
+                                                        (value) =>
+                                                            (typeof value === 'string'
+                                                                ? value
+                                                                : value[0]) === f.data[key],
+                                                    ) && (
+                                                        <option value={f.data[key]}>
+                                                            {f.data[key]} (sin coincidencias)
+                                                        </option>
+                                                    )}
+                                                {values.map((value) => (
+                                                    <option
+                                                        key={
+                                                            typeof value === 'string'
+                                                                ? value
+                                                                : value[0]
+                                                        }
+                                                        value={
+                                                            typeof value === 'string'
+                                                                ? value
+                                                                : value[0]
+                                                        }
+                                                    >
+                                                        {typeof value === 'string'
+                                                            ? value
+                                                            : value[1]}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </Field>
                                     ))}
-                                </select>
-                            </Field>
-                        ))}
-                    </div>
-                    <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-stone-100 pt-5">
-                        <button className="btn w-full sm:w-auto" disabled={f.processing}>
-                            <Icon name="search" className="h-4 w-4" />
-                            {f.processing ? 'Buscando…' : 'Buscar compañeros'}
-                        </button>
-                        <Link href={catalogUrl} className="btn-secondary w-full sm:w-auto">
-                            Limpiar filtros
-                        </Link>
+                                </div>
+                                <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-stone-100 pt-5">
+                                    <button
+                                        className="btn w-full sm:w-auto"
+                                        disabled={f.processing}
+                                    >
+                                        <Icon name="search" className="h-4 w-4" />
+                                        {f.processing ? 'Buscando…' : 'Aplicar filtros'}
+                                    </button>
+                                    <Link
+                                        href={catalogUrl}
+                                        className="btn-secondary w-full sm:w-auto"
+                                    >
+                                        Limpiar filtros
+                                    </Link>
+                                </div>
+                            </div>
+                        </details>
                     </div>
                 </form>
             </section>

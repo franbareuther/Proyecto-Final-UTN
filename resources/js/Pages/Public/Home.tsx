@@ -3,6 +3,7 @@ import { Animal, Refuge } from '@/types/shelter';
 import { AnimalCard, Empty, Shell } from '@/Components/Shelter';
 import FloatingAnimalsHero from '@/Components/ui/FloatingAnimalsHero';
 import About from '@/Components/ui/About';
+import ContactWithDog from '@/Components/ui/ContactWithDog';
 import Icon from '@/Components/Icon';
 import ShelterImage from '@/Components/ShelterImage';
 
@@ -12,8 +13,8 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
             <Head title="Encontrá a tu próximo compañero de huellitas" />
             <FloatingAnimalsHero />
             <About />
-            <section aria-labelledby="featured-title" className="py-14 sm:py-20">
-                <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
+            <section aria-labelledby="featured-title" className="featured-animals">
+                <div className="featured-animals-heading flex flex-wrap items-end justify-between gap-4">
                     <div>
                         <h2 id="featured-title" className="section-heading">
                             Buscan un lugar en tu vida.
@@ -71,6 +72,7 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
                 </div>
                 {!refuges.length && <Empty>Pronto conocerás los refugios de nuestra red.</Empty>}
             </section>
+            <ContactWithDog />
         </Shell>
     );
 }

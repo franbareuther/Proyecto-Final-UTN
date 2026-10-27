@@ -24,7 +24,7 @@
         align-items: center;
         flex-shrink: 0;
         padding-bottom: 1rem;
-        background: #fff;
+        background: var(--color-huella-paper);
         scroll-margin-top: 10rem;
     }
     .about-tabs {
@@ -72,7 +72,7 @@
         display: flex;
         flex-direction: column;
         padding-block: 1rem;
-        background: white;
+        background: var(--color-huella-paper);
     }
     .about-interactive {
         display: flex;

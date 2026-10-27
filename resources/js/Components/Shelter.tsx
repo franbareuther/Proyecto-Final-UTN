@@ -16,6 +16,7 @@ import Modal from '@/Components/Modal';
 import AnimalImage from '@/Components/AnimalImage';
 import Icon, { IconName } from '@/Components/Icon';
 import DashboardLayout from '@/Components/ui/dashboard-sidebar';
+import PublicFooter from '@/Components/PublicFooter';
 
 export const date = (value: string) =>
     new Date(value.slice(0, 10) + 'T12:00:00').toLocaleDateString('es-AR');
@@ -507,7 +508,7 @@ export function Shell({
                     {currentShelter &&
                         navLink(catalogUrl, 'Adoptar', currentPath.startsWith(catalogUrl))}
                     {navLink('/#como-funciona', 'Cómo funciona', false)}
-                    {navLink('/#nosotros', 'Huellitas', false)}
+                    {navLink('/#contacto', 'Contacto', false)}
                 </>
             )}
         </>
@@ -741,64 +742,7 @@ export function Shell({
                 </div>
             </div>
             {!internal && (
-                <footer className="bg-huella-forest text-white">
-                    <div className="site-gutter grid min-w-0 gap-10 py-12 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)] md:py-16">
-                        <div>
-                            <div className="flex items-center gap-3 text-2xl font-semibold">
-                                <Icon name="paw" className="h-7 w-7" />
-                                huellitas.
-                            </div>
-                            <p className="mt-4 max-w-sm text-sm leading-relaxed text-emerald-100">
-                                Un encuentro puede cambiar dos vidas. Acompañamos el camino hacia
-                                una adopción responsable.
-                            </p>
-                        </div>
-                        <nav aria-label="Enlaces de adopción">
-                            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-emerald-200">
-                                Encontrá tu compañero
-                            </p>
-                            <Link
-                                href={catalogUrl}
-                                className="block py-2 text-sm underline-offset-4 hover:underline"
-                            >
-                                {currentShelter ? 'Animales del refugio' : 'Animales en adopción'}
-                            </Link>
-                            <Link
-                                href="/refugios"
-                                className="block py-2 text-sm underline-offset-4 hover:underline"
-                            >
-                                Refugios
-                            </Link>
-                            <Link
-                                href="/#como-funciona"
-                                className="block py-2 text-sm underline-offset-4 hover:underline"
-                            >
-                                Cómo funciona la adopción
-                            </Link>
-                        </nav>
-                        <nav aria-label="Enlaces del refugio">
-                            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-emerald-200">
-                                Sigamos en contacto
-                            </p>
-                            <Link
-                                href="/#nosotros"
-                                className="block py-2 text-sm underline-offset-4 hover:underline"
-                            >
-                                Sobre Huellitas
-                            </Link>
-                            <Link
-                                href={auth.user ? '/dashboard' : '/login'}
-                                className="block py-2 text-sm underline-offset-4 hover:underline"
-                            >
-                                {auth.user ? 'Mi espacio' : 'Ingresar a mi cuenta'}
-                            </Link>
-                        </nav>
-                    </div>
-                    <div className="site-gutter flex min-w-0 flex-wrap justify-between gap-3 border-t border-white/20 py-6 text-xs leading-relaxed text-emerald-100">
-                        <p>{shelterName} · Adopciones y refugios.</p>
-                        <p>Proyecto final · UTN</p>
-                    </div>
-                </footer>
+                <PublicFooter catalogUrl={catalogUrl} scoped={Boolean(currentShelter)} signedIn={Boolean(auth.user)} shelterName={shelterName} />
             )}
         </div>
     );

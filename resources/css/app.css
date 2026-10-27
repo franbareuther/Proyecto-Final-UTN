@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 @import './about.css';
+@import './contact.css';
+@import './catalog.css';
 @config "../../tailwind.config.js";
 
 @font-face {
@@ -25,7 +27,7 @@
 
 @layer base {
     body {
-        @apply bg-[#f7f8f4] text-stone-800 antialiased;
+        @apply bg-huella-paper text-stone-800 antialiased;
     }
     h1,
     h2,
@@ -70,7 +72,7 @@
         *::before,
         *::after {
             transition-duration: 0ms !important;
-            animation-duration: 0ms !important;
+            animation-duration: var(--reduced-motion-duration, 0ms) !important;
         }
     }
 }
@@ -430,7 +432,7 @@
         @apply bg-huella-paper;
     }
     .public-shell:has(.floating-animals-hero) {
-        background-color: #fff;
+        background-color: var(--color-huella-paper);
     }
     .public-shell main {
         @apply py-8 sm:py-12;
@@ -501,12 +503,12 @@
         inset: calc(-5.5rem - 3rem - env(safe-area-inset-top, 0px)) 0 0;
         z-index: -1;
         pointer-events: none;
-        background-color: #eaf3e8;
+        background-color: var(--color-huella-paper);
         background-image:
             linear-gradient(
                 to bottom,
                 transparent calc(100% - clamp(8rem, 14vw, 14rem)),
-                #fff 100%
+                #fbf9f4 100%
             ),
             url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M40 0H0V40' fill='none' stroke='%23153e31' stroke-opacity='.19' stroke-width='1'/%3E%3C/svg%3E");
         background-size:
@@ -718,6 +720,59 @@
         gap: clamp(0.75rem, 2vw, 1.75rem);
         align-items: stretch;
     }
+    .featured-animals {
+        padding-block: 1.5rem;
+        scroll-margin-top: 5.5rem;
+    }
+    .featured-animals-heading { margin-bottom: 1.25rem; }
+    .featured-animals-heading h2 { font-size: clamp(1.75rem, 3vw, 3rem); }
+    .featured-animals-heading p { margin-top: .5rem; }
+    .featured-animals .companions-grid .animal-card-photo {
+        object-fit: contain;
+        background-color: #edf0e8;
+    }
+    .featured-animals .animal-card:hover .animal-card-photo { transform: none; }
+    @media (min-width: 768px) and (min-height: 600px) {
+        .featured-animals {
+            height: calc(100svh - 5.5rem);
+            display: flex;
+            flex-direction: column;
+            padding-block: 1.25rem;
+        }
+        .featured-animals-heading { flex-shrink: 0; }
+        .featured-animals .companions-grid {
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+            max-width: calc((100svh - 19rem) * 2.1);
+            margin-inline: auto;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-rows: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+        .featured-animals .animal-card { min-height: 0; }
+        .featured-animals .animal-card > div:first-child {
+            flex: 1;
+            min-height: 0;
+        }
+        .featured-animals .companions-grid .animal-card-photo {
+            height: 100%;
+            aspect-ratio: auto;
+            object-fit: contain;
+        }
+        .featured-animals .companions-grid .animal-card-body {
+            flex: 0 0 auto !important;
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: .25rem .75rem;
+            align-items: center;
+            padding: .65rem 1rem !important;
+        }
+        .featured-animals .animal-card h3 { font-size: 1.125rem; }
+        .featured-animals .animal-card-body p { margin-top: 0 !important; }
+        .featured-animals .animal-card-body p:nth-child(2) { text-align: right; }
+        .featured-animals .animal-card-body p:last-child { text-align: right; }
+    }
     .companions-grid .animal-card-photo {
         aspect-ratio: 16 / 10;
     }
@@ -746,8 +801,108 @@
     .filter-grid > * {
         min-width: 0;
     }
-    .public-shell footer :focus-visible {
-        outline-color: #efdbc0;
+    .illustrated-footer {
+        overflow: hidden;
+        border-top: 1px solid #153e311c;
+        background: var(--color-huella-paper);
+        color: var(--color-huella-forest);
+    }
+    .footer-scene {
+        display: grid;
+        min-height: max(34rem, calc(100vw / 3 + 5rem));
+        isolation: isolate;
+    }
+    .footer-content {
+        grid-area: 1 / 1;
+        align-self: start;
+        display: grid;
+        grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr));
+        gap: clamp(2rem, 5vw, 6rem);
+        padding-top: clamp(2.5rem, 4vw, 4rem);
+        padding-bottom: 3rem;
+        background: linear-gradient(to bottom, #fbf9f4 82%, #fbf9f400);
+        position: relative;
+        z-index: 1;
+    }
+    .footer-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.625rem;
+        font-family: 'Bricolage Grotesque', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 650;
+        letter-spacing: -0.06em;
+    }
+    .footer-intro p {
+        max-width: 29ch;
+        margin-top: 1rem;
+        font-size: 1.0625rem;
+        line-height: 1.75;
+    }
+    .footer-content nav h2 {
+        margin: 0.5rem 0 1rem;
+        font-family: inherit;
+        font-size: 1.0625rem;
+        font-weight: 650;
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 6px;
+    }
+    .footer-content nav a {
+        display: block;
+        width: fit-content;
+        padding-block: 0.5rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 5px;
+    }
+    .footer-content a:hover {
+        text-decoration-line: underline;
+    }
+    .footer-meadow {
+        grid-area: 1 / 1;
+        align-self: end;
+        min-width: 0;
+        pointer-events: none;
+    }
+    .footer-meadow img {
+        display: block;
+        width: 100%;
+        height: auto;
+        mask-image: linear-gradient(to bottom, transparent, #000 24%);
+    }
+    .footer-credit {
+        display: grid;
+        gap: 0.25rem;
+        margin-top: 1rem;
+        max-width: 38ch;
+        font-size: 0.75rem;
+        line-height: 1.7;
+    }
+    @media (max-width: 639px) {
+        .footer-scene {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .footer-content {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 2rem 1.25rem;
+        }
+        .footer-intro {
+            grid-column: 1 / -1;
+        }
+        .footer-intro p {
+            max-width: 38ch;
+        }
+        .footer-meadow {
+            align-self: auto;
+            width: 140%;
+            max-width: none;
+            margin-top: -2rem;
+            margin-left: -20%;
+        }
     }
     @media (min-width: 640px) {
         .hero-photo {

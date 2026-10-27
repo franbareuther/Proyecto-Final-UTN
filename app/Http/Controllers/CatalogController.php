@@ -11,7 +11,7 @@ class CatalogController extends Controller
 {
     public function home()
     {
-        return Inertia::render('Public/Home', ['animals' => Animal::with(['photos', 'shelter'])->whereHas('shelter', fn ($q) => $q->where('active', true))->where('availability_status', 'Disponible')->latest()->take(6)->get(), 'refuges' => Shelter::where('active', true)->orderBy('name')->take(3)->get(['id', 'name', 'slug', 'city', 'image_path', 'image_type'])]);
+        return Inertia::render('Public/Home', ['animals' => Animal::with(['photos', 'shelter'])->whereHas('shelter', fn ($q) => $q->where('active', true))->where('availability_status', 'Disponible')->latest()->take(6)->get(), 'refuges' => Shelter::where('active', true)->latest('id')->take(3)->get(['id', 'name', 'slug', 'city', 'image_path', 'image_type'])]);
     }
 
     public function all(Request $r)

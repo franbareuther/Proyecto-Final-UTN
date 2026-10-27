@@ -1,0 +1,195 @@
+@layer components {
+    .contact-section {
+        min-height: calc(100svh - 5.5rem);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-block: clamp(1.5rem, 3vh, 2.5rem);
+        border-top: 1px solid #153e3120;
+        color: #153e31;
+        scroll-margin-top: 7rem;
+    }
+    .contact-heading {
+        text-align: center;
+        margin: 0 auto 1.5rem;
+        max-width: 52rem;
+    }
+    .contact-heading h2 {
+        font-size: clamp(1.75rem, 3.4vw, 3.25rem);
+        line-height: 1.08;
+        letter-spacing: -0.045em;
+        font-weight: 600;
+    }
+    .contact-heading > p {
+        max-width: 44ch;
+        margin: 0.75rem auto 0;
+        color: #5b695f;
+        line-height: 1.8;
+    }
+    .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: clamp(3rem, 7vw, 7rem);
+        width: 100%;
+        max-width: 64rem;
+        margin-inline: auto;
+        align-items: center;
+    }
+    .contact-aside {
+        min-width: 0;
+        width: 100%;
+        padding-top: 0;
+    }
+    .contact-section h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+    }
+    .contact-aside > div > p {
+        max-width: 40ch;
+        margin-top: 0.75rem;
+        line-height: 1.8;
+        color: #5b695f;
+    }
+    .contact-dog {
+        margin-top: 1.25rem;
+        max-width: 30rem;
+    }
+    .contact-dog-run {
+        width: 100%;
+        max-width: 42vh;
+        aspect-ratio: 3 / 2;
+        margin-inline: auto;
+        background-image: url('/images/contact/perro-ciclo-carrera.png');
+        background-repeat: no-repeat;
+        background-size: 400% 200%;
+        mix-blend-mode: multiply;
+        animation: contact-dog-run 1.2s steps(1, end) infinite;
+        --reduced-motion-duration: 1.6s;
+    }
+    .contact-form {
+        min-width: 0;
+        width: 100%;
+        max-width: 30rem;
+        justify-self: end;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+    }
+    .contact-form > div > p {
+        margin-top: 0.4rem;
+        font-size: 0.875rem;
+        line-height: 1.7;
+        color: #5b695f;
+    }
+    .contact-fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+    .contact-form textarea {
+        resize: vertical;
+        min-height: 5.5rem;
+    }
+    .contact-form input,
+    .contact-form select,
+    .contact-form textarea {
+        width: 100%;
+        border: 0;
+        border-bottom: 1px solid #9daa9c;
+        border-radius: 0;
+        box-shadow: none;
+        padding: 0.6rem 0;
+        min-height: 2.5rem;
+        background-color: transparent;
+        color: #153e31;
+        font: inherit;
+        font-size: 1rem;
+    }
+    .contact-submit-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+    }
+    .contact-submit-row > span {
+        max-width: 24ch;
+        font-size: 0.7rem;
+        line-height: 1.6;
+        color: #5b695f;
+    }
+    .contact-success {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border: 1px solid #b9d0bb;
+        border-radius: 0.75rem;
+        padding: 0.9rem;
+        background: #edf4e9;
+        font-size: 0.875rem;
+    }
+    @media (max-width: 767px) {
+        .contact-grid {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.75rem;
+        }
+        .contact-aside {
+            padding-top: 0;
+        }
+        .contact-dog {
+            max-width: 14rem;
+            margin-top: 0;
+            margin-inline: auto;
+        }
+        .contact-dog-run {
+            max-width: 10.5rem;
+        }
+        .contact-aside > div:first-child {
+            display: none;
+        }
+        .contact-heading {
+            margin-bottom: 0.75rem;
+        }
+        .contact-heading > p {
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .contact-form {
+            max-width: none;
+            gap: 0.6rem;
+        }
+        .contact-submit-row > span {
+            max-width: none;
+        }
+        .contact-submit-row {
+            gap: 0.5rem;
+        }
+    }
+    @keyframes contact-dog-run {
+        0%,
+        100% {
+            background-position: 0% 0%;
+        }
+        12.5% {
+            background-position: 33.333333% 0%;
+        }
+        25% {
+            background-position: 66.666667% 0%;
+        }
+        37.5% {
+            background-position: 100% 0%;
+        }
+        50% {
+            background-position: 0% 100%;
+        }
+        62.5% {
+            background-position: 33.333333% 100%;
+        }
+        75% {
+            background-position: 66.666667% 100%;
+        }
+        87.5% {
+            background-position: 100% 100%;
+        }
+    }
+}

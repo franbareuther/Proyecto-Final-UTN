@@ -3,13 +3,26 @@
 use App\Http\Controllers\AdoptionRequestController;
 use App\Http\Controllers\AnimalController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MedicalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShelterController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', [CatalogController::class, 'home'])->name('home');
+Route::get('/creditos-fotografias', function () {
+    $photos = json_decode(file_get_contents(public_path('images/demo/refugios/creditos.json')), true, flags: JSON_THROW_ON_ERROR);
+    $photos = array_map(function ($photo) {
+        $photo['author'] = html_entity_decode(strip_tags($photo['authorHtml']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        return $photo;
+    }, $photos);
+
+    return Inertia::render('Public/PhotoCredits', ['photos' => $photos]);
+})->name('photos.credits');
+Route::post('/contacto', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
 Route::get('/animales', [CatalogController::class, 'all'])->name('catalog');
 Route::get('/refugios', [ShelterController::class, 'index'])->name('shelters.index');
 Route::get('/refugios/{shelter}', [ShelterController::class, 'show'])->name('shelters.show');

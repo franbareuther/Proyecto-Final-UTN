@@ -1,5 +1,15 @@
 # Fotografías de demostración
 
+## Refugios comunitarios con fotografía documental
+
+Se agregaron tres instituciones de demostración (Patitas del Sur, Hogar Los Aromos y Refugio La Ribera) y seis fichas de perros. Sus nombres, ciudades y datos son ficticios. Las fotografías son documentales de refugios y animales reales y no implican afiliación ni disponibilidad actual de esos animales.
+
+Los archivos están en `public/images/demo/refugios/`; el manifiesto `creditos.json` conserva autores, enlaces originales y licencias Creative Commons individuales. Los créditos públicos están en `/creditos-fotografias`, enlazados desde el footer. Las vistas usan las miniaturas de Wikimedia y recortes de presentación, sin retoques del contenido.
+
+La carga reproducible se ejecuta con `php artisan db:seed --class=CommunitySheltersDemoSeeder` solo en local/testing. Agrega tres refugios, seis perros y sus fotos sin modificar registros existentes; repetirla no duplica datos. Se guardó un respaldo local antes de cargar la base de esta computadora. La landing destaca los tres refugios agregados más recientemente.
+
+## Fotografías de muestra originales
+
 Las fotos incluidas son ilustrativas: no representan a animales reales del refugio. Los registros demo están identificados en sus descripciones. Se almacenan localmente para no depender de servicios externos al navegar.
 
 Fuente: Unsplash, licencia general de Unsplash (https://unsplash.com/license).
