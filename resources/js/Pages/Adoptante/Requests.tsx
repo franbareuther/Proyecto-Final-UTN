@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { Application, Page } from '@/types/shelter';
-import { Pagination, RequestList, Shell, Title } from '@/Components/Shelter';
+import { Empty, Pagination, RequestList, Shell, Title } from '@/Components/Shelter';
 export default function Requests({ requests }: { requests: Page<Application> }) {
     return (
         <Shell>
@@ -13,7 +13,15 @@ export default function Requests({ requests }: { requests: Page<Application> }) 
                     Explorar animales
                 </Link>
             </Title>
-            <RequestList requests={requests.data} />
+            {requests.data.length ? (
+                <RequestList requests={requests.data} />
+            ) : (
+                <Empty>
+                    <Link href="/animales" className="btn">
+                        Explorar animales en adopción
+                    </Link>
+                </Empty>
+            )}
             <Pagination page={requests} />
         </Shell>
     );
