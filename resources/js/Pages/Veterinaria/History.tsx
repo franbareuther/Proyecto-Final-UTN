@@ -158,8 +158,9 @@ export default function History({
             </Title>
             {readOnly && (
                 <p role="status" className="card mb-6">
-                    Animal archivado · Antecedentes de solo lectura. No se admiten cargas,
-                    correcciones ni resolución de dosis.
+                    {user?.role === 'superadmin'
+                        ? 'Vista de supervisión de la red. Los registros y las aplicaciones de dosis los gestiona el equipo del refugio.'
+                        : 'Animal archivado · Antecedentes de solo lectura. No se admiten cargas, correcciones ni resolución de dosis.'}
                 </p>
             )}
             <div className="mb-6 flex flex-wrap gap-3">

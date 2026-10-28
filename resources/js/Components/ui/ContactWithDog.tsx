@@ -3,12 +3,12 @@ import { ArrowUpRight, Check } from 'lucide-react';
 import { Field } from '@/Components/Shelter';
 
 export default function ContactWithDog() {
-    const form = useForm({ name: '', email: '', subject: 'Consulta general', message: '' });
+    const form = useForm({ name: '', email: '', phone: '', subject: 'Consulta general', message: '' });
 
     return (
         <section id="contacto" aria-labelledby="contact-title" className="contact-section">
             <header className="contact-heading">
-                <h2 id="contact-title">Contacto</h2>
+                <h2 id="contact-title">Contactanos</h2>
                 <p>
                     ¿Tenés una pregunta o querés sumar tu refugio a la red? Nos encantará conocerte.
                 </p>
@@ -70,6 +70,18 @@ export default function ContactWithDog() {
                             />
                         </Field>
                     </div>
+                    <Field label="Tu teléfono" error={form.errors.phone}>
+                        <input
+                            type="tel"
+                            name="phone"
+                            autoComplete="tel"
+                            required
+                            maxLength={32}
+                            placeholder="Ej.: +54 9 11 1234 5678"
+                            value={form.data.phone}
+                            onChange={(event) => form.setData('phone', event.target.value)}
+                        />
+                    </Field>
                     <Field label="¿Sobre qué querés conversar?" error={form.errors.subject}>
                         <select
                             name="subject"

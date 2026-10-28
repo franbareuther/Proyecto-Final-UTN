@@ -267,7 +267,7 @@
         .about-sticky-panel {
             display: grid;
             grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-            grid-template-rows: max-content max-content;
+            grid-template-rows: max-content minmax(0, 1fr);
             align-content: start;
             column-gap: clamp(3rem, 6vw, 7rem);
             padding-top: clamp(1.5rem, 6svh, 3.5rem);
@@ -311,11 +311,11 @@
         .about-desktop-photo {
             display: flex;
             flex-direction: column;
-            position: absolute;
+            position: relative;
             grid-column: 2;
             grid-row: 1 / span 2;
-            inset: 0;
-            height: auto;
+            min-height: 0;
+            height: 100%;
         }
         .about-desktop-photo .about-photo-frame {
             position: absolute;
@@ -375,6 +375,57 @@
         }
         .about-choose {
             padding-bottom: 0.75rem;
+        }
+    }
+    @media (min-width: 1024px) and (max-height: 800px) {
+        .about-sticky-panel {
+            padding-block: 0.75rem;
+        }
+        .about-header {
+            padding-bottom: 0.75rem;
+        }
+        .about-header h2 {
+            font-size: clamp(2.25rem, 4vw, 3rem);
+        }
+        .about-choose {
+            padding-bottom: 0.75rem;
+        }
+        .about-guide-heading h3 {
+            font-size: 1.75rem;
+        }
+        .about-steps {
+            margin-top: 0.875rem;
+        }
+        .about-step button {
+            min-height: 3.125rem;
+            padding-block: 0.625rem;
+            font-size: 1.125rem;
+        }
+        .about-disclosure p {
+            font-size: 0.875rem;
+            line-height: 1.6;
+            padding-bottom: 0.875rem;
+        }
+        .about-desktop-photo figcaption {
+            padding: 1.25rem 1.5rem;
+        }
+        .about-photo-tags {
+            margin-top: 0.625rem;
+        }
+    }
+    /* Very short windows need normal page scrolling to keep every step reachable. */
+    @media (max-height: 560px) {
+        .about-scroll-track {
+            height: auto;
+        }
+        .about-sticky-panel {
+            position: relative;
+            top: auto;
+            height: auto;
+        }
+        .about-journey,
+        .about-journey-layout {
+            height: auto;
         }
     }
     @media (prefers-reduced-motion: reduce) {

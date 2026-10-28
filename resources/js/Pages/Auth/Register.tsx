@@ -21,11 +21,14 @@ export default function Register() {
                     onSubmit={(e) => {
                         e.preventDefault();
                         f.post('/register', {
-                            onFinish: () => f.reset('password', 'password_confirmation'),
+                            onSuccess: () => f.reset('password', 'password_confirmation'),
+                            onError: () => document.getElementById('registration-errors')?.scrollIntoView({ block: 'center' }),
                         });
                     }}
                 >
-                    <Errors errors={f.errors} />
+                    <div id="registration-errors" aria-live="polite">
+                        <Errors errors={f.errors} />
+                    </div>
                     {(
                         [
                             ['name', 'Nombre', 'text', 'given-name'],
@@ -45,11 +48,13 @@ export default function Register() {
                                 type={t}
                                 autoComplete={ac}
                                 required
+                                minLength={t === 'password' ? 8 : undefined}
                                 value={f.data[k]}
                                 onChange={(e) => f.setData(k, e.target.value)}
                             />
                         </Field>
                     ))}
+                    <p className="text-sm text-stone-600">Usá al menos 8 caracteres y repetí la misma contraseña.</p>
                     <button className="btn w-full" disabled={f.processing}>
                         {f.processing ? 'Creando cuenta…' : 'Crear cuenta'}
                     </button>

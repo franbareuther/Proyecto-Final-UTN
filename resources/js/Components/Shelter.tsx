@@ -15,7 +15,6 @@ import { Animal, Application, Page, Shared } from '@/types/shelter';
 import Modal from '@/Components/Modal';
 import AnimalImage from '@/Components/AnimalImage';
 import Icon, { IconName } from '@/Components/Icon';
-import DashboardLayout from '@/Components/ui/dashboard-sidebar';
 import PublicFooter from '@/Components/PublicFooter';
 
 export const date = (value: string) =>
@@ -465,6 +464,7 @@ export function Shell({
             aria-current={active ? 'page' : undefined}
             onClick={() => setOpen(false)}
             title={internal && sidebarCollapsed ? label : undefined}
+            aria-label={label}
         >
             {icon && <Icon name={icon} className="nav-link-icon h-5 w-5 shrink-0" />}
             <span className="nav-link-label">{label}</span>
@@ -472,9 +472,18 @@ export function Shell({
     );
     const primaryNavigation = (
         <>
-            {internal &&
-                superadmin &&
-                navLink('/superadmin/refugios', 'Gestionar refugios', undefined, 'building')}
+            {internal && superadmin && (
+                <>
+                    {navLink('/superadmin', 'Resumen de la red', currentPath === '/superadmin', 'dashboard')}
+                    {navLink('/superadmin/refugios', 'Gestionar refugios', undefined, 'building')}
+                    {navLink('/superadmin/animales', 'Todos los animales', currentPath.startsWith('/superadmin/animales'), 'paw')}
+                    {navLink('/superadmin/solicitudes', 'Solicitudes', currentPath.startsWith('/superadmin/solicitudes'), 'clipboard')}
+                    {navLink('/superadmin/adopciones', 'Adopciones', undefined, 'heart')}
+                    {navLink('/superadmin/controles', 'Controles de la red', undefined, 'medical')}
+                    {navLink('/superadmin/dosis', 'Vacunas y dosis', undefined, 'calendar')}
+                    {navLink('/superadmin/mensajes', 'Mensajes', undefined, 'mail')}
+                </>
+            )}
             {internal && admin && (
                 <>
                     {navLink('/admin', 'Resumen', undefined, 'dashboard')}
@@ -521,6 +530,7 @@ export function Shell({
             className="nav-link nav-link-danger text-left"
             onClick={() => setOpen(false)}
             title={internal && sidebarCollapsed ? 'Salir' : undefined}
+            aria-label="Salir"
         >
             <Icon name="logout" className="nav-link-icon h-5 w-5 shrink-0" />
             <span className="nav-link-label">Salir</span>
@@ -560,13 +570,10 @@ export function Shell({
         >
             <Icon name="paw" className="h-9 w-9 shrink-0" />
             <span className="font-display text-3xl font-bold leading-none tracking-tight">
-                huellitas
+                {internal ? 'huella' : 'huellitas'}
             </span>
         </Link>
     );
-    if (internal && (admin || superadmin)) {
-        return <DashboardLayout sidebarContent={sidebar}>{children}</DashboardLayout>;
-    }
     return (
         <div className={'min-h-screen ' + (internal ? 'internal-shell' : 'public-shell')}>
             <a className="skip-link" href="#main">
@@ -647,6 +654,13 @@ export function Shell({
                                 {navLink('/', 'Inicio')}
                                 {primaryNavigation}
                                 {auth.user && accountNavigation}
+                                {internal && sidebar && (
+                                    <div onClick={(event) => {
+                                        if ((event.target as HTMLElement).closest('button, a')) setOpen(false);
+                                    }}>
+                                        {sidebar}
+                                    </div>
+                                )}
                                 {internal && navLink(catalogUrl, 'Ver sitio público')}
                                 {internal && logoutLink}
                             </div>
@@ -692,13 +706,14 @@ export function Shell({
                             </button>
                         </div>
                         <nav
-                            aria-label="Panel del refugio"
+                            aria-label={superadmin ? 'Panel de administración' : 'Panel del refugio'}
                             className="mt-5 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto"
                         >
                             {navigation}
+                            {!sidebarCollapsed && sidebar}
                         </nav>
                         <div className="sidebar-footer mt-3 flex flex-col gap-1 border-t border-stone-100 pt-3">
-                            <Link href={catalogUrl} className="nav-link">
+                            <Link href={catalogUrl} className="nav-link" aria-label="Ver sitio público" title={sidebarCollapsed ? 'Ver sitio público' : undefined}>
                                 <Icon name="arrow" className="nav-link-icon h-5 w-5 shrink-0" />
                                 <span className="nav-link-label">Ver sitio público</span>
                             </Link>

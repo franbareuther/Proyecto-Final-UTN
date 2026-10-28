@@ -1,6 +1,6 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { Errors, Field, Shell } from '@/Components/Shelter';
+import { Errors, Field, Shell, Title } from '@/Components/Shelter';
 import ShelterForm from '@/Components/ShelterForm';
 import { Refuge } from '@/types/shelter';
 
@@ -123,7 +123,34 @@ export default function Shelters({ shelters }: { shelters: Refuge[] }) {
     return (
         <Shell internal sidebar={refugeNavigation}>
             <Head title="Administrar refugios" />
-            <div className="min-w-0 rounded-lg border border-stone-200 bg-white p-4 sm:p-5">
+            <Title
+                title="Gestionar refugios"
+                text="Administrá los datos de cada refugio y las cuentas de su equipo."
+            >
+                <button
+                    type="button"
+                    className="btn"
+                    onClick={() => {
+                        setSelected(null);
+                        setTab('profile');
+                    }}
+                >
+                    Nuevo refugio
+                </button>
+            </Title>
+            <div className="mb-6 grid grid-cols-2 gap-2.5 sm:mb-8 sm:grid-cols-3 sm:gap-4">
+                {[
+                    ['Refugios registrados', shelters.length],
+                    ['Refugios activos', shelters.filter((item) => item.active).length],
+                    ['Cuentas del equipo', shelters.reduce((total, item) => total + (item.staff?.length ?? 0), 0)],
+                ].map(([label, value]) => (
+                    <div key={label} className="min-w-0 rounded-lg border border-stone-200 bg-white p-3 sm:rounded-xl sm:p-5">
+                        <p className="text-xs leading-snug text-stone-500 sm:text-sm">{label}</p>
+                        <p className="mt-2 text-2xl font-semibold leading-none text-emerald-900 sm:mt-3 sm:text-4xl">{value}</p>
+                    </div>
+                ))}
+            </div>
+            <div className="card min-w-0 w-full">
                 {shelter && (
                     <div className="mb-4 flex gap-4 border-b border-stone-200 text-sm">
                         <button
@@ -152,11 +179,17 @@ export default function Shelters({ shelters }: { shelters: Refuge[] }) {
                 )}
                 {tab === 'profile' && (
                     <section>
-                        <h2 className="mb-4 text-base font-semibold">
-                            {shelter ? shelter.name : 'Nuevo refugio'}
-                        </h2>
+                        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                            <h2 className="text-xl font-semibold">
+                                {shelter ? shelter.name : 'Nuevo refugio'}
+                            </h2>
+                            {shelter && (
+                                <Link className="btn-secondary" href={`/refugios/${shelter.slug}`}>
+                                    Ver perfil público
+                                </Link>
+                            )}
+                        </div>
                         <ShelterForm
-                            compact
                             key={shelter ? JSON.stringify(shelter) : 'new'}
                             shelter={shelter}
                         />

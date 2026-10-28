@@ -4,6 +4,7 @@ import { AnimalCard, Empty, Shell } from '@/Components/Shelter';
 import FloatingAnimalsHero from '@/Components/ui/FloatingAnimalsHero';
 import About from '@/Components/ui/About';
 import ContactWithDog from '@/Components/ui/ContactWithDog';
+import WhoWeAre from '@/Components/ui/WhoWeAre';
 import Icon from '@/Components/Icon';
 import ShelterImage from '@/Components/ShelterImage';
 
@@ -72,6 +73,7 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
                 </div>
                 {!refuges.length && <Empty>Pronto conocerás los refugios de nuestra red.</Empty>}
             </section>
+            <WhoWeAre />
             <ContactWithDog />
         </Shell>
     );

@@ -156,7 +156,7 @@ class MultiShelterTest extends TestCase
             $this->post('/superadmin/refugios/sur/personal', [])->assertForbidden();
         }
         $this->actingAs(User::factory()->create(['role' => 'superadmin']));
-        $this->get('/dashboard')->assertRedirect('/superadmin/refugios');
+        $this->get('/dashboard')->assertRedirect('/superadmin');
         $this->post('/superadmin/refugios', ['name' => 'Nuevo', 'slug' => 'nuevo', 'active' => true])->assertSessionHasNoErrors();
         $this->post('/superadmin/refugios/nuevo/personal', ['name' => 'Ana', 'last_name' => 'Pérez', 'email' => 'admin@example.test', 'role' => 'admin', 'password' => 'clave-inicial-123', 'password_confirmation' => 'clave-inicial-123', 'shelter_id' => $a->id])->assertSessionHasNoErrors();
         $user = User::where('email', 'admin@example.test')->firstOrFail();

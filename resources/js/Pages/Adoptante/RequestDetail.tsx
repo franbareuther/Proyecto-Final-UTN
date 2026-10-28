@@ -2,7 +2,8 @@ import { Head, useForm, usePage } from '@inertiajs/react';
 import { Application, Shared } from '@/types/shelter';
 import { Badge, Confirm, date, Errors, Field, Shell, Title } from '@/Components/Shelter';
 export default function RequestDetail({ application: r }: { application: Application }) {
-    const admin = usePage<Shared>().props.auth.user?.role === 'admin';
+    const role = usePage<Shared>().props.auth.user?.role;
+    const admin = role === 'admin';
     const f = useForm({ status: '', observations: '' });
     const options: Record<string, string[]> = {
         Nueva: ['En revisión', 'Aprobada', 'Rechazada'],
@@ -10,7 +11,7 @@ export default function RequestDetail({ application: r }: { application: Applica
         Aprobada: ['Adoptado', 'Rechazada'],
     };
     return (
-        <Shell internal={admin}>
+        <Shell internal={admin || role === 'superadmin'}>
             <Head title={`Solicitud #${r.id}`} />
             <Title title={`Solicitud #${r.id}`} text={`Presentada el ${date(r.created_at)}`}>
                 <Badge>{r.status}</Badge>

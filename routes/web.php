@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MedicalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShelterController;
+use App\Http\Controllers\SuperadminController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -31,7 +32,7 @@ Route::get('/refugios/{shelter}/animales/{animal}', [CatalogController::class, '
 Route::get('/animales/{animal}', [CatalogController::class, 'show'])->name('animals.show');
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', fn () => redirect(match (auth()->user()->role) {
-        'superadmin' => '/superadmin/refugios', 'admin' => '/admin',default => '/mis-solicitudes'
+        'superadmin' => '/superadmin', 'admin' => '/admin',default => '/mis-solicitudes'
     }))->name('dashboard');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -42,6 +43,13 @@ Route::middleware('auth')->group(function () {
     });
     Route::get('/solicitudes/{adoptionRequest}', [AdoptionRequestController::class, 'show'])->name('requests.show');
     Route::middleware('role:superadmin')->prefix('superadmin')->group(function () {
+        Route::get('/', [SuperadminController::class, 'dashboard'])->name('superadmin.dashboard');
+        foreach (['animales', 'solicitudes', 'adopciones', 'controles', 'dosis'] as $view) {
+            Route::get('/'.$view, [SuperadminController::class, 'index'])->defaults('view', $view)->name('superadmin.'.$view);
+        }
+        Route::get('/animales/{animal}/historia', [SuperadminController::class, 'history'])->withTrashed()->name('superadmin.history');
+        Route::get('/solicitudes/{adoptionRequest}', [SuperadminController::class, 'application'])->name('superadmin.application');
+        Route::get('/mensajes', [ContactController::class, 'index'])->name('superadmin.messages');
         Route::get('/refugios', [ShelterController::class, 'manage'])->name('superadmin.shelters');
         Route::post('/refugios', [ShelterController::class, 'store'])->name('superadmin.shelters.store');
         Route::patch('/refugios/{shelter}', [ShelterController::class, 'update'])->name('superadmin.shelters.update');

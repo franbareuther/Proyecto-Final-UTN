@@ -15,6 +15,7 @@ export type IconName =
     | 'dashboard'
     | 'building'
     | 'clipboard'
+    | 'mail'
     | 'calendar'
     | 'medical'
     | 'user'
@@ -36,6 +37,7 @@ export default function Icon({ name, ...props }: SVGProps<SVGSVGElement> & { nam
         dashboard: 'M4 4h6v6H4V4Zm10 0h6v10h-6V4ZM4 14h6v6H4v-6Zm10 4h6v2h-6v-2Z',
         building: 'M4 21V5l8-3 8 3v16M8 8h1m6 0h1M8 12h1m6 0h1M8 16h1m6 0h1M10 21v-3h4v3',
         clipboard: 'M9 5H6a2 2 0 0 0-2 2v13h16V7a2 2 0 0 0-2-2h-3M9 3h6v4H9V3Zm0 9h6m-6 4h6',
+        mail: 'M3 5h18v14H3V5Zm0 0 9 7 9-7',
         calendar: 'M5 3v3m14-3v3M3 9h18M5 5h14a2 2 0 0 1 2 2v14H3V7a2 2 0 0 1 2-2Z',
         medical: 'M9 3h6v6h6v6h-6v6H9v-6H3V9h6V3Z',
         user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0',

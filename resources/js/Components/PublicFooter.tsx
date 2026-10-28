@@ -41,7 +41,7 @@ export default function PublicFooter({
                     <nav aria-label="Enlaces del refugio">
                         <h2>Sigamos en contacto</h2>
                         <Link href="/#contacto">Contacto</Link>
-                        <Link href="/#nosotros">Sobre Huellitas</Link>
+                        <Link href="/#sobre-huellitas">Sobre Huellitas</Link>
                         <Link href="/creditos-fotografias">Créditos de fotografías</Link>
                         <Link href={signedIn ? '/dashboard' : '/login'}>
                             {signedIn ? 'Mi espacio' : 'Ingresar a mi cuenta'}

@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import './about.css';
 @import './contact.css';
+@import './who-we-are.css';
 @import './catalog.css';
 @config "../../tailwind.config.js";
 
@@ -197,6 +198,7 @@
     }
     .internal-sidebar.is-collapsed {
         width: 5.25rem;
+        padding-inline: 0.5rem;
     }
     .internal-sidebar .site-brand {
         min-width: 0;
@@ -211,16 +213,34 @@
     }
     .internal-sidebar.is-collapsed .site-brand span,
     .internal-sidebar.is-collapsed .nav-link-label {
-        width: 0;
-        opacity: 0;
-        overflow: hidden;
+        display: none;
     }
     .internal-sidebar.is-collapsed .internal-sidebar-header {
         flex-direction: column;
+        flex-shrink: 0;
+    }
+    .internal-sidebar.is-collapsed .site-brand {
+        width: 2.75rem;
+        justify-content: center;
+        gap: 0;
+    }
+    .internal-sidebar nav {
+        scrollbar-width: thin;
+    }
+    .internal-sidebar .nav-link {
+        flex-shrink: 0;
     }
     .internal-sidebar.is-collapsed .nav-link {
+        align-self: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        min-height: 2.75rem;
         justify-content: center;
-        padding-inline: 0.75rem;
+        gap: 0;
+        padding: 0;
+    }
+    .internal-sidebar.is-collapsed .sidebar-footer {
+        flex-shrink: 0;
     }
     .sidebar-toggle {
         @apply inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-green-700 transition hover:bg-emerald-50 hover:text-green-800;
@@ -728,7 +748,7 @@
     .featured-animals-heading h2 { font-size: clamp(1.75rem, 3vw, 3rem); }
     .featured-animals-heading p { margin-top: .5rem; }
     .featured-animals .companions-grid .animal-card-photo {
-        object-fit: contain;
+        object-fit: cover;
         background-color: #edf0e8;
     }
     .featured-animals .animal-card:hover .animal-card-photo { transform: none; }
@@ -744,8 +764,6 @@
             flex: 1;
             min-height: 0;
             width: 100%;
-            max-width: calc((100svh - 19rem) * 2.1);
-            margin-inline: auto;
             grid-template-columns: repeat(3, minmax(0, 1fr));
             grid-template-rows: repeat(2, minmax(0, 1fr));
             gap: 1rem;
@@ -758,7 +776,7 @@
         .featured-animals .companions-grid .animal-card-photo {
             height: 100%;
             aspect-ratio: auto;
-            object-fit: contain;
+            object-fit: cover;
         }
         .featured-animals .companions-grid .animal-card-body {
             flex: 0 0 auto !important;
