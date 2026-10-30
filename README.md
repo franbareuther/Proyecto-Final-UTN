@@ -22,12 +22,16 @@ php artisan migrate
 php artisan storage:link
 # Opcional: definir DEMO_PASSWORD (mínimo 12 caracteres) en .env
 php artisan db:seed --class=DemoSeeder
+# Opcional: actividad de muestra para el panel de cada refugio activo
+php artisan db:seed --class=DashboardActivityDemoSeeder
 php artisan serve
 ```
 
 En otra terminal ejecutar `npm run dev` y abrir http://localhost:8000. Con `npm run build` se pueden usar los recursos compilados sin mantener Vite en ejecución.
 
 Cuentas demo: `admin@huella.test` y `adoptante@huella.test`; contraseña elegida en DEMO_PASSWORD. DemoSeeder solo funciona en local/testing y no crea superadministradores. Crear explícitamente el primer superadministrador con `php artisan shelter:create-staff`, elegir `superadmin`; luego crea refugios y sus administradores desde su panel. No hay perfil veterinario ni contraseña fija versionada.
+
+`DashboardActivityDemoSeeder` (solo local/testing) agrega a cada refugio activo nueve fichas [DEMOSTRACIÓN] con solicitudes en todos los estados, cinco adopciones repartidas en los últimos seis meses, tratamientos, controles y dosis pendientes. Usa los servicios de adopción y salud, por lo que respeta historial y auditoría. Crea adoptantes de muestra con contraseña aleatoria y, si un refugio no tiene administrador, una cuenta `equipo.<slug>@huella.test`. Repetirlo no duplica fichas y se puede aplicar sobre una base existente.
 
 ## Verificar
 
