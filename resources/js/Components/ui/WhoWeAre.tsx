@@ -23,10 +23,7 @@ export default function WhoWeAre() {
                         <h3 id="who-we-are-team-title">Quienes hicimos posible este proyecto</h3>
                         <ul aria-labelledby="who-we-are-team-title">
                             {team.map((name) => (
-                                <li key={name}>
-                                    <Icon name="paw" className="h-4 w-4 shrink-0" />
-                                    {name}
-                                </li>
+                                <li key={name}>{name}</li>
                             ))}
                         </ul>
                     </div>

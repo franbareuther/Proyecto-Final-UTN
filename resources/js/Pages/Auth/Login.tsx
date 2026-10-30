@@ -9,12 +9,6 @@ export default function Login({ status }: { status?: string }) {
             <AuthLayout
                 title="Qué bueno volver a verte."
                 text="Ingresá para continuar tu historia con el refugio."
-                image="/images/demo/perro.jpg"
-                imageAlt="Un perro dorado sentado al aire libre, con una flor en la boca"
-                points={[
-                    'Si adoptás, seguí el estado y el historial de tus solicitudes.',
-                    'Si sos parte de un refugio, entrá a su panel para gestionar animales, solicitudes y cuidados.',
-                ]}
             >
                 {status && (
                     <p role="status" className="mb-4">

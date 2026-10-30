@@ -15,13 +15,6 @@ export default function Register() {
             <AuthLayout
                 title="Tu próxima historia empieza acá."
                 text="Creá tu cuenta para solicitar una adopción."
-                image="/images/demo/gato.jpg"
-                imageAlt="Un gato blanco y negro de ojos verdes mirando a la cámara"
-                points={[
-                    'Podés mirar los perfiles sin cuenta; la necesitás para enviar una solicitud.',
-                    'Cada refugio evalúa la solicitud y te acompaña en los siguientes pasos.',
-                    'En Mis solicitudes seguís el estado y el historial de cada una.',
-                ]}
             >
                 <form
                     className="card space-y-5 sm:p-8"
