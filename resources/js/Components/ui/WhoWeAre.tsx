@@ -10,7 +10,7 @@ export default function WhoWeAre() {
             </header>
             <div className="who-we-are-main">
                 <div className="who-we-are-intro">
-                    <h2 id="who-we-are-title">Somos <span>huellitas.</span></h2>
+                    <h2 id="who-we-are-title">Somos <span>Huellita.</span></h2>
                     <p>
                         Un equipo que está construyendo una herramienta para refugios y personas
                         que quieren adoptar. El proyecto nació en la UTN, con una pregunta concreta:

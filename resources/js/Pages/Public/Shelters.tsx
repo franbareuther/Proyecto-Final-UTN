@@ -15,7 +15,7 @@ export default function Shelters({
     useEffect(() => form.setData('q', filters.q || ''), [filters.q]);
     return (
         <Shell>
-            <Head title="Refugios de Huellitas" />
+            <Head title="Refugios de Huellita" />
             <Title
                 title="Elegí un refugio"
                 text="Conocé a quienes cuidan cada historia y descubrí los animales que esperan un hogar."
@@ -54,7 +54,7 @@ export default function Shelters({
                             <ShelterImage src={s.image_url} name={s.name} kind={s.image_type} />
                             <h2 className="text-2xl font-semibold text-emerald-950">{s.name}</h2>
                             <p className="text-sm text-stone-600">
-                                {s.city || 'Refugio de la red Huellitas'}
+                                {s.city || 'Refugio de la red Huellita'}
                             </p>
                             <p className="line-clamp-3 text-stone-600">
                                 {s.description || 'Conocé al refugio y a sus animales en adopción.'}

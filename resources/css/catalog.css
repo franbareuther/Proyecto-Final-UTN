@@ -1,14 +1,29 @@
 @layer components {
     .catalog-heading {
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1.75rem;
+        border-bottom: 1px solid #153e3120;
+    }
+    .catalog-heading-eyebrow {
+        color: #a34f32;
+        font-size: 0.875rem;
+        font-weight: 600;
     }
     .catalog-heading h1 {
+        max-width: 22ch;
+        margin-top: 0.5rem;
         color: #153e31;
-        font-size: clamp(1rem, 4.7vw, 3rem);
+        font-size: clamp(1.875rem, 5vw, 3rem);
         font-weight: 600;
         letter-spacing: -0.04em;
-        line-height: 1.2;
-        white-space: nowrap;
+        line-height: 1.1;
+        text-wrap: balance;
+    }
+    .catalog-heading-copy {
+        max-width: 42rem;
+        margin-top: 1rem;
+        color: #57534e;
+        line-height: 1.65;
     }
     .catalog-tools {
         margin-bottom: 1.5rem;

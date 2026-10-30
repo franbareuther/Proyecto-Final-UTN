@@ -17,7 +17,7 @@ class MedicalRequest extends FormRequest
         $rules = match ($this->route('type')) {
             'consultations' => ['consultation_date' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'], 'reason' => ['required', 'string', 'max:255'], 'symptoms' => ['nullable', 'string', 'max:5000'], 'diagnosis' => ['required', 'string', 'max:5000'], 'instructions' => ['nullable', 'string', 'max:5000']],
             'vaccinations' => $this->vaccinationRules(),
-            'treatments' => ['description' => ['required', 'string', 'max:5000'], 'start_date' => ['required', 'date_format:Y-m-d'], 'estimated_end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:start_date'], 'status' => ['required', Rule::in(['Activo', 'Finalizado', 'Suspendido'])]],
+            'treatments' => ['treatment_type' => ['sometimes', 'required', Rule::in(['Tratamiento', 'Desparasitación', 'Medicación'])], 'description' => ['required', 'string', 'max:5000'], 'medication' => ['nullable', 'string', 'max:255'], 'start_date' => ['required', 'date_format:Y-m-d'], 'estimated_end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:start_date'], 'status' => ['required', Rule::in(['Activo', 'Finalizado', 'Suspendido'])]],
             'controls' => ['control_type' => ['required', 'string', 'max:255'], 'scheduled_date' => ['required', 'date_format:Y-m-d'], 'status' => ['required', Rule::in(['Pendiente', 'Realizado', 'Cancelado'])]],
             default => abort(404),
         };

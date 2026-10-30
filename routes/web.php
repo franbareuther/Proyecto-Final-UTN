@@ -25,6 +25,10 @@ Route::get('/creditos-fotografias', function () {
 })->name('photos.credits');
 Route::post('/contacto', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
 Route::get('/animales', [CatalogController::class, 'all'])->name('catalog');
+Route::middleware('guest')->group(function () {
+    Route::get('/registro-refugio', [ShelterController::class, 'registerForm'])->name('shelters.register');
+    Route::post('/registro-refugio', [ShelterController::class, 'register'])->middleware('throttle:5,1')->name('shelters.register.store');
+});
 Route::get('/refugios', [ShelterController::class, 'index'])->name('shelters.index');
 Route::get('/refugios/{shelter}', [ShelterController::class, 'show'])->name('shelters.show');
 Route::get('/refugios/{shelter}/animales', [CatalogController::class, 'index'])->name('shelters.catalog');

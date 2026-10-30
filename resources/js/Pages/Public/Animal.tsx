@@ -18,6 +18,8 @@ export default function Animal({ animal: a }: { animal: AnimalType }) {
     const index = Math.min(selected, photos.length - 1);
     const canApply =
         a.availability_status === 'Disponible' && (!auth.user || auth.user.role === 'adoptante');
+    // El servidor vuelve a autorizar; esto solo evita mostrar accesos que el usuario no puede usar.
+    const ownStaff = auth.user?.role === 'admin' && auth.user.shelter_id === a.shelter?.id;
     return (
         <Shell>
             <Head title={`Conocé a ${a.name}`} />
@@ -122,8 +124,20 @@ export default function Animal({ animal: a }: { animal: AnimalType }) {
                     <p className="mt-4 break-words text-lg text-stone-600">
                         {a.species} · {a.breed || 'Raza sin especificar'}
                     </p>
+                    {ownStaff && (
+                        <div className="mt-5 flex flex-wrap gap-3" aria-label="Acciones del refugio">
+                            <Link className="btn-secondary" href={`/admin/animales/${a.id}/edit`}>
+                                Editar ficha
+                            </Link>
+                            <Link className="btn-secondary" href={`/veterinaria/${a.id}`}>
+                                Historia clínica
+                            </Link>
+                        </div>
+                    )}
                     <dl className="my-7 grid min-w-0 grid-cols-2 gap-x-4 gap-y-6 rounded-2xl border border-stone-200 bg-white p-5 sm:p-6">
                         {[
+                            ['Especie', a.species],
+                            ['Raza', a.breed || 'Sin especificar'],
                             ['Sexo', a.sex],
                             ['Tamaño', a.size],
                             ['Color', a.color],
@@ -135,6 +149,8 @@ export default function Animal({ animal: a }: { animal: AnimalType }) {
                                       ? `${a.estimated_age} meses aprox.`
                                       : 'A confirmar con el refugio',
                             ],
+                            ['En el refugio desde', date(a.entry_date)],
+                            ['Estado', a.availability_status],
                         ].map(([label, value]) => (
                             <div className="min-w-0" key={label}>
                                 <dt className="text-xs font-semibold uppercase tracking-wider text-stone-600">
@@ -151,10 +167,10 @@ export default function Animal({ animal: a }: { animal: AnimalType }) {
                             id="story-title"
                             className="text-xl font-semibold tracking-tight text-emerald-950"
                         >
-                            Un poquito sobre mí
+                            Mi historia
                         </h2>
                         <p className="reading-copy mt-3 whitespace-pre-line break-words leading-relaxed text-stone-700">
-                            {a.description}
+                            {a.description || 'El refugio pronto compartirá mi historia.'}
                         </p>
                     </section>
                     <section aria-labelledby="personality-title" className="mt-7">
@@ -183,7 +199,44 @@ export default function Animal({ animal: a }: { animal: AnimalType }) {
                             {a.public_health_info ||
                                 'Consultá al refugio para conocer los cuidados que necesito.'}
                         </p>
+                        <p className="mt-3 text-xs leading-relaxed text-emerald-900/80">
+                            Es la información de salud que el refugio comparte. Mi historia clínica
+                            completa la lleva su equipo.
+                        </p>
                     </section>
+                    {a.shelter && (
+                        <section
+                            aria-labelledby="shelter-title"
+                            className="mt-7 rounded-2xl border border-stone-200 bg-white p-5 sm:p-6"
+                        >
+                            <p className="text-xs font-semibold uppercase tracking-wider text-stone-600">
+                                Me cuida
+                            </p>
+                            <h2
+                                id="shelter-title"
+                                className="mt-2 break-words text-lg font-semibold text-emerald-950"
+                            >
+                                {a.shelter.name}
+                            </h2>
+                            <p className="mt-1 text-sm text-stone-600">
+                                {a.shelter.city || 'Localidad sin informar'}
+                            </p>
+                            {(a.shelter.phone || a.shelter.email) && (
+                                <p className="mt-3 break-words text-sm text-stone-700">
+                                    {a.shelter.phone && <>Teléfono: {a.shelter.phone}</>}
+                                    {a.shelter.phone && a.shelter.email && <br />}
+                                    {a.shelter.email && (
+                                        <a className="text-link" href={`mailto:${a.shelter.email}`}>
+                                            {a.shelter.email}
+                                        </a>
+                                    )}
+                                </p>
+                            )}
+                            <Link className="text-link mt-4" href={`/refugios/${a.shelter.slug}`}>
+                                Conocer el refugio <Icon name="arrow" className="h-4 w-4" />
+                            </Link>
+                        </section>
+                    )}
                     <section
                         aria-label="Solicitud de adopción"
                         className="mt-7 rounded-2xl border border-stone-200 bg-white p-5 sm:p-6"

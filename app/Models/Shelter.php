@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Shelter extends Model
 {
-    protected $fillable = ['name', 'slug', 'description', 'city', 'address', 'email', 'phone', 'active', 'image_type'];
+    protected $fillable = ['name', 'slug', 'description', 'city', 'address', 'email', 'phone', 'website', 'instagram', 'facebook', 'active', 'image_type'];
 
     protected $appends = ['image_url'];
 

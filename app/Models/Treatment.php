@@ -9,7 +9,7 @@ class Treatment extends Model
 {
     use ScopedToStaffShelter;
 
-    protected $fillable = ['description', 'start_date', 'estimated_end_date', 'status', 'observations', 'recorded_by', 'updated_by', 'practitioner_name'];
+    protected $fillable = ['treatment_type', 'description', 'medication', 'start_date', 'estimated_end_date', 'status', 'observations', 'recorded_by', 'updated_by', 'practitioner_name'];
 
     public function animal()
     {

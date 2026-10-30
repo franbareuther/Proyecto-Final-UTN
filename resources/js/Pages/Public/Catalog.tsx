@@ -108,17 +108,27 @@ export default function Catalog({
     }, [f.errors]);
     return (
         <Shell>
-            <Head title="Encontrá tu compañero" />
-            <header className="catalog-heading">
+            <Head title={shelter ? `Animales de ${shelter.name}` : 'Encontrá tu compañero'} />
+            <header className="catalog-heading" aria-labelledby="catalog-title">
                 {shelter && (
                     <Link className="text-link mb-4 inline-flex" href={`/refugios/${shelter.slug}`}>
                         {shelter.name} · Ver refugio
                     </Link>
                 )}
-                <h1>
-                    Tu próximo compañero{' '}
-                    <span className="font-medium text-huella-clay">está por acá.</span>
+                <p className="catalog-heading-eyebrow">
+                    {shelter
+                        ? `Animales en adopción${shelter.city ? ` en ${shelter.city}` : ''}`
+                        : 'Animales en adopción de toda la red'}
+                </p>
+                <h1 id="catalog-title">
+                    {shelter ? `Conocé a los amigos de ${shelter.name} ` : 'Conocé a nuestros amigos '}
+                    <span className="font-medium text-huella-clay">que buscan un hogar.</span>
                 </h1>
+                <p className="catalog-heading-copy">
+                    {shelter
+                        ? `Cada uno tiene una historia única. El equipo de ${shelter.name} los cuida mientras esperan una oportunidad para formar parte de una familia.`
+                        : 'Cada uno tiene una historia única y está esperando una oportunidad para formar parte de una familia. Conocé sus perfiles y el refugio que los acompaña.'}
+                </p>
             </header>
             <section aria-label="Búsqueda y filtros" className="catalog-tools">
                 <form

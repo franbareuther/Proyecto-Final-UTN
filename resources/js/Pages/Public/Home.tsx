@@ -5,13 +5,14 @@ import FloatingAnimalsHero from '@/Components/ui/FloatingAnimalsHero';
 import About from '@/Components/ui/About';
 import ContactWithDog from '@/Components/ui/ContactWithDog';
 import WhoWeAre from '@/Components/ui/WhoWeAre';
+import Team from '@/Components/ui/Team';
 import Icon from '@/Components/Icon';
 import ShelterImage from '@/Components/ShelterImage';
 
 export default function Home({ animals, refuges = [] }: { animals: Animal[]; refuges?: Refuge[] }) {
     return (
         <Shell>
-            <Head title="Encontrá a tu próximo compañero de huellitas" />
+            <Head title="Encontrá a tu próximo compañero en Huellita" />
             <FloatingAnimalsHero />
             <About />
             <section aria-labelledby="featured-title" className="featured-animals">
@@ -64,7 +65,7 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
                                 className="mb-4"
                             />
                             <h3 className="text-2xl font-semibold">{s.name}</h3>
-                            <p className="mt-2 text-sm text-stone-600">{s.city || 'Red Huellitas'}</p>
+                            <p className="mt-2 text-sm text-stone-600">{s.city || 'Red Huellita'}</p>
                             <p className="mt-4 text-sm text-emerald-800">
                                 Conocer su historia y sus animales →
                             </p>
@@ -74,6 +75,7 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
                 {!refuges.length && <Empty>Pronto conocerás los refugios de nuestra red.</Empty>}
             </section>
             <WhoWeAre />
+            <Team />
             <ContactWithDog />
         </Shell>
     );

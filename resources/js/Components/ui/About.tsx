@@ -48,9 +48,9 @@ const journeys = [
         label: 'Soy refugio',
         title: 'El trabajo de cada día, organizado.',
         intro: 'Los animales, sus cuidados y las solicitudes tienen su lugar.',
-        cta: 'Ingresar al panel',
-        href: '/dashboard',
-        note: 'El acceso del equipo lo habilita la administración de la red.',
+        cta: 'Registrar mi refugio',
+        href: '/registro-refugio',
+        note: 'Si tu refugio ya tiene cuenta, ingresá desde Ingresar.',
         steps: [
             {
                 title: 'Presentá a cada animal',
@@ -240,7 +240,7 @@ export default function About() {
             >
                 <div ref={panel} className="about-sticky-panel">
                     <header id="nosotros" className="about-header">
-                        <h2 id="about-title">Conoce huellitas</h2>
+                        <h2 id="about-title">Conocé Huellita</h2>
                     </header>
                     <TabGroup
                         className="about-interactive"
@@ -263,7 +263,7 @@ export default function About() {
                         }}
                     >
                         <div id="como-funciona" className="about-choose">
-                            <TabList className="about-tabs" aria-label="Cómo funciona Huellitas">
+                            <TabList className="about-tabs" aria-label="Cómo funciona Huellita">
                                 {journeys.map((item, index) => (
                                     <Tab key={item.label} className="about-tab">
                                         <Icon

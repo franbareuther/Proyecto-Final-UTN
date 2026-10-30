@@ -17,9 +17,9 @@ export default function PublicFooter({
             <div className="footer-scene">
                 <div className="site-gutter footer-content">
                     <div className="footer-intro">
-                        <Link href="/" className="footer-brand" aria-label="Huellitas, inicio">
+                        <Link href="/" className="footer-brand" aria-label="Huellita, inicio">
                             <Icon name="paw" className="h-7 w-7" />
-                            <span>huellitas.</span>
+                            <span>huellita.</span>
                         </Link>
                         <p>
                             Un encuentro puede cambiar dos vidas. Acompañamos el camino hacia una
@@ -41,7 +41,8 @@ export default function PublicFooter({
                     <nav aria-label="Enlaces del refugio">
                         <h2>Sigamos en contacto</h2>
                         <Link href="/#contacto">Contacto</Link>
-                        <Link href="/#sobre-huellitas">Sobre Huellitas</Link>
+                        <Link href="/#sobre-huellitas">Sobre Huellita</Link>
+                        <Link href="/#equipo">Nuestro equipo</Link>
                         <Link href="/creditos-fotografias">Créditos de fotografías</Link>
                         <Link href={signedIn ? '/dashboard' : '/login'}>
                             {signedIn ? 'Mi espacio' : 'Ingresar a mi cuenta'}

@@ -158,7 +158,7 @@ export function SidebarNav({
                             onClick={onNavigate}
                             className="flex min-h-11 items-center justify-between rounded-md px-2 text-xs hover:bg-stone-50"
                         >
-                            Ir al sitio de Huella <ArrowUpRight size={15} />
+                            Ir al sitio de Huellita <ArrowUpRight size={15} />
                         </Link>
                         <Link
                             href={
@@ -233,7 +233,7 @@ export function SidebarNav({
                     Salir
                 </Link>
                 <p className="px-3 pt-4 text-[10px] tracking-wide text-stone-400">
-                    HUELLA · PROYECTO UTN
+                    HUELLITA · PROYECTO UTN
                 </p>
             </div>
         </div>
@@ -250,7 +250,7 @@ export default function DashboardLayout({
     } = usePage<Shared>();
     const path = url.split(/[?#]/)[0];
     const superadmin = auth.user?.role === 'superadmin';
-    const workspace = superadmin ? 'Huella' : currentShelter?.name || 'Mi refugio';
+    const workspace = superadmin ? 'Huellita' : currentShelter?.name || 'Mi refugio';
     const role = superadmin ? 'Superadministrador' : 'Administrador';
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);

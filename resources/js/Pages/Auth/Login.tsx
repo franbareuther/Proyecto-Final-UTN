@@ -60,6 +60,12 @@ export default function Login({ status }: { status?: string }) {
                             Crear cuenta
                         </Link>
                     </div>
+                    <p className="border-t border-stone-100 pt-4 text-center text-sm text-stone-500">
+                        ¿Tu refugio todavía no está en Huellita?{' '}
+                        <Link href="/registro-refugio" className="text-emerald-800 underline">
+                            Registralo
+                        </Link>
+                    </p>
                 </form>
             </div>
         </Shell>

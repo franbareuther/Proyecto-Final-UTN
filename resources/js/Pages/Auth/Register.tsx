@@ -64,6 +64,12 @@ export default function Register() {
                             Ingresá
                         </Link>
                     </p>
+                    <p className="text-center text-sm text-stone-500">
+                        ¿Representás a un refugio?{' '}
+                        <Link className="text-emerald-800 underline" href="/registro-refugio">
+                            Registrá tu refugio
+                        </Link>
+                    </p>
                 </form>
             </div>
         </Shell>

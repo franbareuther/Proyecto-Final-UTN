@@ -101,7 +101,7 @@ export default function AnimalForm({ animal: a }: { animal?: Animal }) {
                 </div>
                 {(
                     [
-                        ['description', 'Descripción'],
+                        ['description', 'Historia del animal'],
                         ['personality', 'Personalidad'],
                         [
                             'public_health_info',

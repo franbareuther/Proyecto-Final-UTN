@@ -34,7 +34,7 @@ async function render(component, props) {
                     auth: { user: null },
                     errors: {},
                     flash: {},
-                    shelterName: 'Huellitas',
+                    shelterName: 'Huellita',
                     ...props,
                 },
                 url: '/animales',

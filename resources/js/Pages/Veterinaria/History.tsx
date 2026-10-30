@@ -21,7 +21,9 @@ const schemas: Record<Kind, SchemaField[]> = {
         ['next_dose_date', 'Próxima dosis', 'date'],
     ],
     treatments: [
+        ['treatment_type', 'Tipo', 'select', ['Tratamiento', 'Desparasitación', 'Medicación']],
         ['description', 'Descripción', 'textarea'],
+        ['medication', 'Medicamento y dosis (si corresponde)', 'text'],
         ['start_date', 'Inicio', 'date'],
         ['estimated_end_date', 'Finalización estimada', 'date'],
         ['status', 'Estado', 'select', ['Activo', 'Finalizado', 'Suspendido']],
@@ -35,7 +37,7 @@ const schemas: Record<Kind, SchemaField[]> = {
 const labels: Record<Kind, string> = {
     consultations: 'Consultas',
     vaccinations: 'Vacunas',
-    treatments: 'Tratamientos',
+    treatments: 'Tratamientos y desparasitaciones',
     controls: 'Controles',
 };
 function MedicalForm({

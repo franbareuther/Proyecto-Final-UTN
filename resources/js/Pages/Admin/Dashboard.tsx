@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { Adoption, Application, MedicalRecord } from '@/types/shelter';
+import { Adoption, Application, MedicalRecord, Refuge } from '@/types/shelter';
 import { date, Empty, RequestList, Shell, Title } from '@/Components/Shelter';
 function Chart({ title, items }: { title: string; items: { label: string; total: number }[] }) {
     const max = Math.max(1, ...items.map((i) => i.total));
@@ -28,6 +28,7 @@ function Chart({ title, items }: { title: string; items: { label: string; total:
     );
 }
 export default function Dashboard({
+    shelter,
     stats,
     species,
     statuses,
@@ -36,6 +37,7 @@ export default function Dashboard({
     recentAdoptions,
     controls,
 }: {
+    shelter: Pick<Refuge, 'id' | 'name' | 'slug' | 'city'> | null;
     stats: Record<string, number>;
     species: { label: string; total: number }[];
     statuses: { label: string; total: number }[];
@@ -46,11 +48,26 @@ export default function Dashboard({
 }) {
     return (
         <Shell internal>
-            <Head title="Resumen del refugio" />
+            <Head title={shelter ? `Resumen · ${shelter.name}` : 'Resumen del refugio'} />
             <Title
-                title="Cada día, una nueva oportunidad."
-                text="La actividad del refugio, de un vistazo."
-            />
+                title={shelter ? `¡Bienvenido, ${shelter.name}!` : '¡Bienvenido!'}
+                text={
+                    shelter
+                        ? 'Cada día, una nueva oportunidad. Esta es la actividad de tu refugio, de un vistazo.'
+                        : 'Tu cuenta todavía no tiene un refugio asociado. Contactá a la administración de Huellita para habilitarlo.'
+                }
+            >
+                {shelter && (
+                    <div className="flex flex-wrap gap-3">
+                        <Link className="btn" href="/admin/animales/create">
+                            Agregar animal
+                        </Link>
+                        <Link className="btn-secondary" href={`/refugios/${shelter.slug}`}>
+                            Ver perfil público
+                        </Link>
+                    </div>
+                )}
+            </Title>
             <div className="mb-6 grid grid-cols-2 gap-2.5 sm:mb-8 sm:gap-4 xl:grid-cols-3">
                 {Object.entries(stats).map(([k, v]) => (
                     <div

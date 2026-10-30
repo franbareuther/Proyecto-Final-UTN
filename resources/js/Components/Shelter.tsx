@@ -570,7 +570,7 @@ export function Shell({
         >
             <Icon name="paw" className="h-9 w-9 shrink-0" />
             <span className="font-display text-3xl font-bold leading-none tracking-tight">
-                {internal ? 'huella' : 'huellitas'}
+                huellita
             </span>
         </Link>
     );

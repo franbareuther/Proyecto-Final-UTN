@@ -21,6 +21,9 @@ export default function ShelterForm({
         address: shelter?.address || '',
         email: shelter?.email || '',
         phone: shelter?.phone || '',
+        website: shelter?.website || '',
+        instagram: shelter?.instagram || '',
+        facebook: shelter?.facebook || '',
         active: shelter?.active ?? true,
         image: null as File | null,
         image_type: shelter?.image_type || 'photo',
@@ -49,7 +52,11 @@ export default function ShelterForm({
         ['address', 'Dirección pública'],
         ['email', 'Correo de contacto'],
         ['phone', 'Teléfono'],
+        ['website', 'Sitio web (opcional)'],
+        ['instagram', 'Instagram (opcional)'],
+        ['facebook', 'Facebook (opcional)'],
     ];
+    const urlFields = ['website', 'instagram', 'facebook'];
     return (
         <form
             className={compact ? 'compact-shelter-form space-y-4' : 'space-y-5'}
@@ -76,7 +83,8 @@ export default function ShelterForm({
                         <input
                             className="input"
                             required={key === 'name'}
-                            type={key === 'email' ? 'email' : 'text'}
+                            type={key === 'email' ? 'email' : urlFields.includes(key) ? 'url' : 'text'}
+                            placeholder={urlFields.includes(key) ? 'https://' : undefined}
                             value={String(f.data[key])}
                             onChange={(e) => f.setData(key, e.target.value)}
                         />

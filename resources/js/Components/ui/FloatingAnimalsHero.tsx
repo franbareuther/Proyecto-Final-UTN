@@ -35,7 +35,7 @@ export default function FloatingAnimalsHero() {
                     <span className="hero-title-brand">
                         <Icon name="paw" className="h-[0.85em] w-[0.85em] shrink-0" />
                         <span>
-                            <span className="hero-marker-underline">huellitas</span>.
+                            <span className="hero-marker-underline">huellita</span>.
                         </span>
                     </span>
                 </h1>

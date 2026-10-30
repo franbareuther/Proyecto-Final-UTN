@@ -42,7 +42,7 @@ async function render(component, props) {
                     auth: { user: null },
                     flash: {},
                     errors: {},
-                    shelterName: 'Huellitas',
+                    shelterName: 'Huellita',
                     ...props,
                 },
                 url: '/',
@@ -81,7 +81,7 @@ test('the image component has an accessible photo label and preserves an empty p
     assert.match(photo, /alt="Fotografía de Sur"/);
     const empty = renderToStaticMarkup(createElement(Image, { name: 'Sur' }));
     assert.doesNotMatch(empty, /<img/);
-    assert.match(empty, /Refugio de la red Huellitas/);
+    assert.match(empty, /Refugio de la red Huellita/);
 });
 
 test('both management consumers expose upload, presentation and reversible removal', async () => {

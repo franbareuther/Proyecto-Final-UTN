@@ -7,7 +7,7 @@ export default function ShelterInactive() {
             <Head title="Refugio inactivo" />
             <Title
                 title="El refugio está inactivo"
-                text="Contactá a la administración de Huellitas para revisar su habilitación. Los animales y el historial se conservan."
+                text="Contactá a la administración de Huellita para revisar su habilitación. Los animales y el historial se conservan."
             />
             <Link className="btn" href="/refugios">
                 Conocer otros refugios

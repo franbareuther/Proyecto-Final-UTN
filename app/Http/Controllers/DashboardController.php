@@ -8,11 +8,12 @@ use App\Models\Animal;
 use App\Models\Treatment;
 use App\Models\VaccinationDose;
 use App\Models\VeterinaryControl;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    public function __invoke()
+    public function __invoke(Request $request)
     {
         $months = collect(range(5, 0))->map(function ($offset) {
             $date = today()->startOfMonth()->subMonths($offset);
@@ -21,6 +22,8 @@ class DashboardController extends Controller
         });
 
         return Inertia::render('Admin/Dashboard', [
+            // RequireRole ya garantiza un refugio activo; el nombre siempre proviene de la base.
+            'shelter' => $request->user()->shelter?->only(['id', 'name', 'slug', 'city']),
             'stats' => [
                 'Animales registrados' => Animal::count(), 'Disponibles' => Animal::where('availability_status', 'Disponible')->count(),
                 'Adopciones realizadas' => Adoption::count(), 'Solicitudes pendientes' => AdoptionRequest::whereIn('status', ['Nueva', 'En revisión'])->count(),

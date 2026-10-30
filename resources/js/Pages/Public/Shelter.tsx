@@ -43,6 +43,30 @@ export default function Shelter({ shelter: s }: { shelter: Refuge }) {
                     {!s.phone && !s.email && (
                         <p>Los datos de contacto estarán disponibles próximamente.</p>
                     )}
+                    {(s.website || s.instagram || s.facebook) && (
+                        <ul className="mt-5 flex flex-wrap gap-2 border-t border-stone-100 pt-5" aria-label="Redes del refugio">
+                            {(
+                                [
+                                    ['Sitio web', s.website],
+                                    ['Instagram', s.instagram],
+                                    ['Facebook', s.facebook],
+                                ] as const
+                            )
+                                .filter(([, url]) => url)
+                                .map(([label, url]) => (
+                                    <li key={label}>
+                                        <a
+                                            className="btn-secondary"
+                                            href={url!}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            {label}
+                                        </a>
+                                    </li>
+                                ))}
+                        </ul>
+                    )}
                 </aside>
             </div>
         </Shell>

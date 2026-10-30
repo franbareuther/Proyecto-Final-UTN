@@ -5,6 +5,7 @@ export interface Person {
     email: string;
     email_verified_at?: string;
     role: 'superadmin' | 'admin' | 'adoptante';
+    shelter_id?: number | null;
 }
 export interface Photo {
     id: number;
@@ -20,6 +21,9 @@ export interface Refuge {
     address: string | null;
     email: string | null;
     phone: string | null;
+    website?: string | null;
+    instagram?: string | null;
+    facebook?: string | null;
     active: boolean;
     staff?: Person[];
     image_url?: string | null;
