@@ -16,6 +16,7 @@ import Modal from '@/Components/Modal';
 import AnimalImage from '@/Components/AnimalImage';
 import Icon, { IconName } from '@/Components/Icon';
 import PublicFooter from '@/Components/PublicFooter';
+import ChatBubble from '@/Components/ChatBubble';
 
 export const date = (value: string) =>
     new Date(value.slice(0, 10) + 'T12:00:00').toLocaleDateString('es-AR');
@@ -38,6 +39,8 @@ const badgeStyles: Record<string, string> = {
     Realizado: 'text-emerald-800',
     Cancelada: 'text-stone-600',
     Cancelado: 'text-stone-600',
+    Enviado: 'text-sky-700',
+    Revisado: 'text-emerald-800',
 };
 /** `overlay` agrega un fondo blanco solo cuando el estado va encima de una fotografía, para que siga siendo legible. */
 export function Badge({ children, overlay = false }: PropsWithChildren<{ overlay?: boolean }>) {
@@ -396,6 +399,8 @@ export function Shell({
     const admin = auth.user?.role === 'admin';
     const superadmin = auth.user?.role === 'superadmin';
     const staff = admin;
+    // Burbuja de chat: en el panel del refugio para su personal y en todo el sitio para adoptantes.
+    const showChat = (admin && internal) || auth.user?.role === 'adoptante';
     const catalogUrl = currentShelter ? `/refugios/${currentShelter.slug}/animales` : '/animales';
     useEffect(() => {
         setSidebarCollapsed(window.localStorage.getItem('huella-sidebar-collapsed') === 'true');
@@ -773,6 +778,7 @@ export function Shell({
             {!internal && (
                 <PublicFooter catalogUrl={catalogUrl} scoped={Boolean(currentShelter)} signedIn={Boolean(auth.user)} shelterName={shelterName} />
             )}
+            {showChat && <ChatBubble />}
         </div>
     );
 }

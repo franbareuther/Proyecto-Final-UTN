@@ -1,6 +1,7 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Adoption, Page } from '@/types/shelter';
 import { date, Empty, Pagination, Shell, Title } from '@/Components/Shelter';
+import { openChat } from '@/Components/ChatBubble';
 export default function Adoptions({ adoptions }: { adoptions: Page<Adoption> }) {
     return (
         <Shell internal>
@@ -26,6 +27,23 @@ export default function Adoptions({ adoptions }: { adoptions: Page<Adoption> }) 
                                 <p className="mt-2 text-sm text-stone-500">
                                     Adopción #{a.id} · {date(a.adoption_date)}
                                 </p>
+                                <div className="mt-3 flex flex-wrap gap-4 text-sm">
+                                    <Link
+                                        className="text-link"
+                                        href={`/adopciones/${a.id}/seguimiento`}
+                                    >
+                                        Ver seguimiento
+                                    </Link>
+                                    <button
+                                        type="button"
+                                        className="text-link"
+                                        onClick={() =>
+                                            a.adoption_request_id && openChat(a.adoption_request_id)
+                                        }
+                                    >
+                                        Abrir chat
+                                    </button>
+                                </div>
                             </div>
                         </article>
                     ))}

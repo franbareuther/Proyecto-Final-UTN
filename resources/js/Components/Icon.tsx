@@ -20,7 +20,8 @@ export type IconName =
     | 'medical'
     | 'user'
     | 'logout'
-    | 'sidebar';
+    | 'sidebar'
+    | 'chat';
 
 export default function Icon({ name, ...props }: SVGProps<SVGSVGElement> & { name: IconName }) {
     const paths: Record<Exclude<IconName, 'paw'>, string> = {
@@ -43,6 +44,7 @@ export default function Icon({ name, ...props }: SVGProps<SVGSVGElement> & { nam
         user: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0',
         logout: 'M10 5H5v14h5m4-4 4-3-4-3m4 3H9',
         sidebar: 'M4 4h16v16H4V4Zm6 0v16m4-12 4 4-4 4',
+        chat: 'M4 5h16v11H9l-5 4V5Zm4 5h8m-8 3h5',
     };
     return (
         <svg

@@ -6,6 +6,7 @@ use App\Http\Requests\StoreAdoptionRequest;
 use App\Models\Adoption;
 use App\Models\AdoptionRequest;
 use App\Models\Animal;
+use App\Services\AdoptionChatService;
 use App\Services\AdoptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -31,20 +32,30 @@ class AdoptionRequestController extends Controller
         return to_route('requests.show', $application)->with('success', 'Recibimos tu solicitud. Podés seguirla desde tu cuenta.');
     }
 
-    public function mine(Request $r)
+    public function mine(Request $r, AdoptionChatService $chat)
     {
+        $chat->enforceDue();
+
         return Inertia::render('Adoptante/Requests', ['requests' => $r->user()->adoptionRequests()->with('animal.photos', 'animal.shelter')->latest()->paginate(10)]);
     }
 
-    public function show(AdoptionRequest $adoptionRequest)
+    public function show(AdoptionRequest $adoptionRequest, AdoptionChatService $chat)
     {
         Gate::authorize('view', $adoptionRequest);
+        // Sin depender de la tarea programada: un plazo vencido se aplica al abrir la solicitud.
+        $chat->enforce($adoptionRequest);
+        $adoptionRequest->refresh();
 
-        return Inertia::render('Adoptante/RequestDetail', ['application' => $adoptionRequest->load(['animal.photos', 'animal.shelter', 'user:id,name,last_name,email', 'history'])]);
+        // La conversación vive en la burbuja de chat; acá solo se indica el plazo vigente.
+        return Inertia::render('Adoptante/RequestDetail', [
+            'application' => $adoptionRequest->load(['animal.photos', 'animal.shelter', 'user:id,name,last_name,email', 'history', 'adoption:id,adoption_request_id']),
+            'chatDeadline' => $chat->deadline($adoptionRequest)?->toIso8601String(),
+        ]);
     }
 
-    public function index(Request $r)
+    public function index(Request $r, AdoptionChatService $chat)
     {
+        $chat->enforceDue();
         $f = $r->validate(['q' => 'nullable|string|max:100', 'status' => ['nullable', Rule::in(['Nueva', 'En revisión', 'Aprobada', 'Rechazada', 'Adoptado'])]]);
         $q = AdoptionRequest::with(['animal.photos', 'animal.shelter', 'user:id,name,last_name,email']);
         if ($r->filled('status')) {

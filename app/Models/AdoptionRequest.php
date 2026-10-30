@@ -15,7 +15,7 @@ class AdoptionRequest extends Model
 
     protected function casts(): array
     {
-        return ['has_other_pets' => 'boolean', 'reviewed_at' => 'datetime'];
+        return ['has_other_pets' => 'boolean', 'reviewed_at' => 'datetime', 'awaiting_reply_since' => 'datetime', 'inactivity_warned_at' => 'datetime', 'adopter_read_at' => 'datetime', 'shelter_read_at' => 'datetime'];
     }
 
     public function animal()
@@ -36,5 +36,15 @@ class AdoptionRequest extends Model
     public function adoption()
     {
         return $this->hasOne(Adoption::class);
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(AdoptionMessage::class)->orderBy('created_at')->orderBy('id');
+    }
+
+    public function lastMessage()
+    {
+        return $this->hasOne(AdoptionMessage::class)->latestOfMany();
     }
 }

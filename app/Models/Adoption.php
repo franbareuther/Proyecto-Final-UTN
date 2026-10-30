@@ -25,4 +25,14 @@ class Adoption extends Model
     {
         return $this->belongsTo(AdoptionRequest::class, 'adoption_request_id');
     }
+
+    public function checkins()
+    {
+        return $this->hasMany(FollowUpCheckin::class)->orderBy('sequence');
+    }
+
+    public function certificates()
+    {
+        return $this->hasMany(VaccinationCertificate::class)->orderByDesc('application_date')->orderByDesc('id');
+    }
 }

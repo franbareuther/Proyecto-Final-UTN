@@ -3,8 +3,10 @@
 use App\Http\Controllers\AdoptionRequestController;
 use App\Http\Controllers\AnimalController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FollowUpController;
 use App\Http\Controllers\MedicalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ShelterController;
@@ -46,6 +48,20 @@ Route::middleware('auth')->group(function () {
         Route::post('/animales/{animal}/solicitar', [AdoptionRequestController::class, 'store'])->middleware('throttle:20,1')->name('requests.store');
     });
     Route::get('/solicitudes/{adoptionRequest}', [AdoptionRequestController::class, 'show'])->name('requests.show');
+    Route::middleware('role:admin,adoptante')->prefix('/chats')->controller(ChatController::class)->group(function () {
+        Route::get('/', 'index')->name('chats.index');
+        Route::get('/{adoptionRequest}', 'show')->name('chats.show');
+        Route::post('/{adoptionRequest}/mensajes', 'store')->middleware('throttle:30,1')->name('chats.messages.store');
+    });
+    Route::prefix('/adopciones/{adoption}')->controller(FollowUpController::class)->group(function () {
+        Route::get('/seguimiento', 'show')->name('followups.show');
+        Route::post('/seguimiento/{checkin}', 'submit')->middleware('throttle:20,1')->name('followups.submit');
+        Route::patch('/seguimiento/{checkin}', 'review')->name('followups.review');
+        Route::post('/certificados', 'storeCertificate')->middleware('throttle:20,1')->name('followups.certificates.store');
+        Route::patch('/certificados/{certificate}', 'reviewCertificate')->name('followups.certificates.review');
+        Route::get('/archivos/fotos/{photo}', 'photo')->name('followups.photo');
+        Route::get('/archivos/certificados/{certificate}', 'certificate')->name('followups.certificate');
+    });
     Route::middleware('role:superadmin')->prefix('superadmin')->group(function () {
         Route::get('/', [SuperadminController::class, 'dashboard'])->name('superadmin.dashboard');
         foreach (['animales', 'solicitudes', 'adopciones', 'controles', 'dosis'] as $view) {

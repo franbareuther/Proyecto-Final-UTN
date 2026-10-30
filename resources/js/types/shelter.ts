@@ -69,6 +69,7 @@ export interface Application {
     previous_experience: string;
     motivation: string;
     additional_information: string;
+    adoption?: { id: number } | null;
     history: {
         id: number;
         new_status: string;
@@ -79,9 +80,62 @@ export interface Application {
 }
 export interface Adoption {
     id: number;
+    adoption_request_id?: number;
     animal: Animal;
     user: Person;
     adoption_date: string;
+}
+export interface ChatMessage {
+    id: number;
+    type: 'message' | 'warning' | 'system';
+    body: string;
+    created_at: string;
+    user_id: number | null;
+    author: Pick<Person, 'id' | 'name' | 'last_name' | 'role'> | null;
+}
+type ChatAnimal = Pick<Animal, 'id' | 'name' | 'photo_url'>;
+export interface ChatSummary {
+    id: number;
+    status: string;
+    animal: ChatAnimal;
+    counterpart: string;
+    last: { body: string; type: ChatMessage['type']; created_at: string; mine: boolean } | null;
+    unread: number;
+    deadline: string | null;
+}
+export interface ChatConversation {
+    id: number;
+    status: string;
+    animal: ChatAnimal;
+    counterpart: string;
+    requestUrl: string;
+    followUpUrl: string | null;
+    followUpPending: number | null;
+    messages: ChatMessage[];
+    open: boolean;
+    preAdoption: boolean;
+    deadline: string | null;
+    limitHours: number;
+}
+export interface FollowUpCheckin {
+    id: number;
+    sequence: number;
+    due_date: string;
+    submitted_at: string | null;
+    comment: string | null;
+    reviewed_at: string | null;
+    shelter_note: string | null;
+    reviewer?: Pick<Person, 'id' | 'name' | 'last_name'> | null;
+    photos: { id: number; category: string }[];
+}
+export interface VaccinationCertificate {
+    id: number;
+    vaccine_name: string;
+    application_date: string;
+    notes: string | null;
+    reviewed_at: string | null;
+    uploader?: Pick<Person, 'id' | 'name' | 'last_name'>;
+    reviewer?: Pick<Person, 'id' | 'name' | 'last_name'> | null;
 }
 export interface MedicalRecord {
     updater?: Person;

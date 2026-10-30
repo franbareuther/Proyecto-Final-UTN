@@ -117,3 +117,91 @@ test('el perfil del animal separa la salud pública de la historia clínica', as
     const foreign = await renderPage('Public/Animal', { animal }, { id: 2, role: 'admin', shelter_id: 9 }, '/refugios/patitas-del-sur/animales/7');
     assert.doesNotMatch(foreign, /Editar ficha/);
 });
+
+// React separa texto fijo y variables con <!-- --> al renderizar en el servidor.
+const plain = async (html) => (await html).replaceAll('<!-- -->', '');
+
+const application = {
+    id: 5, status: 'Aprobada', created_at: '2026-10-20T10:00:00Z', phone: '1155551234', address: 'Calle 123', housing_type: 'Casa',
+    has_other_pets: false, previous_experience: 'Sí', motivation: 'Un hogar', additional_information: null, history: [], adoption: null,
+    animal, user: { id: 2, name: 'Ana', last_name: 'Gómez', email: 'ana@test', role: 'adoptante' },
+};
+const conversation = {
+    id: 5, status: 'Aprobada', counterpart: 'Patitas del Sur', requestUrl: '/solicitudes/5', followUpUrl: null,
+    animal: { id: 7, name: 'Mora', photo_url: '/storage/animals/mora.jpg' },
+    open: true, preAdoption: true, limitHours: 48, deadline: '2026-10-30T12:00:00Z',
+    messages: [
+        { id: 1, type: 'message', body: '¿Coordinamos una visita?', created_at: '2026-10-28T12:00:00Z', user_id: 1, author: { id: 1, name: 'Equipo', last_name: 'Patitas', role: 'admin' } },
+        { id: 2, type: 'warning', body: 'Aviso: el refugio está esperando tu respuesta.', created_at: '2026-10-29T12:00:00Z', user_id: null, author: null },
+    ],
+};
+
+test('la burbuja de chat aparece en el panel del refugio y para adoptantes, no para visitantes ni superadmin', async () => {
+    const adopter = await plain(renderPage('Public/Catalog', { animals: emptyPage, filters: {}, breeds: [] }, { id: 2, role: 'adoptante' }, '/animales'));
+    assert.match(adopter, /aria-label="Abrir mensajes"/);
+    const panel = await plain(renderPage('Admin/Dashboard', { shelter, stats: {}, species: [], statuses: [], months: [], recentRequests: [], recentAdoptions: [], controls: [] }, { id: 1, role: 'admin', shelter_id: 3 }, '/admin'));
+    assert.match(panel, /aria-label="Abrir mensajes"/);
+    const guest = await plain(renderPage('Public/Catalog', { animals: emptyPage, filters: {}, breeds: [] }, null, '/animales'));
+    assert.doesNotMatch(guest, /Abrir mensajes/);
+    const supervision = await plain(renderPage('Adoptante/RequestDetail', { application }, { id: 9, role: 'superadmin' }, '/superadmin/solicitudes/5'));
+    assert.doesNotMatch(supervision, /Abrir mensajes|Abrir chat/);
+
+    const detail = await plain(renderPage('Adoptante/RequestDetail', { application, chatDeadline: '2026-10-30T12:00:00Z' }, { id: 2, role: 'adoptante' }, '/solicitudes/5'));
+    assert.match(detail, /Conversación con el refugio/);
+    assert.match(detail, /Tenés tiempo para responder hasta el/);
+    assert.match(detail, /Abrir chat/);
+});
+
+test('la conversación muestra mensajes, avisos automáticos y el plazo de respuesta', async () => {
+    const { Conversation } = await server.ssrLoadModule('/resources/js/Components/ChatBubble.tsx');
+    const props = { userId: 2, admin: false, sending: false, error: null, onSend: async () => true };
+    const html = renderToStaticMarkup(createElement(Conversation, { ...props, conversation })).replaceAll('<!-- -->', '');
+    assert.match(html, /Equipo Patitas · Refugio/);
+    assert.match(html, /Aviso automático/);
+    assert.match(html, /El refugio espera tu respuesta hasta el/);
+    assert.match(html, /<textarea[^>]*id="chat-body"/);
+
+    const closed = renderToStaticMarkup(createElement(Conversation, { ...props, conversation: { ...conversation, status: 'Rechazada', open: false, preAdoption: false, deadline: null } }));
+    assert.match(closed, /ya no se pueden enviar mensajes/);
+    assert.doesNotMatch(closed, /id="chat-body"/);
+    assert.doesNotMatch(closed, /Seguimiento/);
+});
+
+test('el botón Seguimiento del chat se habilita recién con la adopción', async () => {
+    const { Conversation } = await server.ssrLoadModule('/resources/js/Components/ChatBubble.tsx');
+    const props = { userId: 2, admin: false, sending: false, error: null, onSend: async () => true };
+    const before = renderToStaticMarkup(createElement(Conversation, { ...props, conversation: { ...conversation, followUpPending: null } }));
+    assert.match(before, /<button[^>]*disabled=""[^>]*>Seguimiento<\/button>/);
+    assert.match(before, /Se habilita cuando se registre la adopción/);
+
+    const adopted = { ...conversation, status: 'Adoptado', preAdoption: false, deadline: null, followUpUrl: '/adopciones/4/seguimiento', followUpPending: 1 };
+    const after = renderToStaticMarkup(createElement(Conversation, { ...props, conversation: adopted })).replaceAll('<!-- -->', '');
+    assert.match(after, /<a[^>]*href="\/adopciones\/4\/seguimiento"[^>]*>Seguimiento/);
+    assert.match(after, /1 control listo para cargar fotos y vacunas/);
+    assert.doesNotMatch(after, /disabled=""[^>]*>Seguimiento/);
+});
+
+test('el seguimiento lista los controles y habilita la carga de las cuatro fotos', async () => {
+    const checkin = (sequence, due, extra = {}) => ({ id: sequence, sequence, due_date: due, submitted_at: null, comment: null, reviewed_at: null, shelter_note: null, photos: [], ...extra });
+    const adoption = {
+        id: 4, adoption_request_id: 5, adoption_date: '2026-10-23', animal, user: application.user, certificates: [],
+        checkins: [
+            checkin(1, '2026-10-30'),
+            checkin(2, '2026-10-20', { submitted_at: '2026-10-20T10:00:00Z', photos: [{ id: 11, category: 'Jugando' }] }),
+            checkin(5, '2026-12-23'),
+        ],
+    };
+    const props = { adoption, categories: ['Jugando', 'Durmiendo', 'Comiendo', 'Convivencia'], opensDaysBefore: 7, today: '2026-10-30' };
+    const html = await plain(renderPage('FollowUp/Show', { ...props, canSubmit: true, canReview: false }, { id: 2, role: 'adoptante' }, '/adopciones/4/seguimiento'));
+    assert.match(html, /Seguimiento de Mora/);
+    assert.match(html, /Control 1 · Semana 1/);
+    assert.match(html, /Control 5 · Mes 2/);
+    assert.match(html, /Enviar control 1/);
+    assert.doesNotMatch(html, /Enviar control 5/);
+    assert.match(html, /src="\/adopciones\/4\/archivos\/fotos\/11"/);
+    assert.match(html, /Foto de la hoja firmada por el veterinario/);
+
+    const shelter = await plain(renderPage('FollowUp/Show', { ...props, canSubmit: false, canReview: true }, { id: 1, role: 'admin', shelter_id: 3 }, '/adopciones/4/seguimiento'));
+    assert.match(shelter, /Marcar como revisado/);
+    assert.doesNotMatch(shelter, /Enviar control/);
+});

@@ -1,9 +1,19 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Application, Shared } from '@/types/shelter';
 import { Badge, Confirm, date, Errors, Field, Shell, Title } from '@/Components/Shelter';
-export default function RequestDetail({ application: r }: { application: Application }) {
+import { openChat } from '@/Components/ChatBubble';
+import Icon from '@/Components/Icon';
+export default function RequestDetail({
+    application: r,
+    chatDeadline = null,
+}: {
+    application: Application;
+    chatDeadline?: string | null;
+}) {
     const role = usePage<Shared>().props.auth.user?.role;
     const admin = role === 'admin';
+    // El superadmin supervisa la red pero no participa de la conversación privada.
+    const canChat = admin || role === 'adoptante';
     const f = useForm({ status: '', observations: '' });
     const options: Record<string, string[]> = {
         Nueva: ['En revisión', 'Aprobada', 'Rechazada'],
@@ -14,7 +24,14 @@ export default function RequestDetail({ application: r }: { application: Applica
         <Shell internal={admin || role === 'superadmin'}>
             <Head title={`Solicitud #${r.id}`} />
             <Title title={`Solicitud #${r.id}`} text={`Presentada el ${date(r.created_at)}`}>
-                <Badge>{r.status}</Badge>
+                <div className="flex flex-wrap items-center gap-4">
+                    <Badge>{r.status}</Badge>
+                    {r.adoption && role !== 'superadmin' && (
+                        <Link className="btn" href={`/adopciones/${r.adoption.id}/seguimiento`}>
+                            Ver seguimiento
+                        </Link>
+                    )}
+                </div>
             </Title>
             <div className="grid gap-6 lg:grid-cols-3">
                 <div className="space-y-6 lg:col-span-2">
@@ -32,6 +49,24 @@ export default function RequestDetail({ application: r }: { application: Applica
                             <p className="text-sm text-stone-500">{r.user.email}</p>
                         </div>
                     </div>
+                    {canChat && (
+                        <section className="card flex flex-wrap items-center justify-between gap-4">
+                            <div className="min-w-0 flex-1 basis-64">
+                                <h2 className="text-lg font-semibold">
+                                    Conversación con {admin ? 'la familia' : 'el refugio'}
+                                </h2>
+                                <p className="mt-1 text-sm text-stone-600">
+                                    {chatDeadline
+                                        ? `${admin ? 'La familia tiene' : 'Tenés'} tiempo para responder hasta el ${new Date(chatDeadline).toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' })}.`
+                                        : 'El chat está en la burbuja de mensajes, abajo a la derecha.'}
+                                </p>
+                            </div>
+                            <button type="button" className="btn" onClick={() => openChat(r.id)}>
+                                <Icon name="chat" className="h-4 w-4" />
+                                Abrir chat
+                            </button>
+                        </section>
+                    )}
                     <dl className="card grid gap-6 sm:grid-cols-2">
                         {[
                             ['Teléfono', r.phone],
