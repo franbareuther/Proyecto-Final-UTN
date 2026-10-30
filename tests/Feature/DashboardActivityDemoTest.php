@@ -38,7 +38,7 @@ class DashboardActivityDemoTest extends TestCase
         $this->assertSame(0, Animal::whereHas('shelter', fn ($q) => $q->where('active', false))->count());
         $this->assertSame(Adoption::count(), Adoption::distinct()->count('animal_id'));
         $this->assertDatabaseHas('users', ['email' => 'equipo.sin-equipo@huella.test', 'role' => 'admin', 'shelter_id' => $unstaffed->id]);
-        $this->assertSame(0, DB::table('adoption_requests')->where('status', 'Aprobada')->groupBy('animal_id')->havingRaw('COUNT(*) > 1')->count());
+        $this->assertSame(0, DB::table('adoption_requests')->where('status', 'Aprobada')->select('animal_id')->groupBy('animal_id')->havingRaw('COUNT(*) > 1')->count());
 
         $this->actingAs($admin)->get('/admin')->assertInertia(fn (Assert $page) => $page
             ->where('stats.Animales registrados', 9)
