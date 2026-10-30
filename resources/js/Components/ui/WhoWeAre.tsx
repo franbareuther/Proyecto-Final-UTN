@@ -1,6 +1,8 @@
 ﻿import { Link } from '@inertiajs/react';
 import Icon from '@/Components/Icon';
 
+const team = ['Laureano Beltrami', 'Francisco Bareuther', 'Leon Comolli', 'Luciano Brea'];
+
 export default function WhoWeAre() {
     return (
         <section id="sobre-huellitas" aria-labelledby="who-we-are-title" className="who-we-are">
@@ -12,10 +14,22 @@ export default function WhoWeAre() {
                 <div className="who-we-are-intro">
                     <h2 id="who-we-are-title">Somos <span>Huellita.</span></h2>
                     <p>
-                        Un equipo que está construyendo una herramienta para refugios y personas
-                        que quieren adoptar. El proyecto nació en la UTN, con una pregunta concreta:
-                        ¿cómo reunir los animales, sus cuidados y las solicitudes en un mismo lugar?
+                        Cuatro estudiantes de la UTN construyendo, con compromiso y cariño, una
+                        herramienta para refugios y personas que quieren adoptar. Partimos de una
+                        pregunta concreta: ¿cómo reunir los animales, sus cuidados y las
+                        solicitudes en un mismo lugar?
                     </p>
+                    <div className="who-we-are-team">
+                        <h3 id="who-we-are-team-title">Quienes hicimos posible este proyecto</h3>
+                        <ul aria-labelledby="who-we-are-team-title">
+                            {team.map((name) => (
+                                <li key={name}>
+                                    <Icon name="paw" className="h-4 w-4 shrink-0" />
+                                    {name}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
                 <figure className="who-we-are-photo">
                     <div className="who-we-are-photo-crop">

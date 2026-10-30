@@ -29,7 +29,13 @@ const shelterFields: Input[] = [
 const accountFields: Input[] = [
     ['name', 'Nombre', 'text', 'given-name'],
     ['last_name', 'Apellido', 'text', 'family-name'],
-    ['email', 'Correo electrónico', 'email', 'email', 'También será el correo de contacto del refugio.'],
+    [
+        'email',
+        'Correo electrónico',
+        'email',
+        'email',
+        'También será el correo de contacto del refugio.',
+    ],
     ['password', 'Contraseña', 'password', 'new-password', 'Usá al menos 8 caracteres.'],
     ['password_confirmation', 'Confirmar contraseña', 'password', 'new-password'],
 ];
@@ -123,7 +129,7 @@ export default function RegisterShelter() {
     return (
         <Shell>
             <Head title="Registrar mi refugio" />
-            <div className="mx-auto max-w-3xl">
+            <div className="mx-auto w-full max-w-6xl">
                 <Title
                     title="Sumá tu refugio a Huellita."
                     text="Creá el espacio de tu refugio para presentar a sus animales, recibir solicitudes de adopción y llevar sus cuidados al día. Cada refugio ve y gestiona solo su propia información."
@@ -132,102 +138,132 @@ export default function RegisterShelter() {
                     <div id="shelter-registration-errors" aria-live="polite">
                         <Errors errors={f.errors} />
                     </div>
-                    <fieldset className="card min-w-0 space-y-5" disabled={f.processing}>
-                        <legend className="sr-only">Datos del refugio</legend>
-                        <h2 className="text-xl font-semibold text-emerald-950">Tu refugio</h2>
-                        <div className="grid gap-5 sm:grid-cols-2">{shelterFields.map(input)}</div>
-                        <Field label="Descripción del refugio" error={f.errors.description}>
-                            <textarea
-                                name="description"
-                                required
-                                minLength={20}
-                                maxLength={5000}
-                                rows={5}
-                                aria-describedby="description-hint"
-                                value={f.data.description}
-                                onChange={(e) => f.setData('description', e.target.value)}
-                            />
-                            <p id="description-hint" className="mt-2 text-xs font-normal text-stone-500">
-                                Contá su historia, cómo trabajan y qué animales acompañan. Las
-                                familias lo verán en su perfil público.
-                            </p>
-                        </Field>
-                        <div className="grid gap-5 sm:grid-cols-2">
-                            <Field label="Logo o fotografía (opcional)" error={f.errors.image}>
-                                <input
-                                    ref={fileInput}
-                                    className="block w-full min-w-0 max-w-full text-sm"
-                                    type="file"
-                                    name="image"
-                                    accept="image/jpeg,image/png,image/webp"
-                                    aria-describedby="image-hint"
-                                    onChange={(e) => {
-                                        f.clearErrors('image');
-                                        f.setData('image', e.target.files?.[0] || null);
-                                    }}
+                    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+                        <fieldset className="card min-w-0 space-y-5 sm:p-8" disabled={f.processing}>
+                            <legend className="sr-only">Datos del refugio</legend>
+                            <h2 className="text-xl font-semibold text-emerald-950">Tu refugio</h2>
+                            <div className="grid gap-5 sm:grid-cols-2">
+                                {shelterFields.map(input)}
+                            </div>
+                            <Field label="Descripción del refugio" error={f.errors.description}>
+                                <textarea
+                                    name="description"
+                                    required
+                                    minLength={20}
+                                    maxLength={5000}
+                                    rows={5}
+                                    aria-describedby="description-hint"
+                                    value={f.data.description}
+                                    onChange={(e) => f.setData('description', e.target.value)}
                                 />
-                                <p id="image-hint" className="mt-2 text-xs font-normal text-stone-500">
-                                    JPEG, PNG o WebP, hasta 5 MB.
+                                <p
+                                    id="description-hint"
+                                    className="mt-2 text-xs font-normal text-stone-500"
+                                >
+                                    Contá su historia, cómo trabajan y qué animales acompañan. Las
+                                    familias lo verán en su perfil público.
                                 </p>
                             </Field>
-                            <Field label="Presentación de la imagen" error={f.errors.image_type}>
-                                <select
-                                    name="image_type"
-                                    value={f.data.image_type}
-                                    onChange={(e) =>
-                                        f.setData('image_type', e.target.value as 'photo' | 'logo')
-                                    }
+                            <div className="grid gap-5 sm:grid-cols-2">
+                                <Field label="Logo o fotografía (opcional)" error={f.errors.image}>
+                                    <input
+                                        ref={fileInput}
+                                        className="block w-full min-w-0 max-w-full text-sm"
+                                        type="file"
+                                        name="image"
+                                        accept="image/jpeg,image/png,image/webp"
+                                        aria-describedby="image-hint"
+                                        onChange={(e) => {
+                                            f.clearErrors('image');
+                                            f.setData('image', e.target.files?.[0] || null);
+                                        }}
+                                    />
+                                    <p
+                                        id="image-hint"
+                                        className="mt-2 text-xs font-normal text-stone-500"
+                                    >
+                                        JPEG, PNG o WebP, hasta 5 MB.
+                                    </p>
+                                </Field>
+                                <Field
+                                    label="Presentación de la imagen"
+                                    error={f.errors.image_type}
                                 >
-                                    <option value="photo">Fotografía · llenar el marco</option>
-                                    <option value="logo">Logo · mostrar completo</option>
-                                </select>
-                            </Field>
-                        </div>
-                        {preview && (
-                            <div className="max-w-sm">
-                                <ShelterImage
-                                    src={preview}
-                                    name={f.data.shelter_name || 'tu refugio'}
-                                    kind={f.data.image_type}
-                                />
-                                <button
-                                    type="button"
-                                    className="btn-secondary mt-3"
-                                    onClick={() => {
-                                        f.setData('image', null);
-                                        if (fileInput.current) fileInput.current.value = '';
-                                    }}
-                                >
-                                    Quitar imagen
-                                </button>
+                                    <select
+                                        name="image_type"
+                                        value={f.data.image_type}
+                                        onChange={(e) =>
+                                            f.setData(
+                                                'image_type',
+                                                e.target.value as 'photo' | 'logo',
+                                            )
+                                        }
+                                    >
+                                        <option value="photo">Fotografía · llenar el marco</option>
+                                        <option value="logo">Logo · mostrar completo</option>
+                                    </select>
+                                </Field>
                             </div>
-                        )}
-                    </fieldset>
-                    <fieldset className="card min-w-0 space-y-5" disabled={f.processing}>
-                        <legend className="sr-only">Persona responsable</legend>
-                        <div>
-                            <h2 className="text-xl font-semibold text-emerald-950">
-                                Persona responsable
-                            </h2>
-                            <p className="mt-1 text-sm text-stone-600">
-                                Con estos datos vas a ingresar al panel del refugio.
-                            </p>
+                            {preview && (
+                                <div className="max-w-sm">
+                                    <ShelterImage
+                                        src={preview}
+                                        name={f.data.shelter_name || 'tu refugio'}
+                                        kind={f.data.image_type}
+                                    />
+                                    <button
+                                        type="button"
+                                        className="btn-secondary mt-3"
+                                        onClick={() => {
+                                            f.setData('image', null);
+                                            if (fileInput.current) fileInput.current.value = '';
+                                        }}
+                                    >
+                                        Quitar imagen
+                                    </button>
+                                </div>
+                            )}
+                        </fieldset>
+                        <div className="min-w-0 space-y-6">
+                            <fieldset
+                                className="card min-w-0 space-y-5 sm:p-8"
+                                disabled={f.processing}
+                            >
+                                <legend className="sr-only">Persona responsable</legend>
+                                <div>
+                                    <h2 className="text-xl font-semibold text-emerald-950">
+                                        Persona responsable
+                                    </h2>
+                                    <p className="mt-1 text-sm text-stone-600">
+                                        Con estos datos vas a ingresar al panel del refugio.
+                                    </p>
+                                </div>
+                                <div className="grid gap-5 sm:grid-cols-2">
+                                    {accountFields.map(input)}
+                                </div>
+                            </fieldset>
+                            <fieldset
+                                className="card min-w-0 space-y-5 sm:p-8"
+                                disabled={f.processing}
+                            >
+                                <legend className="sr-only">Redes sociales</legend>
+                                <div>
+                                    <h2 className="text-xl font-semibold text-emerald-950">
+                                        Redes y sitio web{' '}
+                                        <span className="text-sm font-normal text-stone-500">
+                                            (opcional)
+                                        </span>
+                                    </h2>
+                                    <p className="mt-1 text-sm text-stone-600">
+                                        Pegá el enlace completo de cada perfil.
+                                    </p>
+                                </div>
+                                <div className="grid gap-5 sm:grid-cols-3 lg:grid-cols-1">
+                                    {socialFields.map(input)}
+                                </div>
+                            </fieldset>
                         </div>
-                        <div className="grid gap-5 sm:grid-cols-2">{accountFields.map(input)}</div>
-                    </fieldset>
-                    <fieldset className="card min-w-0 space-y-5" disabled={f.processing}>
-                        <legend className="sr-only">Redes sociales</legend>
-                        <div>
-                            <h2 className="text-xl font-semibold text-emerald-950">
-                                Redes y sitio web{' '}
-                                <span className="text-sm font-normal text-stone-500">(opcional)</span>
-                            </h2>
-                            <p className="mt-1 text-sm text-stone-600">
-                                Pegá el enlace completo de cada perfil.
-                            </p>
-                        </div>
-                        <div className="grid gap-5 sm:grid-cols-3">{socialFields.map(input)}</div>
-                    </fieldset>
+                    </div>
                     <div className="flex flex-wrap items-center gap-4">
                         <button className="btn w-full sm:w-auto" disabled={f.processing}>
                             {f.processing ? 'Registrando refugio…' : 'Registrar mi refugio'}

@@ -14,7 +14,7 @@ export default function Shelters({
     const form = useForm({ q: filters.q || '' });
     useEffect(() => form.setData('q', filters.q || ''), [filters.q]);
     return (
-        <Shell>
+        <Shell backdrop>
             <Head title="Refugios de Huellita" />
             <Title
                 title="Elegí un refugio"

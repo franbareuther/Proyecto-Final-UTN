@@ -1,22 +1,28 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Errors, Field, Shell, Title } from '@/Components/Shelter';
+import { Errors, Field, Shell } from '@/Components/Shelter';
+import AuthLayout from '@/Components/AuthLayout';
 export default function Login({ status }: { status?: string }) {
     const f = useForm({ email: '', password: '', remember: false });
     return (
         <Shell>
             <Head title="Ingresar" />
-            <div className="mx-auto max-w-lg">
-                <Title
-                    title="Qué bueno volver a verte."
-                    text="Ingresá para continuar tu historia con el refugio."
-                />
+            <AuthLayout
+                title="Qué bueno volver a verte."
+                text="Ingresá para continuar tu historia con el refugio."
+                image="/images/demo/perro.jpg"
+                imageAlt="Un perro dorado sentado al aire libre, con una flor en la boca"
+                points={[
+                    'Si adoptás, seguí el estado y el historial de tus solicitudes.',
+                    'Si sos parte de un refugio, entrá a su panel para gestionar animales, solicitudes y cuidados.',
+                ]}
+            >
                 {status && (
                     <p role="status" className="mb-4">
                         {status}
                     </p>
                 )}
                 <form
-                    className="card space-y-5"
+                    className="card space-y-5 sm:p-8"
                     onSubmit={(e) => {
                         e.preventDefault();
                         f.post('/login', { onFinish: () => f.reset('password') });
@@ -67,7 +73,7 @@ export default function Login({ status }: { status?: string }) {
                         </Link>
                     </p>
                 </form>
-            </div>
+            </AuthLayout>
         </Shell>
     );
 }

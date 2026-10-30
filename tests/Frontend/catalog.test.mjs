@@ -104,12 +104,20 @@ test('los badges mantienen texto y distinguen disponible, en proceso y adoptado'
         createElement(components.Badge, null, 'En proceso de adopción'),
     );
     const adopted = renderToStaticMarkup(createElement(components.Badge, null, 'Adoptado'));
-    const availableClass = available.match(/^<span class="([^"]+)"/)[1];
-    assert.doesNotMatch(availableClass, /bg-|border|rounded|px-|py-/);
-    assert.match(availableClass, /text-emerald-800/);
-    assert.match(processing, /bg-amber-50/);
-    assert.match(adopted, /bg-sky-50/);
+    const classOf = (html) => html.match(/^<span class="([^"]+)"/)[1];
+    // Los estados se distinguen solo por color: sin recuadro, borde ni fondo.
+    for (const html of [available, processing, adopted]) {
+        assert.doesNotMatch(classOf(html), /bg-|border|rounded|px-|py-/);
+    }
+    assert.match(classOf(available), /text-emerald-800/);
+    assert.match(classOf(processing), /text-amber-700/);
+    assert.match(classOf(adopted), /text-sky-700/);
     assert.match(processing, /En proceso de adopción/);
+    // Sobre una fotografía conserva un fondo para seguir siendo legible.
+    const overlay = renderToStaticMarkup(
+        createElement(components.Badge, { overlay: true }, 'Adoptado'),
+    );
+    assert.match(classOf(overlay), /bg-white/);
 });
 
 test('la tarjeta conserva enlace, foto y fecha real antes de edad estimada', () => {
@@ -255,7 +263,8 @@ test('la paleta de marca supera contraste 4.5:1 para los pares usados en texto',
 
 test('los layouts fluidos conservan los formularios acotados de login y edición', async () => {
     const login = await renderPage('Auth/Login', {}, null, '/login');
-    assert.match(login, /max-w-lg/);
+    // Usa más ancho en dos columnas, pero sigue acotado para no estirar el formulario.
+    assert.match(login, /max-w-6xl[^"]*lg:grid-cols-/);
     assert.match(login, /type="email"/);
     assert.match(login, /type="password"/);
     const edit = await renderPage(

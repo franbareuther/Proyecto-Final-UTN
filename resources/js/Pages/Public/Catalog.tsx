@@ -107,7 +107,7 @@ export default function Catalog({
         }
     }, [f.errors]);
     return (
-        <Shell>
+        <Shell backdrop>
             <Head title={shelter ? `Animales de ${shelter.name}` : 'Encontrá tu compañero'} />
             <header className="catalog-heading" aria-labelledby="catalog-title">
                 {shelter && (

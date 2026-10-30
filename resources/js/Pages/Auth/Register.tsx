@@ -1,5 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Errors, Field, Shell, Title } from '@/Components/Shelter';
+import { Errors, Field, Shell } from '@/Components/Shelter';
+import AuthLayout from '@/Components/AuthLayout';
 export default function Register() {
     const f = useForm({
         name: '',
@@ -11,13 +12,19 @@ export default function Register() {
     return (
         <Shell>
             <Head title="Crear cuenta" />
-            <div className="mx-auto max-w-lg">
-                <Title
-                    title="Tu próxima historia empieza acá."
-                    text="Creá tu cuenta para solicitar una adopción."
-                />
+            <AuthLayout
+                title="Tu próxima historia empieza acá."
+                text="Creá tu cuenta para solicitar una adopción."
+                image="/images/demo/gato.jpg"
+                imageAlt="Un gato blanco y negro de ojos verdes mirando a la cámara"
+                points={[
+                    'Podés mirar los perfiles sin cuenta; la necesitás para enviar una solicitud.',
+                    'Cada refugio evalúa la solicitud y te acompaña en los siguientes pasos.',
+                    'En Mis solicitudes seguís el estado y el historial de cada una.',
+                ]}
+            >
                 <form
-                    className="card space-y-5"
+                    className="card space-y-5 sm:p-8"
                     onSubmit={(e) => {
                         e.preventDefault();
                         f.post('/register', {
@@ -29,31 +36,36 @@ export default function Register() {
                     <div id="registration-errors" aria-live="polite">
                         <Errors errors={f.errors} />
                     </div>
-                    {(
-                        [
-                            ['name', 'Nombre', 'text', 'given-name'],
-                            ['last_name', 'Apellido', 'text', 'family-name'],
-                            ['email', 'Correo electrónico', 'email', 'email'],
-                            ['password', 'Contraseña', 'password', 'new-password'],
+                    <div className="grid gap-5 sm:grid-cols-2">
+                        {(
                             [
-                                'password_confirmation',
-                                'Confirmar contraseña',
-                                'password',
-                                'new-password',
-                            ],
-                        ] as const
-                    ).map(([k, l, t, ac]) => (
-                        <Field label={l} key={k} error={f.errors[k]}>
-                            <input
-                                type={t}
-                                autoComplete={ac}
-                                required
-                                minLength={t === 'password' ? 8 : undefined}
-                                value={f.data[k]}
-                                onChange={(e) => f.setData(k, e.target.value)}
-                            />
-                        </Field>
-                    ))}
+                                ['name', 'Nombre', 'text', 'given-name', ''],
+                                ['last_name', 'Apellido', 'text', 'family-name', ''],
+                                ['email', 'Correo electrónico', 'email', 'email', 'sm:col-span-2'],
+                                ['password', 'Contraseña', 'password', 'new-password', ''],
+                                [
+                                    'password_confirmation',
+                                    'Confirmar contraseña',
+                                    'password',
+                                    'new-password',
+                                    '',
+                                ],
+                            ] as const
+                        ).map(([k, l, t, ac, span]) => (
+                            <div key={k} className={span}>
+                                <Field label={l} error={f.errors[k]}>
+                                    <input
+                                        type={t}
+                                        autoComplete={ac}
+                                        required
+                                        minLength={t === 'password' ? 8 : undefined}
+                                        value={f.data[k]}
+                                        onChange={(e) => f.setData(k, e.target.value)}
+                                    />
+                                </Field>
+                            </div>
+                        ))}
+                    </div>
                     <p className="text-sm text-stone-600">Usá al menos 8 caracteres y repetí la misma contraseña.</p>
                     <button className="btn w-full" disabled={f.processing}>
                         {f.processing ? 'Creando cuenta…' : 'Crear cuenta'}
@@ -71,7 +83,7 @@ export default function Register() {
                         </Link>
                     </p>
                 </form>
-            </div>
+            </AuthLayout>
         </Shell>
     );
 }

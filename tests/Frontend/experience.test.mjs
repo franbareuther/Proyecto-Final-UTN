@@ -62,12 +62,25 @@ test('el catálogo presenta la red y se adapta al refugio elegido', async () => 
     assert.doesNotMatch(scoped, /de toda la red/);
 });
 
-test('el equipo muestra nombres confirmados y deja lugar para completar el resto', async () => {
-    const { default: Team } = await server.ssrLoadModule('/resources/js/Components/ui/Team.tsx');
-    const html = renderToStaticMarkup(createElement(Team));
-    assert.match(html, /Conocé a quienes hicieron posible este proyecto/);
-    assert.match(html, />Laureano</);
-    assert.match(html, /Integrante por confirmar/);
+test('Somos Huellita presenta a los cuatro integrantes sin una sección aparte', async () => {
+    const { default: WhoWeAre } = await server.ssrLoadModule('/resources/js/Components/ui/WhoWeAre.tsx');
+    const html = renderToStaticMarkup(createElement(WhoWeAre));
+    assert.match(html, /Somos <span>Huellita\.<\/span>/);
+    for (const name of ['Laureano Beltrami', 'Francisco Bareuther', 'Leon Comolli', 'Luciano Brea']) {
+        assert.match(html, new RegExp(`${name}</li>`));
+    }
+    const home = await renderPage('Public/Home', { animals: [], refuges: [] });
+    assert.doesNotMatch(home, /id="equipo"|Nuestro equipo/);
+});
+
+test('los catálogos, refugios y paneles usan el cuadriculado de la landing', async () => {
+    const catalog = await renderPage('Public/Catalog', { animals: emptyPage, filters: {}, breeds: [] }, null, '/animales');
+    const refuges = await renderPage('Public/Shelters', { shelters: emptyPage, filters: {} }, null, '/refugios');
+    const refuge = await renderPage('Public/Shelter', { shelter }, null, '/refugios/patitas-del-sur');
+    const panel = await renderPage('Admin/Dashboard', { shelter, stats: {}, species: [], statuses: [], months: [], recentRequests: [], recentAdoptions: [], controls: [] }, { id: 1, role: 'admin', shelter_id: 3 }, '/admin');
+    for (const html of [catalog, refuges, refuge, panel]) assert.match(html, /class="min-h-screen [a-z-]+ grid-backdrop"/);
+    const login = await renderPage('Auth/Login', {}, null, '/login');
+    assert.doesNotMatch(login, /grid-backdrop/);
 });
 
 test('el panel da la bienvenida con el nombre del refugio recibido', async () => {

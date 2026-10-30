@@ -50,7 +50,7 @@ export default function Animal({ animal: a }: { animal: AnimalType }) {
                         />
                         <div className="absolute left-4 top-4 right-4">
                             {a.availability_status !== 'Disponible' && (
-                                <Badge>{a.availability_status}</Badge>
+                                <Badge overlay>{a.availability_status}</Badge>
                             )}
                         </div>
                         {photos.length > 1 && (

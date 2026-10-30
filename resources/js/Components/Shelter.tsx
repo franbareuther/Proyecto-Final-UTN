@@ -20,27 +20,34 @@ import PublicFooter from '@/Components/PublicFooter';
 export const date = (value: string) =>
     new Date(value.slice(0, 10) + 'T12:00:00').toLocaleDateString('es-AR');
 
+// Solo color de texto: los estados se leen sin recuadro. Tonos 700/800 para mantener contraste sobre el fondo claro.
 const badgeStyles: Record<string, string> = {
     Disponible: 'text-emerald-800',
-    'En proceso de adopción': 'border-amber-200 bg-amber-50 text-amber-950',
-    Adoptado: 'border-sky-200 bg-sky-50 text-sky-950',
-    'No disponible temporalmente': 'border-stone-300 bg-stone-100 text-stone-700',
-    Nueva: 'border-sky-200 bg-sky-50 text-sky-950',
-    'En revisión': 'border-amber-200 bg-amber-50 text-amber-950',
-    Aprobada: 'border-emerald-200 bg-emerald-50 text-emerald-900',
-    Rechazada: 'border-rose-200 bg-rose-50 text-rose-900',
-    Vencido: 'border-rose-200 bg-rose-50 text-rose-900',
-    Próximo: 'border-amber-200 bg-amber-50 text-amber-950',
+    'En proceso de adopción': 'text-amber-700',
+    Adoptado: 'text-sky-700',
+    'No disponible temporalmente': 'text-stone-600',
+    Nueva: 'text-sky-700',
+    'En revisión': 'text-amber-700',
+    Aprobada: 'text-emerald-800',
+    Rechazada: 'text-rose-700',
+    Vencido: 'text-rose-700',
+    Hoy: 'text-amber-800',
+    Próximo: 'text-amber-700',
+    Pendiente: 'text-amber-700',
+    Aplicada: 'text-emerald-800',
+    Realizado: 'text-emerald-800',
+    Cancelada: 'text-stone-600',
+    Cancelado: 'text-stone-600',
 };
-export function Badge({ children }: PropsWithChildren) {
+/** `overlay` agrega un fondo blanco solo cuando el estado va encima de una fotografía, para que siga siendo legible. */
+export function Badge({ children, overlay = false }: PropsWithChildren<{ overlay?: boolean }>) {
     const style = typeof children === 'string' ? badgeStyles[children] : undefined;
-    const plain = children === 'Disponible';
     return (
         <span
             className={
                 'inline-flex max-w-full items-center gap-2 text-xs font-semibold leading-relaxed ' +
-                (plain ? '' : 'rounded-full border px-3 py-1.5 ') +
-                (style || 'border-stone-200 bg-stone-50 text-stone-700')
+                (overlay ? 'rounded-full bg-white/95 px-3 py-1.5 shadow-sm ' : '') +
+                (style || 'text-stone-700')
             }
         >
             <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full bg-current" />
@@ -252,7 +259,7 @@ export function AnimalCard({ animal, compact = false }: { animal: Animal; compac
                 />
                 {animal.availability_status !== 'Disponible' && (
                     <div className="absolute left-3 top-3 right-3">
-                        <Badge>{animal.availability_status}</Badge>
+                        <Badge overlay>{animal.availability_status}</Badge>
                     </div>
                 )}
             </div>
@@ -375,7 +382,8 @@ export function Shell({
     children,
     internal = false,
     sidebar,
-}: PropsWithChildren<{ internal?: boolean; sidebar?: ReactNode }>) {
+    backdrop = false,
+}: PropsWithChildren<{ internal?: boolean; sidebar?: ReactNode; backdrop?: boolean }>) {
     const { auth, flash, shelterName, currentShelter } = usePage<Shared>().props;
     const currentPath = usePage().url.split(/[?#]/)[0];
     const [open, setOpen] = useState(false);
@@ -575,7 +583,13 @@ export function Shell({
         </Link>
     );
     return (
-        <div className={'min-h-screen ' + (internal ? 'internal-shell' : 'public-shell')}>
+        <div
+            className={
+                'min-h-screen ' +
+                (internal ? 'internal-shell' : 'public-shell') +
+                (internal || backdrop ? ' grid-backdrop' : '')
+            }
+        >
             <a className="skip-link" href="#main">
                 Saltar al contenido
             </a>

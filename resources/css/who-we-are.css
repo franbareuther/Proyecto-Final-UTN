@@ -45,6 +45,33 @@
         font-size: 0.9375rem;
         line-height: 1.75;
     }
+    .who-we-are-team {
+        margin-top: clamp(1rem, 2.5svh, 2rem);
+        border-top: 1px solid #153e3130;
+        padding-top: clamp(0.75rem, 2svh, 1.25rem);
+    }
+    .who-we-are .who-we-are-team h3 {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0;
+        color: #a34f32;
+    }
+    .who-we-are-team ul {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.5rem 1.25rem;
+        margin-top: 0.75rem;
+    }
+    .who-we-are-team li {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: clamp(0.875rem, 1.2vw, 1.0625rem);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        overflow-wrap: anywhere;
+    }
     .who-we-are-photo {
         min-width: 0;
         margin: 0;
@@ -57,7 +84,7 @@
     .who-we-are-photo img {
         display: block;
         width: 100%;
-        height: clamp(14rem, 35svh, 30rem);
+        height: clamp(12rem, 32svh, 28rem);
         object-fit: cover;
         object-position: 50% 48%;
     }
@@ -145,7 +172,14 @@
             line-height: 1.6;
         }
         .who-we-are-photo img {
-            height: clamp(12rem, 36svh, 18rem);
+            height: clamp(11rem, 32svh, 16rem);
+        }
+        .who-we-are-team {
+            margin-top: 0.875rem;
+            padding-top: 0.625rem;
+        }
+        .who-we-are-team ul {
+            margin-top: 0.5rem;
         }
     }
 }

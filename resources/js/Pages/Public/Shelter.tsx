@@ -5,7 +5,7 @@ import ShelterImage from '@/Components/ShelterImage';
 
 export default function Shelter({ shelter: s }: { shelter: Refuge }) {
     return (
-        <Shell>
+        <Shell backdrop>
             <Head title={s.name} />
             <Link href="/refugios" className="text-link mb-6 inline-flex">
                 ← Todos los refugios

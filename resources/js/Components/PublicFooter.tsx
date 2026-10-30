@@ -42,7 +42,6 @@ export default function PublicFooter({
                         <h2>Sigamos en contacto</h2>
                         <Link href="/#contacto">Contacto</Link>
                         <Link href="/#sobre-huellitas">Sobre Huellita</Link>
-                        <Link href="/#equipo">Nuestro equipo</Link>
                         <Link href="/creditos-fotografias">Créditos de fotografías</Link>
                         <Link href={signedIn ? '/dashboard' : '/login'}>
                             {signedIn ? 'Mi espacio' : 'Ingresar a mi cuenta'}
