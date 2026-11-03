@@ -22,21 +22,24 @@ export default function Login({ status }: { status?: string }) {
                         f.post('/login', { onFinish: () => f.reset('password') });
                     }}
                 >
+                    {/* El resumen de arriba ya muestra cada error: los campos solo quedan marcados como inválidos. */}
                     <Errors errors={f.errors} />
-                    <Field label="Correo electrónico" error={f.errors.email}>
+                    <Field label="Correo electrónico">
                         <input
                             type="email"
                             autoComplete="username"
                             required
+                            aria-invalid={f.errors.email ? true : undefined}
                             value={f.data.email}
                             onChange={(e) => f.setData('email', e.target.value)}
                         />
                     </Field>
-                    <Field label="Contraseña" error={f.errors.password}>
+                    <Field label="Contraseña">
                         <input
                             type="password"
                             autoComplete="current-password"
                             required
+                            aria-invalid={f.errors.password ? true : undefined}
                             value={f.data.password}
                             onChange={(e) => f.setData('password', e.target.value)}
                         />

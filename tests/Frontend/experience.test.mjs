@@ -205,3 +205,34 @@ test('el seguimiento lista los controles y habilita la carga de las cuatro fotos
     assert.match(shelter, /Marcar como revisado/);
     assert.doesNotMatch(shelter, /Enviar control/);
 });
+
+test('las páginas de error explican el problema y ofrecen una salida según el caso', async () => {
+    const missing = await plain(renderPage('Errors/Error', { status: 404 }, null, '/no-existe'));
+    assert.match(missing, /Error 404 · Página no encontrada/);
+    assert.match(missing, /Esta huellita se perdió en el camino\./);
+    assert.match(missing, /href="\/animales"[^>]*>Ver animales en adopción/);
+
+    const forbidden = await plain(renderPage('Errors/Error', { status: 403 }, null, '/admin'));
+    assert.match(forbidden, /href="\/login"[^>]*>Ingresar/);
+    const signedIn = await plain(renderPage('Errors/Error', { status: 403 }, { id: 2, role: 'adoptante' }, '/admin'));
+    assert.match(signedIn, /href="\/dashboard"[^>]*>Ir a mi espacio/);
+
+    const server = await plain(renderPage('Errors/Error', { status: 500 }, null, '/'));
+    assert.match(server, /Algo salió mal de nuestro lado\./);
+    assert.match(server, /Intentar de nuevo/);
+});
+
+test('las pantallas de recuperar y confirmar contraseña y de verificar el correo están en español', async () => {
+    const pages = [
+        ['Auth/ForgotPassword', {}, /¿Olvidaste tu contraseña\?[\s\S]*Enviar enlace/],
+        ['Auth/ResetPassword', { token: 't', email: 'ana@huella.test' }, /Nueva contraseña[\s\S]*Guardar nueva contraseña/],
+        ['Auth/ConfirmPassword', {}, /Confirmá tu contraseña\.[\s\S]*Confirmar/],
+        ['Auth/VerifyEmail', { status: 'verification-link-sent' }, /Verificá tu correo\.[\s\S]*Reenviar correo de verificación/],
+    ];
+    for (const [component, props, expected] of pages) {
+        const html = await plain(renderPage(component, props, null, '/'));
+        assert.match(html, expected, component);
+        // Solo el contenido visible: data-page incluye el nombre técnico del componente.
+        assert.doesNotMatch(html.split('<main')[1], /Password|Log Out|Resend|Forgot|Verification/, component);
+    }
+});
