@@ -51,8 +51,8 @@ function CreditGrid({ photos, folder, alt }: { photos: Credit[]; folder: string;
                         )}
                     </div>
                     <p className="mt-3 text-xs leading-relaxed text-stone-500">
-                        Vista reducida de Wikimedia Commons. Recorte visual para adaptar la imagen
-                        a las tarjetas; sin retoque de su contenido.
+                        Vista reducida de Wikimedia Commons. Recorte visual para adaptar la imagen a
+                        las tarjetas; sin retoque de su contenido.
                     </p>
                 </article>
             ))}
@@ -86,7 +86,10 @@ export default function PhotoCredits({
                 alt="Fotografía documental de un refugio o sus perros"
             />
             {networkPhotos.length > 0 && (
-                <section aria-labelledby="network-credits" className="mt-16 border-t border-stone-200 pt-10">
+                <section
+                    aria-labelledby="network-credits"
+                    className="mt-16 border-t border-stone-200 pt-10"
+                >
                     <h2 id="network-credits" className="section-heading">
                         Animales de la red de demostración
                     </h2>

@@ -22,6 +22,8 @@ php artisan migrate
 php artisan storage:link
 # Opcional: definir DEMO_PASSWORD (mínimo 12 caracteres) en .env
 php artisan db:seed --class=DemoSeeder
+# Opcional: seis refugios ficticios con diez animales cada uno y fotos reales
+php artisan db:seed --class=NetworkSheltersDemoSeeder
 # Opcional: actividad de muestra para el panel de cada refugio activo
 php artisan db:seed --class=DashboardActivityDemoSeeder
 php artisan serve
@@ -31,7 +33,9 @@ En otra terminal ejecutar `npm run dev` y abrir http://localhost:8000. Con `npm 
 
 Cuentas demo: `admin@huella.test` y `adoptante@huella.test`; contraseña elegida en DEMO_PASSWORD. DemoSeeder solo funciona en local/testing y no crea superadministradores. Crear explícitamente el primer superadministrador con `php artisan shelter:create-staff`, elegir `superadmin`; luego crea refugios y sus administradores desde su panel. No hay perfil veterinario ni contraseña fija versionada.
 
-`DashboardActivityDemoSeeder` (solo local/testing) agrega a cada refugio activo nueve fichas [DEMOSTRACIÓN] con solicitudes en todos los estados, cinco adopciones repartidas en los últimos seis meses, tratamientos, controles y dosis pendientes. Usa los servicios de adopción y salud, por lo que respeta historial y auditoría. Crea adoptantes de muestra con contraseña aleatoria y, si un refugio no tiene administrador, una cuenta `equipo.<slug>@huella.test`. Repetirlo no duplica fichas y se puede aplicar sobre una base existente.
+`DashboardActivityDemoSeeder` (solo local/testing) agrega a cada refugio activo nueve fichas de muestra con solicitudes en todos los estados, cinco adopciones repartidas en los últimos seis meses, tratamientos, controles y dosis pendientes. Usa los servicios de adopción y salud, por lo que respeta historial y auditoría. Crea adoptantes de muestra con contraseña aleatoria y, si un refugio no tiene administrador, una cuenta `equipo.<slug>@huella.test`. Repetirlo no duplica fichas y se puede aplicar sobre una base existente.
+
+`NetworkSheltersDemoSeeder` (solo local/testing, requiere DEMO_PASSWORD) agrega seis refugios ficticios de Buenos Aires (Lanús, Morón, Tigre, Avellaneda, Moreno y CABA), cada uno con su administrador `equipo.<slug>@huella.test` y diez animales con historia, personalidad, convivencia, salud pública e historia clínica cargada con HealthService. Las fotografías son reales, de Wikimedia Commons con licencias libres, y sus créditos se ven en `/creditos-fotografias` (ver [créditos de fotografías](docs/creditos-imagenes.md)). No modifica registros existentes y repetirlo no duplica datos. Los datos están en `database/seeders/data/network-shelters.php`.
 
 ## Verificar
 

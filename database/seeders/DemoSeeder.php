@@ -45,7 +45,7 @@ class DemoSeeder extends Seeder
                     'name' => $name, 'species' => $i % 3 === 0 ? 'Gato' : 'Perro', 'breed' => 'Mestizo', 'sex' => $i % 2 ? 'Macho' : 'Hembra',
                     'estimated_age' => [8, 24, 48, 100][$i % 4], 'size' => ['Pequeño', 'Mediano', 'Grande'][$i % 3],
                     'color' => ['Marrón', 'Negro y blanco', 'Dorado'][$i % 3],
-                    'description' => '[DEMOSTRACIÓN] '.$name.' está esperando una familia. Disfruta de la compañía y necesita un hogar que respete sus tiempos y cuidados.',
+                    'description' => $name.' está esperando una familia. Disfruta de la compañía y necesita un hogar que respete sus tiempos y cuidados.',
                     'personality' => 'Cariñoso, curioso y con ganas de compartir paseos y siestas.',
                     'entry_date' => today()->subDays(20 + $i), 'availability_status' => 'Disponible',
                     'public_health_info' => 'Seguimiento sanitario al día. Consultá al refugio sobre sus cuidados específicos.',
@@ -69,9 +69,9 @@ class DemoSeeder extends Seeder
             }
             $animals[5]->update(['availability_status' => 'No disponible temporalmente']);
             foreach (array_slice($animals, 0, 5) as $i => $animal) {
-                $vet = ['recorded_by' => $users['admin']->id, 'observations' => '[DEMOSTRACIÓN] Registro académico.'];
+                $vet = ['recorded_by' => $users['admin']->id, 'observations' => 'Registro académico.'];
                 $animal->consultations()->create($vet + ['consultation_date' => today()->subDays(10), 'reason' => 'Control de ingreso', 'symptoms' => 'Sin síntomas referidos', 'diagnosis' => 'Evaluación clínica de demostración', 'instructions' => 'Seguimiento por profesional.']);
-                app(HealthService::class)->save($animal, $users['admin'], 'vaccinations', ['vaccine_name' => 'Vacuna de demostración', 'application_date' => today()->subMonths(11)->toDateString(), 'dose' => 'Primera', 'next_dose_date' => today()->addDays(10 + $i)->toDateString(), 'observations' => '[DEMOSTRACIÓN] Registro académico.']);
+                app(HealthService::class)->save($animal, $users['admin'], 'vaccinations', ['vaccine_name' => 'Vacuna de demostración', 'application_date' => today()->subMonths(11)->toDateString(), 'dose' => 'Primera', 'next_dose_date' => today()->addDays(10 + $i)->toDateString(), 'observations' => 'Registro académico.']);
                 $animal->treatments()->create($vet + ['description' => 'Tratamiento de demostración indicado por profesional', 'start_date' => today()->subDays(3), 'estimated_end_date' => today()->addDays(10), 'status' => $i % 2 ? 'Finalizado' : 'Activo']);
                 $animal->controls()->create($vet + ['control_type' => 'Control general', 'scheduled_date' => today()->addDays($i * 4 - 2), 'status' => 'Pendiente']);
             }

@@ -50,7 +50,7 @@ class CommunitySheltersDemoSeeder extends Seeder
             foreach ($refuges as $refuge) {
                 $shelter = Shelter::firstOrCreate(['slug' => $refuge['slug']], [
                     'name' => $refuge['name'], 'city' => $refuge['city'], 'active' => true,
-                    'description' => '[DEMOSTRACIÓN] '.$refuge['story'].' Nombre, ubicación y fichas ficticios. La fotografía documental es ilustrativa y no corresponde a esta institución. Créditos y procedencia en la sección de fotografías.',
+                    'description' => $refuge['story'].' Nombre, ubicación y fichas ficticios. La fotografía documental es ilustrativa y no corresponde a esta institución. Créditos y procedencia en la sección de fotografías.',
                     'image_type' => 'photo',
                 ]);
                 if ($shelter->wasRecentlyCreated) {
@@ -61,7 +61,7 @@ class CommunitySheltersDemoSeeder extends Seeder
                     $animal = Animal::firstOrCreate(['shelter_id' => $shelter->id, 'name' => $dog['name']], [
                         'species' => 'Perro', 'breed' => 'Mestizo', 'sex' => $dog['sex'],
                         'estimated_age' => $dog['age'], 'size' => $dog['size'], 'color' => $dog['color'],
-                        'description' => '[DEMOSTRACIÓN] Ficha ficticia con una fotografía documental de un perro real de refugio. El nombre, la edad y los datos son de muestra; no se ofrece la adopción del animal fotografiado.',
+                        'description' => 'Ficha ficticia con una fotografía documental de un perro real de refugio. El nombre, la edad y los datos son de muestra; no se ofrece la adopción del animal fotografiado.',
                         'personality' => $dog['personality'], 'entry_date' => today()->subDays(30),
                         'availability_status' => 'Disponible',
                         'public_health_info' => 'Información de demostración. No representa una evaluación veterinaria del animal fotografiado.',

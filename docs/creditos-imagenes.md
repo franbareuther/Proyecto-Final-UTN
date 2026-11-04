@@ -8,6 +8,14 @@ Los archivos están en `public/images/demo/refugios/`; el manifiesto `creditos.j
 
 La carga reproducible se ejecuta con `php artisan db:seed --class=CommunitySheltersDemoSeeder` solo en local/testing. Agrega tres refugios, seis perros y sus fotos sin modificar registros existentes; repetirla no duplica datos. Se guardó un respaldo local antes de cargar la base de esta computadora. La landing destaca los tres refugios agregados más recientemente.
 
+## Red de seis refugios de demostración
+
+`NetworkSheltersDemoSeeder` usa 70 fotografías reales de Wikimedia Commons: 64 de perros y gatos (sesenta fichas; tres de ellas con galería de dos o tres fotos del mismo animal) y seis portadas ilustrativas de los refugios. Se eligieron por categorías de raza y color para que coincidan con cada ficha, con licencias CC BY, CC BY-SA, CC0 o dominio público, descartando ilustraciones, contenido generado por IA y fotos con personas en primer plano.
+
+Los archivos están en `public/images/demo/red/` (vista de 800 px recomprimida) y `creditos.json` conserva por cada una el título, la página original, el autor, la licencia, la categoría de origen y los cambios realizados. Los créditos públicos se ven en `/creditos-fotografias`.
+
+Los refugios, sus contactos (teléfonos con prefijo de ficción 5555 y correos `.test`), las historias de los animales y sus datos clínicos son ficticios. Las fotografías solo ilustran las fichas: no muestran a los animales descriptos ni ofrecen su adopción. Antes de usar el sistema con un refugio real hay que reemplazarlas por fotos propias.
+
 ## Fotografías de muestra originales
 
 Las fotos incluidas son ilustrativas: no representan a animales reales del refugio. Los registros demo están identificados en sus descripciones. Se almacenan localmente para no depender de servicios externos al navegar.

@@ -96,7 +96,7 @@ class DashboardActivityDemoSeeder extends Seeder
             'shelter_id' => $shelter->id, 'name' => $spec['name'], 'species' => $spec['species'], 'breed' => 'Mestizo',
             'sex' => $spec['sex'], 'estimated_age' => [6, 18, 36, 60][$i % 4], 'size' => $spec['size'],
             'color' => ['Atigrado', 'Negro', 'Blanco y marrón', 'Gris'][$i % 4],
-            'description' => '[DEMOSTRACIÓN] '.$spec['name'].' forma parte de la actividad de muestra del refugio. Sus datos son ficticios y sirven para recorrer solicitudes, adopciones y cuidados.',
+            'description' => $spec['name'].' forma parte de la actividad de muestra del refugio. Sus datos son ficticios y sirven para recorrer solicitudes, adopciones y cuidados.',
             'personality' => ['Tranquilo y afectuoso.', 'Juguetón y curioso.', 'Sociable con personas y otros animales.'][$i % 3],
             'entry_date' => $start->copy()->subDays(20 + $i)->toDateString(), 'availability_status' => 'Disponible',
             'public_health_info' => 'Información de demostración. Consultá al refugio sobre sus cuidados.',
@@ -162,7 +162,7 @@ class DashboardActivityDemoSeeder extends Seeder
     {
         $this->at($this->today);
         $h = app(HealthService::class);
-        $note = ['observations' => '[DEMOSTRACIÓN] Registro de muestra.'];
+        $note = ['observations' => 'Registro de muestra.'];
         $h->save($animal, $admin, 'consultations', $note + ['consultation_date' => $this->today->copy()->subDays(15 + $i)->toDateString(), 'reason' => 'Control de ingreso',
             'symptoms' => 'Sin síntomas referidos', 'diagnosis' => 'Buen estado general', 'instructions' => 'Seguimiento por profesional.']);
         $h->save($animal, $admin, 'controls', $note + ['control_type' => ['Control general', 'Control de peso', 'Revisión dental', 'Control posquirúrgico'][$i % 4],
