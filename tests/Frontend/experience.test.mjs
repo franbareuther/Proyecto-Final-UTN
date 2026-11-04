@@ -73,6 +73,14 @@ test('Somos Huellita presenta a los cuatro integrantes sin una sección aparte',
     assert.doesNotMatch(home, /id="equipo"|Nuestro equipo/);
 });
 
+test('el contacto de la landing muestra la ubicación con un mapa de Google', async () => {
+    const home = await renderPage('Public/Home', { animals: [], refuges: [] });
+    assert.match(home, /Av\. Rivadavia 5000, Caballito, CABA/);
+    assert.match(home, /<iframe[^>]+src="https:\/\/www\.google\.com\/maps\?q=Av\.%20Rivadavia%205000[^"]*output=embed"/);
+    assert.match(home, /<iframe[^>]+title="Mapa con la ubicación de nuestra oficina"/);
+    assert.match(home, /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=Av\.%20Rivadavia/);
+});
+
 test('los catálogos, refugios y paneles usan el cuadriculado de la landing', async () => {
     const catalog = await renderPage('Public/Catalog', { animals: emptyPage, filters: {}, breeds: [] }, null, '/animales');
     const refuges = await renderPage('Public/Shelters', { shelters: emptyPage, filters: {} }, null, '/refugios');

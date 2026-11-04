@@ -1,6 +1,10 @@
 import { useForm } from '@inertiajs/react';
-import { ArrowUpRight, Check } from 'lucide-react';
+import { ArrowUpRight, Check, Clock, MapPin } from 'lucide-react';
 import { Field } from '@/Components/Shelter';
+
+// Oficina ficticia sobre una calle real, a metros de Parque Rivadavia, para que Google Maps la ubique.
+const OFFICE_ADDRESS = 'Av. Rivadavia 5000, Caballito, CABA';
+const OFFICE_QUERY = encodeURIComponent(OFFICE_ADDRESS);
 
 export default function ContactWithDog() {
     const form = useForm({ name: '', email: '', phone: '', subject: 'Consulta general', message: '' });
@@ -113,6 +117,35 @@ export default function ContactWithDog() {
                         </button>
                     </div>
                 </form>
+            </div>
+            <div className="contact-location">
+                <div className="contact-location-info">
+                    <h3>Dónde estamos</h3>
+                    <p>
+                        <MapPin size={18} aria-hidden="true" />
+                        <span>{OFFICE_ADDRESS}</span>
+                    </p>
+                    <p>
+                        <Clock size={18} aria-hidden="true" />
+                        <span>Lunes a viernes, de 10 a 18 h</span>
+                    </p>
+                    <a
+                        className="text-link"
+                        href={`https://www.google.com/maps/search/?api=1&query=${OFFICE_QUERY}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Abrir en Google Maps <ArrowUpRight size={16} aria-hidden="true" />
+                    </a>
+                </div>
+                <iframe
+                    className="contact-map"
+                    title="Mapa con la ubicación de nuestra oficina"
+                    src={`https://www.google.com/maps?q=${OFFICE_QUERY}&z=16&output=embed`}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    allowFullScreen
+                />
             </div>
         </section>
     );

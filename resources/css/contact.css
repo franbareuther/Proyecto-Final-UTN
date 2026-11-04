@@ -128,7 +128,54 @@
         background: #edf4e9;
         font-size: 0.875rem;
     }
+    .contact-location {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+        gap: clamp(1.5rem, 4vw, 3rem);
+        width: 100%;
+        max-width: 64rem;
+        margin: clamp(2rem, 5vh, 3.5rem) auto 0;
+        padding-top: clamp(1.5rem, 4vh, 2.5rem);
+        border-top: 1px solid #153e3120;
+        align-items: center;
+    }
+    .contact-location-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .contact-location-info > p {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        line-height: 1.6;
+        color: #5b695f;
+    }
+    .contact-location-info > p > svg {
+        flex-shrink: 0;
+        margin-top: 0.2rem;
+        color: #153e31;
+    }
+    .contact-map {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 7;
+        min-height: 14rem;
+        border: 1px solid #153e3120;
+        border-radius: 1rem;
+        background: #edf4e9;
+    }
     @media (max-width: 767px) {
+        .contact-location {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.25rem;
+        }
+        .contact-map {
+            aspect-ratio: 4 / 3;
+            min-height: 0;
+        }
         .contact-grid {
             grid-template-columns: minmax(0, 1fr);
             gap: 0.75rem;
