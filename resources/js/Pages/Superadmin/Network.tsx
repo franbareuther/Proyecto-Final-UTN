@@ -1,6 +1,7 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Badge, date, Empty, Errors, Field, Pagination, Shell, Title } from '@/Components/Shelter';
 import { Page } from '@/types/shelter';
+import ShelterImage from '@/Components/ShelterImage';
 
 type View = 'animales' | 'solicitudes' | 'adopciones' | 'controles' | 'dosis';
 type Row = {
@@ -22,19 +23,155 @@ const headings: Record<View, { title: string; detail: string; date: string }> = 
     dosis: { title: 'Vacunas y dosis de la red', detail: 'Vacuna', date: 'Programada' },
 };
 
+type RefugeSummary = {
+    id: number;
+    name: string;
+    city: string | null;
+    active: boolean;
+    image_url: string | null;
+    image_type: 'photo' | 'logo';
+    total: number;
+    pending: number;
+    approved: number;
+    adopted: number;
+};
+
+function RefugePicker({
+    refuges,
+    filters,
+}: {
+    refuges: RefugeSummary[];
+    filters: Record<string, string>;
+}) {
+    const search = useForm({ q: '' });
+    // Conserva los filtros que llegan desde el resumen, por ejemplo "por revisar".
+    const keep = new URLSearchParams(
+        Object.entries(filters).filter(
+            ([key, value]) => value && ['status', 'period'].includes(key),
+        ),
+    );
+    const total = refuges.reduce((sum, r) => sum + r.total, 0);
+    return (
+        <>
+            <Title
+                title="Solicitudes de la red"
+                text={`${total} solicitudes en toda la red. Elegí un refugio para ver las suyas.`}
+            >
+                <Link className="btn-secondary" href="/superadmin">
+                    Volver al resumen
+                </Link>
+            </Title>
+            <form
+                className="card mb-6 flex flex-wrap items-end gap-4"
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    search.get('/superadmin/solicitudes');
+                }}
+            >
+                <div className="min-w-0 flex-1 basis-64">
+                    <Field label="Buscar animal o adoptante en toda la red">
+                        <input
+                            maxLength={100}
+                            value={search.data.q}
+                            onChange={(event) => search.setData('q', event.target.value)}
+                        />
+                    </Field>
+                </div>
+                <button className="btn" disabled={search.processing || !search.data.q.trim()}>
+                    Buscar
+                </button>
+            </form>
+            {refuges.length ? (
+                <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                    {refuges.map((r) => {
+                        const query = new URLSearchParams(keep);
+                        query.set('shelter', String(r.id));
+                        return (
+                            <Link
+                                key={r.id}
+                                href={`/superadmin/solicitudes?${query.toString()}`}
+                                className="card flex min-w-0 flex-col transition hover:border-emerald-800"
+                            >
+                                <ShelterImage
+                                    src={r.image_url}
+                                    name={r.name}
+                                    kind={r.image_type}
+                                    className="mb-4"
+                                />
+                                <div className="flex items-start justify-between gap-3">
+                                    <h2 className="min-w-0 break-words text-lg font-semibold text-emerald-950">
+                                        {r.name}
+                                    </h2>
+                                    <span
+                                        className={
+                                            'inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold ' +
+                                            (r.active ? 'text-emerald-800' : 'text-stone-500')
+                                        }
+                                    >
+                                        <span
+                                            aria-hidden="true"
+                                            className="h-1.5 w-1.5 rounded-full bg-current"
+                                        />
+                                        {r.active ? 'Activo' : 'Inactivo'}
+                                    </span>
+                                </div>
+                                <p className="mt-1 text-sm text-stone-600">
+                                    {r.city || 'Localidad sin informar'}
+                                </p>
+                                <dl className="mt-4 grid grid-cols-4 gap-2 border-t border-stone-100 pt-4 text-center">
+                                    {(
+                                        [
+                                            ['Total', r.total, 'text-emerald-950'],
+                                            ['Por revisar', r.pending, 'text-amber-700'],
+                                            ['Aprobadas', r.approved, 'text-emerald-800'],
+                                            ['Adoptadas', r.adopted, 'text-sky-700'],
+                                        ] as const
+                                    ).map(([label, value, color]) => (
+                                        <div key={label} className="min-w-0">
+                                            <dd className={'text-xl font-semibold ' + color}>
+                                                {value}
+                                            </dd>
+                                            <dt className="mt-0.5 text-[11px] leading-tight text-stone-500">
+                                                {label}
+                                            </dt>
+                                        </div>
+                                    ))}
+                                </dl>
+                                <span className="mt-4 text-sm font-semibold text-emerald-800">
+                                    {r.total ? 'Ver solicitudes →' : 'Sin solicitudes todavía'}
+                                </span>
+                            </Link>
+                        );
+                    })}
+                </div>
+            ) : (
+                <Empty>Todavía no hay refugios en la red.</Empty>
+            )}
+        </>
+    );
+}
+
 export default function Network({
     view,
     records,
     filters,
     statuses,
     shelters,
+    refuges = [],
 }: {
     view: View;
     records: Page<Row>;
     filters: Record<string, string>;
     statuses: string[];
     shelters: { id: number; name: string }[];
+    refuges?: RefugeSummary[];
 }) {
+    // En Solicitudes se elige primero el refugio; una búsqueda recorre toda la red.
+    const picker = view === 'solicitudes' && !filters.shelter && !filters.q;
+    const chosen =
+        view === 'solicitudes'
+            ? shelters.find((s) => String(s.id) === String(filters.shelter))
+            : undefined;
     const form = useForm({
         q: filters.q || '',
         shelter: String(filters.shelter || ''),
@@ -45,15 +182,30 @@ export default function Network({
     });
     const heading = headings[view];
     const path = `/superadmin/${view}`;
+    if (picker) {
+        return (
+            <Shell internal>
+                <Head title={heading.title} />
+                <RefugePicker refuges={refuges} filters={filters} />
+            </Shell>
+        );
+    }
     return (
         <Shell internal>
-            <Head title={heading.title} />
+            <Head title={chosen ? `Solicitudes · ${chosen.name}` : heading.title} />
             <Title
-                title={heading.title}
-                text={`${records.total} registros de toda la red. Podés consultar los detalles y filtrar por refugio.`}
+                title={chosen ? `Solicitudes · ${chosen.name}` : heading.title}
+                text={
+                    chosen
+                        ? `${records.total} solicitudes de este refugio. Podés filtrarlas por estado o buscar por animal o adoptante.`
+                        : `${records.total} registros de toda la red. Podés consultar los detalles y filtrar por refugio.`
+                }
             >
-                <Link className="btn-secondary" href="/superadmin">
-                    Volver al resumen
+                <Link
+                    className="btn-secondary"
+                    href={view === 'solicitudes' ? '/superadmin/solicitudes' : '/superadmin'}
+                >
+                    {view === 'solicitudes' ? '← Todos los refugios' : 'Volver al resumen'}
                 </Link>
             </Title>
             <form
@@ -77,19 +229,22 @@ export default function Network({
                         onChange={(event) => form.setData('q', event.target.value)}
                     />
                 </Field>
-                <Field label="Refugio">
-                    <select
-                        value={form.data.shelter}
-                        onChange={(event) => form.setData('shelter', event.target.value)}
-                    >
-                        <option value="">Todos los refugios</option>
-                        {shelters.map((shelter) => (
-                            <option key={shelter.id} value={shelter.id}>
-                                {shelter.name}
-                            </option>
-                        ))}
-                    </select>
-                </Field>
+                {/* En Solicitudes el refugio ya se eligió desde las tarjetas. */}
+                {view !== 'solicitudes' && (
+                    <Field label="Refugio">
+                        <select
+                            value={form.data.shelter}
+                            onChange={(event) => form.setData('shelter', event.target.value)}
+                        >
+                            <option value="">Todos los refugios</option>
+                            {shelters.map((shelter) => (
+                                <option key={shelter.id} value={shelter.id}>
+                                    {shelter.name}
+                                </option>
+                            ))}
+                        </select>
+                    </Field>
+                )}
                 {statuses.length > 0 && (
                     <Field label="Estado">
                         <select
@@ -150,7 +305,10 @@ export default function Network({
                     <button className="btn" disabled={form.processing}>
                         Filtrar
                     </button>
-                    <Link className="btn-secondary" href={path}>
+                    <Link
+                        className="btn-secondary"
+                        href={chosen ? `${path}?shelter=${chosen.id}` : path}
+                    >
                         Limpiar
                     </Link>
                 </div>

@@ -16,14 +16,24 @@ use Inertia\Inertia;
 
 Route::get('/', [CatalogController::class, 'home'])->name('home');
 Route::get('/creditos-fotografias', function () {
-    $photos = json_decode(file_get_contents(public_path('images/demo/refugios/creditos.json')), true, flags: JSON_THROW_ON_ERROR);
-    $photos = array_map(function ($photo) {
-        $photo['author'] = html_entity_decode(strip_tags($photo['authorHtml']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $credits = function (string $manifest) {
+        $path = public_path($manifest);
+        if (! is_file($path)) {
+            return [];
+        }
 
-        return $photo;
-    }, $photos);
+        return array_map(function ($photo) {
+            $photo['author'] = html_entity_decode(strip_tags($photo['authorHtml']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-    return Inertia::render('Public/PhotoCredits', ['photos' => $photos]);
+            return $photo;
+        }, json_decode(file_get_contents($path), true, flags: JSON_THROW_ON_ERROR));
+    };
+
+    return Inertia::render('Public/PhotoCredits', [
+        'photos' => $credits('images/demo/refugios/creditos.json'),
+        // Fotografías de los animales de la red de demostración (RedDemoSeeder).
+        'networkPhotos' => $credits('images/demo/red/creditos.json'),
+    ]);
 })->name('photos.credits');
 Route::post('/contacto', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
 Route::get('/animales', [CatalogController::class, 'all'])->name('catalog');

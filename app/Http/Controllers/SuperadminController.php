@@ -138,7 +138,29 @@ class SuperadminController extends Controller
         return Inertia::render('Superadmin/Network', [
             'view' => $view, 'records' => $records, 'filters' => $filters, 'statuses' => $statuses,
             'shelters' => Shelter::select('id', 'name')->orderBy('name')->get(),
+            // Las solicitudes se recorren primero por refugio; incluye archivados para no esconder antecedentes.
+            'refuges' => $view === 'solicitudes' ? $this->requestSummary() : [],
         ]);
+    }
+
+    private function requestSummary(): array
+    {
+        $counts = DB::table('adoption_requests')
+            ->join('animals', 'animals.id', '=', 'adoption_requests.animal_id')
+            ->selectRaw("animals.shelter_id, COUNT(*) as total,
+                SUM(CASE WHEN adoption_requests.status IN ('Nueva', 'En revisión') THEN 1 ELSE 0 END) as pending,
+                SUM(CASE WHEN adoption_requests.status = 'Aprobada' THEN 1 ELSE 0 END) as approved,
+                SUM(CASE WHEN adoption_requests.status = 'Adoptado' THEN 1 ELSE 0 END) as adopted")
+            ->groupBy('animals.shelter_id')
+            ->get()->keyBy('shelter_id');
+
+        return Shelter::orderBy('name')->get(['id', 'name', 'slug', 'city', 'active', 'image_path', 'image_type'])
+            ->map(fn (Shelter $s) => [
+                'id' => $s->id, 'name' => $s->name, 'city' => $s->city, 'active' => $s->active,
+                'image_url' => $s->image_url, 'image_type' => $s->image_type,
+                'total' => (int) ($counts[$s->id]->total ?? 0), 'pending' => (int) ($counts[$s->id]->pending ?? 0),
+                'approved' => (int) ($counts[$s->id]->approved ?? 0), 'adopted' => (int) ($counts[$s->id]->adopted ?? 0),
+            ])->all();
     }
 
     public function history(Animal $animal): Response

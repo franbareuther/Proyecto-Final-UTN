@@ -8,10 +8,13 @@ export default function ShelterForm({
     shelter,
     admin = false,
     compact = false,
+    onSaved,
 }: {
     shelter?: Refuge;
     admin?: boolean;
     compact?: boolean;
+    /** Se llama después de guardar con éxito, por ejemplo para volver a la lista. */
+    onSaved?: () => void;
 }) {
     const f = useForm({
         name: shelter?.name || '',
@@ -69,6 +72,7 @@ export default function ShelterForm({
                         if (!shelter) f.reset();
                         else f.setData((data) => ({ ...data, image: null, remove_image: false }));
                         if (fileInput.current) fileInput.current.value = '';
+                        onSaved?.();
                     },
                 };
                 if (admin) f.post('/admin/refugio', options);
@@ -83,7 +87,9 @@ export default function ShelterForm({
                         <input
                             className="input"
                             required={key === 'name'}
-                            type={key === 'email' ? 'email' : urlFields.includes(key) ? 'url' : 'text'}
+                            type={
+                                key === 'email' ? 'email' : urlFields.includes(key) ? 'url' : 'text'
+                            }
                             placeholder={urlFields.includes(key) ? 'https://' : undefined}
                             value={String(f.data[key])}
                             onChange={(e) => f.setData(key, e.target.value)}

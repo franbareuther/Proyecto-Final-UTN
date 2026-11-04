@@ -11,7 +11,62 @@ type Credit = {
     licenseUrl: string;
 };
 
-export default function PhotoCredits({ photos }: { photos: Credit[] }) {
+function CreditGrid({ photos, folder, alt }: { photos: Credit[]; folder: string; alt: string }) {
+    return (
+        <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {photos.map((photo) => (
+                <article key={photo.key} className="min-w-0">
+                    <img
+                        src={`/images/demo/${folder}/${photo.file}`}
+                        alt={alt}
+                        loading="lazy"
+                        className="mb-4 aspect-[4/3] w-full rounded-xl object-cover"
+                    />
+                    <h3 className="break-words text-lg font-semibold text-emerald-950">
+                        {photo.title.replace(/^File:/, '')}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-stone-600">
+                        Fotografía: {photo.author}
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-emerald-900">
+                        <a
+                            href={photo.source}
+                            className="underline underline-offset-4"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            Ver fuente original
+                        </a>
+                        {photo.licenseUrl ? (
+                            <a
+                                href={photo.licenseUrl}
+                                className="underline underline-offset-4"
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                {photo.license}
+                            </a>
+                        ) : (
+                            <span>{photo.license}</span>
+                        )}
+                    </div>
+                    <p className="mt-3 text-xs leading-relaxed text-stone-500">
+                        Vista reducida de Wikimedia Commons. Recorte visual para adaptar la imagen
+                        a las tarjetas; sin retoque de su contenido.
+                    </p>
+                </article>
+            ))}
+        </div>
+    );
+}
+
+export default function PhotoCredits({
+    photos,
+    networkPhotos = [],
+}: {
+    photos: Credit[];
+    networkPhotos?: Credit[];
+}) {
     return (
         <Shell>
             <Head title="Créditos de fotografías" />
@@ -25,46 +80,28 @@ export default function PhotoCredits({ photos }: { photos: Credit[] }) {
                 representan a las organizaciones fotografiadas ni la disponibilidad actual de esos
                 animales.
             </p>
-            <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-                {photos.map((photo) => (
-                    <article key={photo.key} className="min-w-0">
-                        <img
-                            src={`/images/demo/refugios/${photo.file}`}
-                            alt="Fotografía documental de un refugio o sus perros"
-                            loading="lazy"
-                            className="mb-4 aspect-[4/3] w-full rounded-xl object-cover"
-                        />
-                        <h2 className="break-words text-lg font-semibold text-emerald-950">
-                            {photo.title.replace(/^File:/, '')}
-                        </h2>
-                        <p className="mt-2 text-sm leading-relaxed text-stone-600">
-                            Fotografía: {photo.author}
-                        </p>
-                        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-emerald-900">
-                            <a
-                                href={photo.source}
-                                className="underline underline-offset-4"
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                Ver fuente original
-                            </a>
-                            <a
-                                href={photo.licenseUrl}
-                                className="underline underline-offset-4"
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                {photo.license}
-                            </a>
-                        </div>
-                        <p className="mt-3 text-xs leading-relaxed text-stone-500">
-                            Vista reducida de Wikimedia Commons. Recorte visual para adaptar la
-                            imagen a las tarjetas; sin retoque de su contenido.
-                        </p>
-                    </article>
-                ))}
-            </div>
+            <CreditGrid
+                photos={photos}
+                folder="refugios"
+                alt="Fotografía documental de un refugio o sus perros"
+            />
+            {networkPhotos.length > 0 && (
+                <section aria-labelledby="network-credits" className="mt-16 border-t border-stone-200 pt-10">
+                    <h2 id="network-credits" className="section-heading">
+                        Animales de la red de demostración
+                    </h2>
+                    <p className="mb-10 mt-4 max-w-3xl leading-relaxed text-stone-600">
+                        Fotografías reales de perros y gatos publicadas con licencias libres. Las
+                        fichas que acompañan cada imagen (nombre, historia, salud y refugio) son
+                        ficticias y no describen al animal fotografiado ni ofrecen su adopción.
+                    </p>
+                    <CreditGrid
+                        photos={networkPhotos}
+                        folder="red"
+                        alt="Fotografía real de un perro o un gato, usada como ilustración"
+                    />
+                </section>
+            )}
         </Shell>
     );
 }

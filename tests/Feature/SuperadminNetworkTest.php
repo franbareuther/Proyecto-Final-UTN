@@ -9,6 +9,7 @@ use App\Models\Shelter;
 use App\Models\User;
 use App\Models\VaccinationDose;
 use App\Models\VeterinaryControl;
+use App\Services\AdoptionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -152,5 +153,28 @@ class SuperadminNetworkTest extends TestCase
             ->where('records.total', 1)->where('records.data.0.detail', 'Ana Prueba')->where('records.data.0.animal', 'Mora'));
         $this->get('/superadmin/solicitudes?status=Adoptado')->assertInertia(fn (Assert $page) => $page
             ->where('records.total', 1)->where('records.data.0.href', '/superadmin/solicitudes/'.$application->id));
+    }
+
+    public function test_requests_are_summarized_per_refuge_before_listing_them(): void
+    {
+        $this->actingAs($this->superadmin());
+        $alfa = $this->shelter('alfa');
+        $beta = $this->shelter('beta', false);
+        $adopter = User::factory()->create(['role' => 'adoptante']);
+        $data = ['phone' => '1155551234', 'address' => 'Calle 123', 'housing_type' => 'Casa', 'has_other_pets' => false, 'previous_experience' => 'Experiencia previa.', 'motivation' => 'Un hogar responsable y permanente.'];
+        foreach (range(1, 2) as $i) {
+            app(AdoptionService::class)->submit(Animal::factory()->create(['shelter_id' => $alfa->id]), $adopter, $data);
+        }
+
+        $this->get('/superadmin/solicitudes')->assertInertia(function (Assert $page) use ($alfa, $beta) {
+            $page->where('refuges', function ($refuges) use ($alfa, $beta) {
+                $byId = collect($refuges)->keyBy('id');
+
+                return $byId[$alfa->id]['total'] === 2 && $byId[$alfa->id]['pending'] === 2
+                    && $byId[$beta->id]['total'] === 0 && $byId[$beta->id]['active'] === false;
+            });
+        });
+        $this->get("/superadmin/solicitudes?shelter={$alfa->id}")->assertInertia(fn (Assert $page) => $page->where('records.total', 2));
+        $this->get("/superadmin/solicitudes?shelter={$beta->id}")->assertInertia(fn (Assert $page) => $page->where('records.total', 0));
     }
 }

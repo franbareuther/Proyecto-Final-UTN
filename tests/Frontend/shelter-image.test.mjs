@@ -32,7 +32,7 @@ const refuge = {
     image_url: '/storage/shelters/logo.png',
     image_type: 'logo',
 };
-async function render(component, props) {
+async function render(component, props, url = '/') {
     const module = await server.ssrLoadModule(`/resources/js/Pages/${component}.tsx`);
     return (
         await createInertiaApp({
@@ -45,7 +45,7 @@ async function render(component, props) {
                     shelterName: 'Huellita',
                     ...props,
                 },
-                url: '/',
+                url,
                 version: 'test',
                 clearHistory: false,
                 encryptHistory: false,
@@ -89,11 +89,13 @@ test('both management consumers expose upload, presentation and reversible remov
         const html = await render(
             component,
             component.startsWith('Admin/') ? { shelter: refuge } : { shelters: [refuge] },
+            // El alta del superadmin se abre con "Nuevo refugio"; ?nuevo=1 es su enlace directo.
+            component.startsWith('Admin/') ? '/' : '/superadmin/refugios?nuevo=1',
         );
         assert.match(html, /name="image" accept="image\/jpeg,image\/png,image\/webp"/);
         assert.match(html, /name="image_type"/);
         assert.match(html, /hasta 5 MB/);
-        // Superadmin initially shows the create form, admin shows its existing image.
+        // Superadmin shows the create form, admin shows its existing image.
         if (component.startsWith('Admin/')) {
             assert.match(html, /Quitar imagen al guardar/);
             assert.match(html, /src="\/storage\/shelters\/logo.png"/);

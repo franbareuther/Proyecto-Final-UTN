@@ -244,3 +244,39 @@ test('las pantallas de recuperar y confirmar contraseña y de verificar el corre
         assert.doesNotMatch(html.split('<main')[1], /Password|Log Out|Resend|Forgot|Verification/, component);
     }
 });
+
+const refugeOf = (id, name) => ({ id, name, slug: `refugio-${id}`, city: 'Quilmes', active: id !== 4, description: null, address: null, email: null, phone: null, staff: [], image_url: null, image_type: 'photo' });
+const superadmin = { id: 9, role: 'superadmin', name: 'Red', last_name: 'Huellita' };
+
+test('gestionar refugios muestra tres tarjetas, despliega el resto y abre el alta solo con el botón', async () => {
+    const shelters = [1, 2, 3, 4].map((id) => refugeOf(id, `Refugio ${id}`));
+    const list = await plain(renderPage('Superadmin/Shelters', { shelters }, superadmin, '/superadmin/refugios'));
+    const main = list.split('<main')[1];
+    assert.equal((main.match(/<article/g) || []).length, 3);
+    assert.match(main, /Ver todos los refugios \(4\)/);
+    assert.match(main, /aria-expanded="false"/);
+    assert.doesNotMatch(main, /name="slug"|Crear refugio/);
+
+    const creating = await plain(renderPage('Superadmin/Shelters', { shelters }, superadmin, '/superadmin/refugios?nuevo=1'));
+    assert.match(creating, /Crear refugio/);
+    assert.match(creating, /Volver a los refugios/);
+
+    const editing = await plain(renderPage('Superadmin/Shelters', { shelters }, superadmin, '/superadmin/refugios?refugio=refugio-2'));
+    assert.match(editing, /Datos del refugio/);
+    assert.match(editing, /value="Refugio 2"/);
+});
+
+test('las solicitudes del superadmin se recorren primero por refugio', async () => {
+    const base = { view: 'solicitudes', records: emptyPage, statuses: ['Nueva', 'En revisión', 'Aprobada', 'Rechazada', 'Adoptado'], shelters: [{ id: 1, name: 'Patitas' }] };
+    const refuges = [{ id: 1, name: 'Patitas', city: 'Quilmes', active: true, image_url: null, image_type: 'photo', total: 7, pending: 3, approved: 1, adopted: 2 }];
+    const picker = await plain(renderPage('Superadmin/Network', { ...base, filters: { period: 'pending' }, refuges }, superadmin, '/superadmin/solicitudes?period=pending'));
+    assert.match(picker, /Elegí un refugio para ver las suyas/);
+    assert.match(picker, /href="\/superadmin\/solicitudes\?period=pending&amp;shelter=1"/);
+    assert.match(picker, /Por revisar/);
+    assert.doesNotMatch(picker, /<table/);
+
+    const chosen = await plain(renderPage('Superadmin/Network', { ...base, filters: { shelter: '1' }, refuges }, superadmin, '/superadmin/solicitudes?shelter=1'));
+    assert.match(chosen, /Solicitudes · Patitas/);
+    assert.match(chosen, /← Todos los refugios/);
+    assert.doesNotMatch(chosen, /Todos los refugios<\/option>/);
+});
