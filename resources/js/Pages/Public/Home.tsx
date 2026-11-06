@@ -1,8 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { Animal, Refuge } from '@/types/shelter';
 import { AnimalCard, Empty, Shell } from '@/Components/Shelter';
-import FloatingAnimalsHero from '@/Components/ui/FloatingAnimalsHero';
-import About from '@/Components/ui/About';
+import HeroAboutTransition from '@/Components/ui/HeroAboutTransition';
 import ContactWithDog from '@/Components/ui/ContactWithDog';
 import WhoWeAre from '@/Components/ui/WhoWeAre';
 import Icon from '@/Components/Icon';
@@ -12,8 +11,7 @@ export default function Home({ animals, refuges = [] }: { animals: Animal[]; ref
     return (
         <Shell>
             <Head title="Encontrá a tu próximo compañero en Huellita" />
-            <FloatingAnimalsHero />
-            <About />
+            <HeroAboutTransition />
             <section aria-labelledby="featured-title" className="featured-animals">
                 <div className="featured-animals-heading flex flex-wrap items-end justify-between gap-4">
                     <div>

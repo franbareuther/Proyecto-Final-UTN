@@ -102,7 +102,6 @@ function JourneyPhoto({ step, className = '' }: { step: Step; className?: string
                     width="1000"
                     height="1000"
                 />
-                <span className="about-photo-note">Fotografía ilustrativa</span>
             </div>
             <figcaption>
                 <p className="about-caption-title">{step.caption}</p>

@@ -188,16 +188,6 @@
         object-fit: cover;
         animation: about-photo-in 300ms ease;
     }
-    .about-photo-note {
-        position: absolute;
-        right: 0.5rem;
-        bottom: 0.5rem;
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
-        background: #153e31e6;
-        color: white;
-        font-size: 0.625rem;
-    }
     .about-mobile-photo {
         margin-bottom: 0.75rem;
     }
@@ -331,28 +321,25 @@
             width: min(100%, 34rem);
             padding: 1.5rem 2rem;
             color: white;
+            text-shadow: 0 1px 3px rgb(0 0 0 / 25%);
         }
         .about-desktop-photo figcaption::before {
             content: '';
             position: absolute;
-            inset: -1.5rem -3rem 0 0;
+            inset: -3rem -5rem 0 0;
             z-index: -1;
-            background: rgb(10 30 23 / 74%);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            pointer-events: none;
+            background: rgb(10 30 23 / 60%);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
             mask-image:
-                linear-gradient(to right, #000 calc(100% - 3rem), transparent),
-                linear-gradient(to top, #000 calc(100% - 1.5rem), transparent);
+                linear-gradient(to right, #000 calc(100% - 5rem), transparent),
+                linear-gradient(to top, #000 calc(100% - 3rem), transparent);
             mask-composite: intersect;
         }
         .about-desktop-photo .about-caption-copy,
         .about-desktop-photo .about-photo-tags {
-            color: #f0f5ed;
-        }
-        .about-desktop-photo .about-photo-note {
-            top: 1rem;
-            right: 1rem;
-            bottom: auto;
+            color: white;
         }
         .about-action {
             display: flex;
